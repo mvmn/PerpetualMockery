@@ -1,0 +1,95 @@
+grammar x.mvmn.permock.dsl.Dsl hidden(WS, ML_COMMENT, SL_COMMENT)
+
+generate dsl "http://www.mvmn.x/permock/dsl/Dsl"
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+
+Rule:
+	'if' conditions=Condition
+	('proxy' proxy=ProxyConf | 'respond' 'with' response=ResponseConf)?;
+
+ProxyConf:
+	'url' proxyUrl=STRING;
+
+ResponseConf:
+	('status' httpStatus?=INTEGER)? &
+	('content' content?=STRING)? & ('headers' headers=Headers?)?;
+
+Headers:
+	headers+=Header (',' headers+=Header)*;
+
+Header:
+	headerName=STRING ':' headerValue=STRING;
+
+Condition:
+	OrCondition;
+
+OrCondition returns Condition:
+	AndCondition ({OrCondition.left=current} 'or' right=AndCondition)*;
+
+AndCondition returns Condition:
+	OptionalNegationCondition ({AndCondition.left=current} 'and' right=OptionalNegationCondition)*;
+
+OptionalNegationCondition returns Condition:
+	BracketedCondition | {Negation} 'not' negated=BracketedCondition;
+
+BracketedCondition returns Condition:
+	expression=Expression | '(' condition=Condition ')';
+
+Expression:
+	left=Operand (op=Operator right=Operand)?;
+
+Operand:
+	ref=Reference | const=Constant | listElementRef=ListElementReference;
+
+ListFunction:
+	'{' op=ListOperation alias=ListElementAlias separator=':' condition=Condition '}';
+
+ListElementAlias:
+	name=ID;
+
+Reference hidden(WS):
+	name=Entity (prop=PropertyRef)?;
+
+ListElementReference hidden(WS):
+	'$' name=[ListElementAlias|ID] (prop=PropertyRef)?;
+
+PropertyRef hidden(WS):
+	('.' name=ID | '[' (name=STRING | index=INTEGER) ']' | listFunc=ListFunction)
+	(subPropery=PropertyRef)?;
+
+enum Operator:
+	EQ='=' | NEQ='!=' | GT='>' | GTEQ='>=' | LT='<' | LTEQ='<=' | REGEX='~=';
+
+Constant:
+	strVal=STRING | intVal=INTEGER | floatVal=FLOAT;
+
+enum ListOperation:
+	FILTER='where' | ALL='all' | ANY='any';
+
+Entity:
+	name=ID;
+
+terminal FLOAT returns ecore::EDoubleObject:
+	INTEGER '.' INTEGER;
+
+terminal INTEGER returns ecore::EIntegerObject:
+	('0'..'9')+;
+
+terminal ID:
+	'^'? ('a'..'z' | 'A'..'Z' | '_') ('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*;
+
+terminal STRING:
+	'"' ('\\' . /* 'b'|'t'|'n'|'f'|'r'|'u'|'"'|"'"|'\\' */ | !('\\' | '"'))* '"' |
+	"'" ('\\' . /* 'b'|'t'|'n'|'f'|'r'|'u'|'"'|"'"|'\\' */ | !('\\' | "'"))* "'";
+
+terminal ML_COMMENT:
+	'/*'->'*/';
+
+terminal SL_COMMENT:
+	'//' !('\n' | '\r')* ('\r'? '\n')?;
+
+terminal WS:
+	(' ' | '\t' | '\r' | '\n')+;
+
+terminal ANY_OTHER:
+	.;

@@ -1,0 +1,47 @@
+<html>
+<head>
+<title>Perpetual Mockery</title>
+<link rel="stylesheet" type="text/css"
+	href="xtext/2.25.0/xtext-codemirror.css" />
+<link rel="stylesheet" type="text/css"
+	href="webjars/codemirror/5.65.6/lib/codemirror.css" />
+<link rel="stylesheet" type="text/css"
+	href="webjars/codemirror/5.65.6/addon/hint/show-hint.css" />
+
+<script src="webjars/requirejs/2.3.6/require.min.js"></script>
+<script defer="defer">
+	var baseUrl = window.location.pathname;
+	var fileIndex = baseUrl.indexOf("index.html");
+	if (fileIndex > 0)
+		baseUrl = baseUrl.slice(0, fileIndex);
+	require.config({
+		paths : {
+			"jquery" : "webjars/jquery/3.5.1/jquery.min",
+			"xtext/xtext-codemirror" : "xtext/2.25.0/xtext-codemirror"
+		},
+		packages : [ {
+			name : "codemirror",
+			location : "webjars/codemirror/5.65.6",
+			main : "lib/codemirror"
+		} ]
+	});
+	require([ "xtext/xtext-codemirror" ], function(xtext) {
+		window.editor = xtext.createEditor({
+			baseUrl : baseUrl + "api/",
+			enableFormattingAction : true,
+			sendFullText : true
+		});
+	});
+</script>
+</head>
+<body>
+	<div class="container">
+		<div class="header">
+			<h1>Editor</h1>
+		</div>
+		<div class="content">
+			<div id="xtext-editor" data-editor-xtext-lang="prmk"></div>
+		</div>
+	</div>
+</body>
+</html>
