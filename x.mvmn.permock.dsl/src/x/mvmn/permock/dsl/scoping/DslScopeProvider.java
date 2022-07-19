@@ -7,9 +7,14 @@ import java.util.Arrays;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
+import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.scoping.IScope;
 import org.eclipse.xtext.scoping.Scopes;
+import org.eclipse.xtext.util.IResourceScopeCache;
 
+import com.google.inject.Inject;
+
+import x.mvmn.permock.dsl.dsl.ListElementReference;
 import x.mvmn.permock.dsl.dsl.ListFunction;
 
 /**
@@ -21,22 +26,32 @@ import x.mvmn.permock.dsl.dsl.ListFunction;
  */
 public class DslScopeProvider extends AbstractDslScopeProvider {
 
+	@Inject
+	IResourceScopeCache scopeCache;
+
 	@Override
 	public IScope getScope(EObject context, EReference reference) {
-		if (context instanceof ListFunction) {
-			ListFunction listFunct = (ListFunction) context;
-			if (listFunct.getAlias() != null) {
-				if (listFunct.eContainer() != null) {
-//					ListFunction parentListFunction = EcoreUtil2.getContainerOfType(listFunct.eContainer(),
-//							ListFunction.class);
-					// TODO: get scope;
-				}
-				return Scopes.scopeFor(Arrays.asList(listFunct.getAlias()));
-			} else {
-				return super.getScope(context, reference);
-			}
+		if (context instanceof ListElementReference) {
+			ListElementReference listElemRef = (ListElementReference) context;
+			ListFunction container = EcoreUtil2.getContainerOfType(listElemRef, ListFunction.class);
+			return container != null && container.getAlias() != null
+					? Scopes.scopeFor(Arrays.asList(container.getAlias()), getParentScope(container))
+					: getParentScope(container);
 		} else {
 			return super.getScope(context, reference);
 		}
+	}
+
+	protected IScope getParentScope(ListFunction container) {
+		IScope result = IScope.NULLSCOPE;
+		if (container != null) {
+			ListFunction parentContainer = EcoreUtil2.getContainerOfType(container.eContainer(), ListFunction.class);
+			if (parentContainer != null) {
+				String path = EcoreUtil2.getFragmentPath(parentContainer.getAlias());
+				result = scopeCache.get(path, container.eResource(), () -> Scopes
+						.scopeFor(Arrays.asList(parentContainer.getAlias()), getParentScope(parentContainer)));
+			}
+		}
+		return result;
 	}
 }
