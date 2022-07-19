@@ -7,18 +7,49 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.util.Arrays;
 import java.util.List;
 
-import lombok.Data;
-
-@Data
 public class HttpRequestModel {
-	private final String method;
+	private final String httpMethod;
 	private final StringDictionary headersByName;
 	private final CookieDictionary cookiesByName;
 	private final byte[] body;
 	private final List<HttpHeader> headers;
 	private final List<Cookie> cookies;
 
-	public String bodyAsString() {
+	public HttpRequestModel(String httpMethod, StringDictionary headersByName, CookieDictionary cookiesByName,
+			byte[] body, List<HttpHeader> headers, List<Cookie> cookies) {
+		this.httpMethod = httpMethod;
+		this.headersByName = headersByName;
+		this.cookiesByName = cookiesByName;
+		this.body = body;
+		this.headers = headers;
+		this.cookies = cookies;
+	}
+
+	public String getHttpMethod() {
+		return httpMethod;
+	}
+
+	public StringDictionary getHeadersByName() {
+		return headersByName;
+	}
+
+	public CookieDictionary getCookiesByName() {
+		return cookiesByName;
+	}
+
+	public byte[] getBody() {
+		return body;
+	}
+
+	public List<HttpHeader> getHeaders() {
+		return headers;
+	}
+
+	public List<Cookie> getCookies() {
+		return cookies;
+	}
+
+	public String getBodyAsString() {
 		return body != null ? new String(body, requestCharset()) : null;
 	}
 

@@ -54,6 +54,9 @@ Workflow {
 			junitSupport = {
 				junitVersion = "5"
 			}
+			contentAssist = {
+				generateStub = true
+			}
 		}
 	}
 }

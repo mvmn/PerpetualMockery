@@ -3,9 +3,16 @@
  */
 package x.mvmn.permock.dsl.ide;
 
+import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalProvider;
+
+import x.mvmn.permock.dsl.ide.contentassist.DslContentProposalProvider;
 
 /**
  * Use this class to register ide components.
  */
 public class DslIdeModule extends AbstractDslIdeModule {
+
+	public Class<? extends IdeContentProposalProvider> bindIdeContentProposalProvider() {
+		return DslContentProposalProvider.class;
+	}
 }

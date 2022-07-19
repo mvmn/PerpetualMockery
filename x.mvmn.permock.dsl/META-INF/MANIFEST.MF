@@ -15,16 +15,18 @@ Require-Bundle: org.eclipse.xtext,
  org.eclipse.emf.common,
  org.antlr.runtime;bundle-version="[3.2.0,3.2.1)"
 Bundle-RequiredExecutionEnvironment: JavaSE-11
-Export-Package: x.mvmn.permock.dsl.serializer,
- x.mvmn.permock.dsl.parser.antlr.internal,
- x.mvmn.permock.dsl.generator,
- x.mvmn.permock.dsl.scoping,
- x.mvmn.permock.dsl,
- x.mvmn.permock.dsl.parser.antlr,
+Export-Package: x.mvmn.permock.dsl,
  x.mvmn.permock.dsl.dsl,
- x.mvmn.permock.dsl.validation,
  x.mvmn.permock.dsl.dsl.impl,
  x.mvmn.permock.dsl.dsl.util,
+ x.mvmn.permock.dsl.formatting2,
+ x.mvmn.permock.dsl.generator,
+ x.mvmn.permock.dsl.model,
+ x.mvmn.permock.dsl.parser.antlr,
+ x.mvmn.permock.dsl.parser.antlr.internal,
+ x.mvmn.permock.dsl.scoping,
+ x.mvmn.permock.dsl.serializer,
  x.mvmn.permock.dsl.services,
- x.mvmn.permock.dsl.formatting2
+ x.mvmn.permock.dsl.validation,
+ x.mvmn.permock.util
 Import-Package: org.apache.log4j

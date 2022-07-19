@@ -22,7 +22,6 @@
 	</properties>
 	
 	<modules>
-		<module>model</module>
 		<module>x.mvmn.permock.dsl</module>
 		<module>x.mvmn.permock.dsl.ide</module>
 		<module>x.mvmn.permock.dsl.ui</module>
