@@ -9,6 +9,7 @@ import org.eclipse.xtext.AbstractElement;
 import org.eclipse.xtext.AbstractRule;
 import org.eclipse.xtext.Assignment;
 import org.eclipse.xtext.EcoreUtil2;
+import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.TerminalRule;
 import org.eclipse.xtext.ide.editor.contentassist.ContentAssistContext;
@@ -29,6 +30,7 @@ import x.mvmn.permock.dsl.dsl.Reference;
 import x.mvmn.permock.dsl.model.ModelHelper;
 import x.mvmn.permock.dsl.services.DslGrammarAccess;
 import x.mvmn.permock.util.BeanUtil;
+import x.mvmn.permock.util.BeanUtil.Property;
 
 public class DslContentProposalProvider extends IdeContentProposalProvider {
 
@@ -179,23 +181,18 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 		super._createProposals(assignment, context, acceptor);
 	}
 
-//	@Override
-//	protected void _createProposals(Keyword keyword, ContentAssistContext context,
-//			IIdeContentProposalAcceptor acceptor) {
-//		if (this.filterKeyword(keyword, context)) {
-//			ContentAssistEntry entry = this.proposalCreator.createProposal(keyword.getValue(), context);
-//			if (entry != null) {
-//				if (dslGrammarAccess.getListElementReferenceAccess().getDollarSignKeyword_0().getValue()
-//						.equals(context.getPrefix())) {
-//					System.out.println("Dollar " + keyword);
-//				} else {
-//
-//				}
-//				entry.setKind(ContentAssistEntry.KIND_KEYWORD);
-//				acceptor.accept(entry, this.proposalPriorities.getKeywordPriority(keyword.getValue(), entry));
-//			}
-//		}
-//	}
+	@Override
+	protected boolean filterKeyword(Keyword keyword, ContentAssistContext context) {
+		Set<Keyword> collectionOps = Set.of(grammarAccess.getListFunctionAccess().getLeftCurlyBracketKeyword_0(),
+				grammarAccess.getCollectionAccessAccess().getLeftSquareBracketKeyword_0());
+
+		Property currentModelType = resolveType(context.getCurrentModel());
+		if (currentModelType == null) {
+			return true;
+		}
+		return grammarAccess.getPropertyRefAccess().getFullStopKeyword_0_0_0().equals(keyword)
+				|| currentModelType.isCollection() == collectionOps.contains(keyword);
+	}
 
 	protected void createProposal(String value, String description, String kind, ContentAssistContext context,
 			IIdeContentProposalAcceptor acceptor) {
