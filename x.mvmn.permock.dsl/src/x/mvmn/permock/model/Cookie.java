@@ -7,13 +7,13 @@ public class Cookie {
 	private final String path;
 	private final String expires;
 	private final String maxAge;
-	private final boolean httpOnly;
-	private final boolean secure;
-	private final boolean sameSiteLax;
-	private final boolean sameSiteStrict;
+	private final Boolean httpOnly;
+	private final Boolean secure;
+	private final Boolean sameSiteLax;
+	private final Boolean sameSiteStrict;
 
-	public Cookie(String name, String domain, String path, String expires, String maxAge, boolean httpOnly,
-			boolean secure, boolean sameSiteLax, boolean sameSiteStrict) {
+	public Cookie(String name, String domain, String path, String expires, String maxAge, Boolean httpOnly,
+			Boolean secure, Boolean sameSiteLax, Boolean sameSiteStrict) {
 		this.name = name;
 		this.domain = domain;
 		this.path = path;
@@ -49,19 +49,19 @@ public class Cookie {
 		return maxAge;
 	}
 
-	public boolean isHttpOnly() {
+	public Boolean getHttpOnly() {
 		return httpOnly;
 	}
 
-	public boolean isSecure() {
+	public Boolean getSecure() {
 		return secure;
 	}
 
-	public boolean isSameSiteLax() {
+	public Boolean getSameSiteLax() {
 		return sameSiteLax;
 	}
 
-	public boolean isSameSiteStrict() {
+	public Boolean getSameSiteStrict() {
 		return sameSiteStrict;
 	}
 }

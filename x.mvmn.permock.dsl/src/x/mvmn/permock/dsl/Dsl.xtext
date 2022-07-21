@@ -53,21 +53,30 @@ Reference hidden(WS):
 ListElementReference hidden(WS):
 	'$' name=[ListElementAlias|ID] (prop=PropertyRef)?;
 
+PropertyAccess:
+	name=ID;
+
+CollectionAccess:
+	'[' (key=STRING | index=INTEGER) ']';
+
 PropertyRef hidden(WS):
-	('.' name=ID | '[' (name=STRING | index=INTEGER) ']' | listFunc=ListFunction)
+	('.' propAccess=PropertyAccess | collectionAccess=CollectionAccess | listFunc=ListFunction)
 	(subPropery=PropertyRef)?;
 
 enum Operator:
 	EQ='=' | NEQ='!=' | GT='>' | GTEQ='>=' | LT='<' | LTEQ='<=' | REGEX='~=';
 
 Constant:
-	strVal=STRING | intVal=INTEGER | floatVal=FLOAT;
+	strVal=STRING | intVal=INTEGER | floatVal=FLOAT | boolVal=BOOLEAN;
 
 enum ListOperation:
 	FILTER='where' | ALL='all' | ANY='any';
 
 Entity:
 	name=ID;
+
+terminal BOOLEAN returns ecore::EBooleanObject:
+	'true' | 'false';
 
 terminal FLOAT returns ecore::EDoubleObject:
 	INTEGER '.' INTEGER;

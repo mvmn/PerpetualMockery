@@ -2,7 +2,6 @@ package x.mvmn.permock.dsl.ide.contentassist;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.AbstractElement;
@@ -19,12 +18,16 @@ import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalProvider;
 
 import com.google.inject.Inject;
 
+import x.mvmn.permock.dsl.dsl.CollectionAccess;
+import x.mvmn.permock.dsl.dsl.ListFunction;
+import x.mvmn.permock.dsl.dsl.PropertyAccess;
 import x.mvmn.permock.dsl.dsl.PropertyRef;
 import x.mvmn.permock.dsl.dsl.Reference;
 import x.mvmn.permock.dsl.model.ModelHelper;
 import x.mvmn.permock.util.BeanUtil;
 
 public class DslContentProposalProvider extends IdeContentProposalProvider {
+
 	@Inject
 	private IdeContentProposalCreator proposalCreator;
 
@@ -42,30 +45,50 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 		String prefix = context.getPrefix();
 		if (ruleCall.getRule().getName().equals("Entity")) {
 			createProposals(modelHelper.entities(), prefix, context, acceptor);
-		} else if (ruleCall.getRule().getName().equals("PropertyRef")) {
-			boolean appendDot = false;
-			if (prefix != null && prefix.startsWith(".")) {
-				appendDot = true;
-			}
-			BeanUtil.Property currentModelType = resolveType(context.getCurrentModel());
-			if (currentModelType != null) {
-				createProposals(modelHelper.properties(currentModelType.getType()).stream().map(v -> "." + v)
-						.collect(Collectors.toList()), prefix, context, acceptor);
+		} else if (ruleCall.getRule().getName().equals("PropertyAccess")) {
+			EObject currentModel = context.getCurrentModel();
+			if (currentModel instanceof PropertyRef) {
+				BeanUtil.Property currentModelType = resolveType(currentModel.eContainer());
+				if (currentModelType != null) {
+					createProposals(modelHelper.properties(currentModelType), prefix, context, acceptor);
+				}
+			} else {
+				// Can this even happen for rule call PropertyRef?
+				System.err.println(currentModel);
 			}
 		}
 	}
 
-	private void createProposals(List<String> options, String prefix, ContentAssistContext context,
+	private void createProposals(List<BeanUtil.Property> options, String prefix, ContentAssistContext context,
 			IIdeContentProposalAcceptor acceptor) {
-		options.stream().filter(n -> prefix != null && !prefix.trim().isEmpty() ? n.startsWith(prefix.trim()) : true)
-				.forEach(n -> createProposal(n, ContentAssistEntry.KIND_KEYWORD, context, acceptor));
+		boolean appendDot = prefix != null && prefix.startsWith(".");
+		options.stream()
+				.forEach(n -> createProposal(appendDot ? ("." + n.getName()) : n.getName(),
+						(n.isCollection() ? "List of " : "") + n.getType().getSimpleName(),
+						ContentAssistEntry.KIND_KEYWORD, context, acceptor));
 	}
 
 	private BeanUtil.Property resolveType(EObject currentModel) {
 		if (currentModel instanceof Reference) {
 			return getReferenceType((Reference) currentModel);
+		} else if (currentModel instanceof PropertyAccess) {
+			return getPropertyType((PropertyAccess) currentModel);
+		} else if (currentModel instanceof CollectionAccess) {
+			return getCollectionType((CollectionAccess) currentModel);
 		} else if (currentModel instanceof PropertyRef) {
-			return getPropertyType((PropertyRef) currentModel);
+			PropertyRef propertyRef = (PropertyRef) currentModel;
+			if (propertyRef.getCollectionAccess() != null) {
+				return getCollectionType(propertyRef.getCollectionAccess());
+			} else if (propertyRef.getPropAccess() != null) {
+				return getPropertyType(propertyRef.getPropAccess());
+			} else if (propertyRef.getListFunc() != null) {
+				ListFunction listFunction = propertyRef.getListFunc();
+				if ("FILTER".equals(listFunction.getOp().getName())) {
+					return resolveType(propertyRef.eContainer());
+				} else { // ALL, ANY - boolean result
+					return BeanUtil.Property.of("list", Boolean.class, false);
+				}
+			}
 		}
 		return null;
 	}
@@ -75,20 +98,31 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 		return modelHelper.entityType(entityName);
 	}
 
-	private BeanUtil.Property getPropertyType(PropertyRef propertyRef) {
-		BeanUtil.Property parentType = resolveType(propertyRef.eContainer());
+	private BeanUtil.Property getPropertyType(PropertyAccess propertyRef) {
+		BeanUtil.Property parentType = resolveType(propertyRef.eContainer().eContainer());
 		if (parentType == null) {
 			return null;
 		}
-		if (propertyRef.getIndex() != null) {
-			if (!parentType.isCollection()) {
-				return null;
-			} else {
-				return new BeanUtil.Property(propertyRef.getIndex().toString(), parentType.getType(), false);
-			}
+		return propertyRef.getName() != null ? modelHelper.typeOfProperty(parentType, propertyRef.getName()) : null;
+	}
+
+	private BeanUtil.Property getCollectionType(CollectionAccess collectionAccess) {
+		BeanUtil.Property parentType = resolveType(collectionAccess.eContainer().eContainer());
+		if (collectionAccess.getKey() != null) {
+			return modelHelper.getDictionaryValueType(parentType);
 		}
-		return propertyRef.getName() != null ? modelHelper.typeOfProperty(parentType.getType(), propertyRef.getName())
-				: null;
+
+		if (parentType == null) {
+			return null;
+		}
+		if (collectionAccess.getIndex() == null) {
+			return null;
+		}
+		if (!parentType.isCollection()) {
+			return null;
+		} else {
+			return new BeanUtil.Property(collectionAccess.getIndex().toString(), parentType.getType(), false);
+		}
 	}
 
 	@Override
@@ -124,11 +158,12 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 //		}
 //	}
 
-	protected void createProposal(String value, String kind, ContentAssistContext context,
+	protected void createProposal(String value, String description, String kind, ContentAssistContext context,
 			IIdeContentProposalAcceptor acceptor) {
 		ContentAssistEntry entry = this.proposalCreator.createProposal(value, context);
 		if (entry != null) {
-//			entry.setKind(kind);
+			entry.setKind(kind);
+			entry.setDescription(description);
 			acceptor.accept(entry, proposalPriorities.getDefaultPriority(entry));
 		}
 	}

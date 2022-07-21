@@ -32,36 +32,43 @@ public class BeanUtil {
 		public boolean isCollection() {
 			return isCollection;
 		}
+
+		public static Property of(String name, Class<?> type, boolean isCollection) {
+			return new Property(name, type, isCollection);
+		}
 	}
 
-	public static List<String> listPropertiesFromGetters(Class<?> klass) {
-		return Stream.of(klass.getDeclaredMethods()).map(Method::getName)
-				.filter(name -> name.length() > 3 && name.startsWith("get")).map(BeanUtil::getterNameToPropertyName)
-				.collect(Collectors.toList());
+	public static List<Property> listPropertiesFromGetters(Class<?> klass) {
+		return Stream.of(klass.getDeclaredMethods())
+				.filter(method -> method.getName().length() > 3 && method.getName().startsWith("get"))
+				.map(BeanUtil::fromMethod).collect(Collectors.toList());
 	}
 
 	public static Property getPropertyType(Class<?> klass, String property) {
 		String getterName = propertyNameToGetterName(property);
 		try {
-			Method getter = klass.getDeclaredMethod(getterName);
-			Class<?> type = getter.getReturnType();
-			boolean isCollection = isCollection(type);
-			if (isCollection) {
-				type = null;
-				Type generic = getter.getGenericReturnType();
-				if (generic instanceof ParameterizedType) {
-					Type[] typeArgs = ((ParameterizedType) generic).getActualTypeArguments();
-					if (typeArgs != null && typeArgs.length > 0 && typeArgs[0] instanceof Class<?>) {
-						type = (Class<?>) typeArgs[0];
-					}
-				}
-			}
-			return new Property(property, type, isCollection);
+			return fromMethod(klass.getDeclaredMethod(getterName));
 		} catch (NoSuchMethodException e) {
 			return null;
 		} catch (SecurityException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	protected static Property fromMethod(Method method) {
+		Class<?> type = method.getReturnType();
+		boolean isCollection = isCollection(type);
+		if (isCollection) {
+			type = null;
+			Type generic = method.getGenericReturnType();
+			if (generic instanceof ParameterizedType) {
+				Type[] typeArgs = ((ParameterizedType) generic).getActualTypeArguments();
+				if (typeArgs != null && typeArgs.length > 0 && typeArgs[0] instanceof Class<?>) {
+					type = (Class<?>) typeArgs[0];
+				}
+			}
+		}
+		return new Property(getterNameToPropertyName(method.getName()), type, isCollection);
 	}
 
 	public static boolean isCollection(Class<?> klass) {

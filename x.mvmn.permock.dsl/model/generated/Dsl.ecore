@@ -69,9 +69,18 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="prop" eType="#//PropertyRef"
         containment="true"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="PropertyRef">
+  <eClassifiers xsi:type="ecore:EClass" name="PropertyAccess">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="CollectionAccess">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="index" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EIntegerObject"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="PropertyRef">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="propAccess" eType="#//PropertyAccess"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="collectionAccess" eType="#//CollectionAccess"
+        containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="listFunc" eType="#//ListFunction"
         containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="subPropery" eType="#//PropertyRef"
@@ -90,6 +99,7 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="strVal" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="intVal" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EIntegerObject"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="floatVal" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDoubleObject"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="boolVal" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBooleanObject"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EEnum" name="ListOperation">
     <eLiterals name="FILTER" literal="where"/>

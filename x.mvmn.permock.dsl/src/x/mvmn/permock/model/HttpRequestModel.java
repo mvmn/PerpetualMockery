@@ -4,7 +4,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.Arrays;
 import java.util.List;
 
 public class HttpRequestModel {
@@ -14,6 +13,7 @@ public class HttpRequestModel {
 	private final byte[] body;
 	private final List<HttpHeader> headers;
 	private final List<Cookie> cookies;
+	private final ContentTypeModel contentType;
 
 	public HttpRequestModel(String httpMethod, StringDictionary headersByName, CookieDictionary cookiesByName,
 			byte[] body, List<HttpHeader> headers, List<Cookie> cookies) {
@@ -23,6 +23,7 @@ public class HttpRequestModel {
 		this.body = body;
 		this.headers = headers;
 		this.cookies = cookies;
+		this.contentType = new ContentTypeModel(headersByName.get("Content-Type"));
 	}
 
 	public String getHttpMethod() {
@@ -37,7 +38,7 @@ public class HttpRequestModel {
 		return cookiesByName;
 	}
 
-	public byte[] getBody() {
+	public byte[] body() {
 		return body;
 	}
 
@@ -55,15 +56,11 @@ public class HttpRequestModel {
 
 	private Charset requestCharset() {
 		Charset result = StandardCharsets.UTF_8;
-		String contentType = headersByName.get("Content-Type");
-		if (contentType != null) {
-			String charsetStr = Arrays.asList(contentType.split("\\s*;\\s*")).stream()
-					.filter(val -> val.toLowerCase().startsWith("charset=")).findFirst().orElse(null);
-			if (charsetStr != null) {
-				try {
-					return Charset.forName(charsetStr.toUpperCase());
-				} catch (IllegalCharsetNameException | UnsupportedCharsetException e) {
-				}
+		String charsetStr = contentType.getCharSet();
+		if (charsetStr != null) {
+			try {
+				return Charset.forName(charsetStr.toUpperCase());
+			} catch (IllegalCharsetNameException | UnsupportedCharsetException e) {
 			}
 		}
 		return result;

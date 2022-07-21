@@ -23,9 +23,11 @@ public class DslFormatter extends AbstractJavaFormatter {
 
 	protected void format(PropertyRef propertyRef, IFormattableDocument doc) {
 		doc.surround(textRegionExtensions.regionFor(propertyRef).keyword("."), i -> i.noSpace());
-		doc.prepend(textRegionExtensions.regionFor(propertyRef).feature(DslPackage.Literals.PROPERTY_REF__NAME),
+		doc.prepend(textRegionExtensions.regionFor(propertyRef).feature(DslPackage.Literals.PROPERTY_ACCESS__NAME),
 				i -> i.noSpace());
-		doc.prepend(textRegionExtensions.regionFor(propertyRef).feature(DslPackage.Literals.PROPERTY_REF__INDEX),
+		doc.prepend(textRegionExtensions.regionFor(propertyRef).feature(DslPackage.Literals.COLLECTION_ACCESS__INDEX),
+				i -> i.noSpace());
+		doc.prepend(textRegionExtensions.regionFor(propertyRef).feature(DslPackage.Literals.COLLECTION_ACCESS__KEY),
 				i -> i.noSpace());
 		doc.surround(textRegionExtensions.regionFor(propertyRef).keyword("["), i -> i.noSpace());
 		doc.prepend(textRegionExtensions.regionFor(propertyRef).keyword("]"), i -> i.noSpace());

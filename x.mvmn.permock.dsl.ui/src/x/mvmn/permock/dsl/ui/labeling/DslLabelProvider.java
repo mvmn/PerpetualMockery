@@ -9,12 +9,13 @@ import org.eclipse.xtext.ui.label.DefaultEObjectLabelProvider;
 import com.google.inject.Inject;
 
 import x.mvmn.permock.dsl.dsl.AndCondition;
+import x.mvmn.permock.dsl.dsl.CollectionAccess;
 import x.mvmn.permock.dsl.dsl.Condition;
 import x.mvmn.permock.dsl.dsl.Constant;
 import x.mvmn.permock.dsl.dsl.Expression;
 import x.mvmn.permock.dsl.dsl.Negation;
 import x.mvmn.permock.dsl.dsl.OrCondition;
-import x.mvmn.permock.dsl.dsl.PropertyRef;
+import x.mvmn.permock.dsl.dsl.PropertyAccess;
 import x.mvmn.permock.dsl.dsl.Reference;
 
 /**
@@ -50,11 +51,16 @@ public class DslLabelProvider extends DefaultEObjectLabelProvider {
 		return "not";
 	}
 
-	public String text(PropertyRef propertyRef) {
-		if (propertyRef.getName() != null)
-			return propertyRef.getName();
-		if (propertyRef.getIndex() != null)
-			return "[" + propertyRef.getIndex().toString() + "]";
+	public String text(PropertyAccess propertyAccess) {
+		return propertyAccess.getName();
+	}
+
+	public String text(CollectionAccess collectionAccess) {
+		if (collectionAccess.getIndex() != null)
+			return "[" + collectionAccess.getIndex().toString() + "]";
+		if (collectionAccess.getKey() != null) {
+			return "['" + collectionAccess.getKey() + "']";
+		}
 		return null;
 	}
 
