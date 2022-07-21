@@ -2,11 +2,13 @@ package x.mvmn.permock.dsl.ide.contentassist;
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.AbstractElement;
 import org.eclipse.xtext.AbstractRule;
 import org.eclipse.xtext.Assignment;
+import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.TerminalRule;
 import org.eclipse.xtext.ide.editor.contentassist.ContentAssistContext;
@@ -19,6 +21,7 @@ import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalProvider;
 import com.google.inject.Inject;
 
 import x.mvmn.permock.dsl.dsl.CollectionAccess;
+import x.mvmn.permock.dsl.dsl.ListElementReference;
 import x.mvmn.permock.dsl.dsl.ListFunction;
 import x.mvmn.permock.dsl.dsl.PropertyAccess;
 import x.mvmn.permock.dsl.dsl.PropertyRef;
@@ -87,6 +90,37 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 					return resolveType(propertyRef.eContainer());
 				} else { // ALL, ANY - boolean result
 					return BeanUtil.Property.of("list", Boolean.class, false);
+				}
+			}
+		} else if (currentModel instanceof ListElementReference) {
+			ListElementReference listElRef = (ListElementReference) currentModel;
+			String alias = listElRef.getName() != null ? listElRef.getName().getName() : null;
+			if (alias != null) {
+				ListFunction parentListFunction = findMatchingContainerOfType(currentModel, ListFunction.class,
+						lf -> lf.getAlias().getName().equals(alias));
+				if (parentListFunction != null) {
+					BeanUtil.Property parentCollection = resolveType(parentListFunction.eContainer());
+					if (parentCollection != null) {
+						return new BeanUtil.Property(alias, parentCollection.getType(),
+								BeanUtil.isCollection(parentCollection.getType()));
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	private <T extends EObject> T findMatchingContainerOfType(EObject currentModel, Class<T> clazz,
+			Predicate<T> check) {
+		T candidate = EcoreUtil2.getContainerOfType(currentModel, clazz);
+		while (candidate != null) {
+			if (check.test(candidate)) {
+				return candidate;
+			} else {
+				if (candidate.eContainer() != null) {
+					candidate = EcoreUtil2.getContainerOfType(candidate.eContainer(), clazz);
+				} else {
+					return null;
 				}
 			}
 		}
