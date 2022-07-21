@@ -33,6 +33,7 @@ public class DslSemanticHighlightingCalculator extends DefaultSemanticHighlighti
 		public static String RESPONSE_STATUS_VALUE_ID = "responseStatusValue";
 		public static String RESPONSE_CONTENT_VALUE_ID = "responseContentValue";
 		public static String BOOLEAN_ID = "boolean";
+		public static String LOGICAL_CONDITION_ID = "logicalCondition";
 	}
 
 	@Inject
@@ -42,12 +43,13 @@ public class DslSemanticHighlightingCalculator extends DefaultSemanticHighlighti
 	protected boolean highlightElement(EObject object, IHighlightedPositionAcceptor acceptor,
 			CancelIndicator cancelIndicator) {
 
+		ICompositeNode node = NodeModelUtils.findActualNodeFor(object);
 		if (object instanceof Rule) {
 			Set<Keyword> keywordSet = Set.of(grammarAccess.getRuleAccess().getIfKeyword_0(),
 					grammarAccess.getRuleAccess().getProxyKeyword_2_0_0(),
 					grammarAccess.getRuleAccess().getRespondKeyword_2_1_0(),
 					grammarAccess.getRuleAccess().getWithKeyword_2_1_1());
-			for (ILeafNode n : NodeModelUtils.findActualNodeFor(object).getLeafNodes()) {
+			for (ILeafNode n : node.getLeafNodes()) {
 				if (n.getGrammarElement() != null && keywordSet.contains(n.getGrammarElement())) {
 					acceptor.addPosition(n.getOffset(), n.getLength(), DslHighlightingStyles.KEYWORD_ID);
 				} else if (n.getGrammarElement() instanceof RuleCall) {
@@ -70,13 +72,13 @@ public class DslSemanticHighlightingCalculator extends DefaultSemanticHighlighti
 			Set<Keyword> keywordSet = Set.of(grammarAccess.getResponseConfAccess().getContentKeyword_1_0(),
 					grammarAccess.getResponseConfAccess().getHeadersKeyword_2_0(),
 					grammarAccess.getResponseConfAccess().getStatusKeyword_0_0());
-			for (ILeafNode n : NodeModelUtils.findActualNodeFor(object).getLeafNodes()) {
+			for (ILeafNode n : node.getLeafNodes()) {
 				if (n.getGrammarElement() != null && keywordSet.contains(n.getGrammarElement())) {
 					acceptor.addPosition(n.getOffset(), n.getLength(), DslHighlightingStyles.KEYWORD_RESPONSE_ID);
 				}
 			}
 		} else if (object instanceof Header) {
-			for (ILeafNode n : NodeModelUtils.findActualNodeFor(object).getLeafNodes()) {
+			for (ILeafNode n : node.getLeafNodes()) {
 				if (n.getGrammarElement() instanceof RuleCall) {
 					RuleCall ruleCall = (RuleCall) n.getGrammarElement();
 					if (ruleCall.eContainer() instanceof Assignment) {
@@ -96,9 +98,7 @@ public class DslSemanticHighlightingCalculator extends DefaultSemanticHighlighti
 		} else if (object instanceof ListFunction) {
 			Set<Keyword> keywordSet = Set.of(grammarAccess.getListFunctionAccess().getLeftCurlyBracketKeyword_0(),
 					grammarAccess.getListFunctionAccess().getRightCurlyBracketKeyword_5(),
-					grammarAccess.getListFunctionAccess().getSeparatorColonKeyword_3_0(),
-					grammarAccess.getListElementReferenceAccess().getDollarSignKeyword_0());
-			ICompositeNode node = NodeModelUtils.findActualNodeFor(object);
+					grammarAccess.getListFunctionAccess().getSeparatorColonKeyword_3_0());
 			for (ILeafNode n : node.getLeafNodes()) {
 				if (n.getGrammarElement() != null && keywordSet.contains(n.getGrammarElement())) {
 					acceptor.addPosition(n.getOffset(), n.getLength(), DslHighlightingStyles.KEYWORD_ID);
@@ -114,15 +114,18 @@ public class DslSemanticHighlightingCalculator extends DefaultSemanticHighlighti
 				}
 			}
 		} else if (object instanceof Condition) {
-			ICompositeNode node = NodeModelUtils.findActualNodeFor(object);
-			Set<Keyword> keywordSet = Set.of(grammarAccess.getOrConditionAccess().getOrKeyword_1_1(),
+			Set<Keyword> logicalConditionSet = Set.of(grammarAccess.getOrConditionAccess().getOrKeyword_1_1(),
 					grammarAccess.getAndConditionAccess().getAndKeyword_1_1(),
-					grammarAccess.getOptionalNegationConditionAccess().getNotKeyword_1_1(),
+					grammarAccess.getOptionalNegationConditionAccess().getNotKeyword_1_1());
+			Set<Keyword> keywordSet = Set.of(
 					grammarAccess.getBracketedConditionAccess().getLeftParenthesisKeyword_1_0(),
 					grammarAccess.getBracketedConditionAccess().getRightParenthesisKeyword_1_2());
 			for (ILeafNode n : node.getLeafNodes()) {
 				if (n.getGrammarElement() != null && keywordSet.contains(n.getGrammarElement())) {
 					acceptor.addPosition(n.getOffset(), n.getLength(), DslHighlightingStyles.KEYWORD_ID);
+				}
+				if (n.getGrammarElement() != null && logicalConditionSet.contains(n.getGrammarElement())) {
+					acceptor.addPosition(n.getOffset(), n.getLength(), DslHighlightingStyles.LOGICAL_CONDITION_ID);
 				}
 			}
 		}
