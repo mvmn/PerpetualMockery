@@ -17,6 +17,7 @@ import org.eclipse.xtext.util.CancelIndicator;
 
 import com.google.inject.Inject;
 
+import x.mvmn.permock.dsl.dsl.Condition;
 import x.mvmn.permock.dsl.dsl.Header;
 import x.mvmn.permock.dsl.dsl.ListFunction;
 import x.mvmn.permock.dsl.dsl.ResponseConf;
@@ -110,6 +111,18 @@ public class DslSemanticHighlightingCalculator extends DefaultSemanticHighlighti
 						acceptor.addPosition(childNode.getOffset(), childNode.getLength(),
 								DslHighlightingStyles.KEYWORD_ID);
 					}
+				}
+			}
+		} else if (object instanceof Condition) {
+			ICompositeNode node = NodeModelUtils.findActualNodeFor(object);
+			Set<Keyword> keywordSet = Set.of(grammarAccess.getOrConditionAccess().getOrKeyword_1_1(),
+					grammarAccess.getAndConditionAccess().getAndKeyword_1_1(),
+					grammarAccess.getOptionalNegationConditionAccess().getNotKeyword_1_1(),
+					grammarAccess.getBracketedConditionAccess().getLeftParenthesisKeyword_1_0(),
+					grammarAccess.getBracketedConditionAccess().getRightParenthesisKeyword_1_2());
+			for (ILeafNode n : node.getLeafNodes()) {
+				if (n.getGrammarElement() != null && keywordSet.contains(n.getGrammarElement())) {
+					acceptor.addPosition(n.getOffset(), n.getLength(), DslHighlightingStyles.KEYWORD_ID);
 				}
 			}
 		}
