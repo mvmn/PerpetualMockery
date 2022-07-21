@@ -52,12 +52,10 @@ public class ModelHelper {
 	}
 
 	public List<Property> properties(Property property) {
-		if (isFromDslPackage(property.getType())) {
-			if (property.isCollection()) {
-				return GET_COLLECTION_FUNCTIONS.apply(property);
-			} else {
-				return BeanUtil.listPropertiesFromGetters(property.getType());
-			}
+		if (property.isCollection()) {
+			return GET_COLLECTION_FUNCTIONS.apply(property);
+		} else if (isFromDslPackage(property.getType())) {
+			return BeanUtil.listPropertiesFromGetters(property.getType());
 		} else if (isSupportedPrimitiveType(property.getType())) {
 			return getPrimitiveTypeProps(property.getType());
 		} else {

@@ -27,6 +27,7 @@ import x.mvmn.permock.dsl.dsl.PropertyAccess;
 import x.mvmn.permock.dsl.dsl.PropertyRef;
 import x.mvmn.permock.dsl.dsl.Reference;
 import x.mvmn.permock.dsl.model.ModelHelper;
+import x.mvmn.permock.dsl.services.DslGrammarAccess;
 import x.mvmn.permock.util.BeanUtil;
 
 public class DslContentProposalProvider extends IdeContentProposalProvider {
@@ -36,6 +37,9 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 
 	@Inject
 	private IdeContentProposalPriorities proposalPriorities;
+
+	@Inject
+	private DslGrammarAccess grammarAccess;
 
 	@Inject
 	private ModelHelper modelHelper;
@@ -86,7 +90,8 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 				return getPropertyType(propertyRef.getPropAccess());
 			} else if (propertyRef.getListFunc() != null) {
 				ListFunction listFunction = propertyRef.getListFunc();
-				if ("FILTER".equals(listFunction.getOp().getName())) {
+				if (grammarAccess.getListOperationAccess().getFILTEREnumLiteralDeclaration_0().getLiteral().getValue()
+						.equals(listFunction.getOp().getLiteral())) {
 					return resolveType(propertyRef.eContainer());
 				} else { // ALL, ANY - boolean result
 					return BeanUtil.Property.of("list", Boolean.class, false);

@@ -36,6 +36,11 @@ public class BeanUtil {
 		public static Property of(String name, Class<?> type, boolean isCollection) {
 			return new Property(name, type, isCollection);
 		}
+
+		@Override
+		public String toString() {
+			return "Property [name=" + name + ", type=" + type + ", isCollection=" + isCollection + "]";
+		}
 	}
 
 	public static List<Property> listPropertiesFromGetters(Class<?> klass) {
