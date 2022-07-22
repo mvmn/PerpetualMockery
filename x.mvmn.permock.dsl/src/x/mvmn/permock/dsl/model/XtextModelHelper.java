@@ -45,7 +45,10 @@ public class XtextModelHelper {
 				} else { // ALL, ANY - boolean result
 					return BeanUtil.Property.of("list", Boolean.class, false);
 				}
-			}
+			} 
+//			else if (propertyRef.getSubPropery() != null) {
+//				return resolveType(propertyRef.getSubPropery());
+//			}
 		} else if (currentModel instanceof ListElementReference) {
 			ListElementReference listElRef = (ListElementReference) currentModel;
 			String alias = listElRef.getName() != null ? listElRef.getName().getName() : null;
@@ -53,7 +56,7 @@ public class XtextModelHelper {
 				ListFunction parentListFunction = findMatchingContainerOfType(currentModel, ListFunction.class,
 						lf -> lf.getAlias().getName().equals(alias));
 				if (parentListFunction != null) {
-					BeanUtil.Property parentCollection = resolveType(parentListFunction.eContainer());
+					BeanUtil.Property parentCollection = resolveType(parentListFunction.eContainer().eContainer());
 					if (parentCollection != null) {
 						return new BeanUtil.Property(alias, parentCollection.getType(),
 								BeanUtil.isCollection(parentCollection.getType()));

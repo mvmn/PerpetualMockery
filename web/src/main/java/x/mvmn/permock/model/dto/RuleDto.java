@@ -8,4 +8,6 @@ import lombok.Data;
 public class RuleDto {
 	@NotBlank
 	private String ruleText;
+
+	private Long priority;
 }

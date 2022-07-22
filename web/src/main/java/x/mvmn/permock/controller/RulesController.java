@@ -1,6 +1,8 @@
 package x.mvmn.permock.controller;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -13,8 +15,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import x.mvmn.permock.exception.NotFound;
 import x.mvmn.permock.mapper.RuleMapper;
 import x.mvmn.permock.model.dto.RuleDto;
+import x.mvmn.permock.model.dto.RuleViewDto;
+import x.mvmn.permock.persistence.entity.RuleEntity;
 import x.mvmn.permock.persistence.repository.RuleRepository;
 import x.mvmn.permock.xtext.service.XtextService;
 
@@ -30,9 +35,14 @@ public class RulesController {
 	@Autowired
 	private RuleRepository ruleRepository;
 
+	@GetMapping
+	public List<RuleViewDto> list() {
+		return ruleRepository.findAll().stream().map(ruleMapper::mapToViewDto).collect(Collectors.toList());
+	}
+
 	@GetMapping("{ruleId}")
-	public Optional<RuleDto> get(@PathVariable("ruleId") Long ruleId) {
-		return ruleRepository.findById(ruleId).map(ruleMapper::map);
+	public Optional<RuleViewDto> get(@PathVariable("ruleId") Long ruleId) {
+		return ruleRepository.findById(ruleId).map(ruleMapper::mapToViewDto);
 	}
 
 	@PostMapping
@@ -48,6 +58,11 @@ public class RulesController {
 
 	@PutMapping("{ruleId}")
 	public void update(@PathVariable("ruleId") Long ruleId, @RequestBody @Validated RuleDto rule) {
-
+		RuleEntity ruleEntity = ruleRepository.findById(ruleId)
+				.orElseThrow(() -> new NotFound("Rule not found by id " + ruleId));
+		System.out.println(xtextService.parse(rule.getRuleText()));
+		ruleEntity.setTextRaw(rule.getRuleText());
+		ruleEntity.setPriority(rule.getPriority());
+		ruleRepository.save(ruleEntity);
 	}
 }

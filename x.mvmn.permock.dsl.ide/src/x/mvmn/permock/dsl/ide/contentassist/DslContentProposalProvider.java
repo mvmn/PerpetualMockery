@@ -51,7 +51,7 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 		String prefix = context.getPrefix();
 		if (ruleCall.getRule().getName().equals("Entity")) {
 			createProposals(modelHelper.entities(), prefix, context, acceptor);
-		} else if (ruleCall.getRule().getName().equals("PropertyAccess")) {
+		} else if (ruleCall.getRule().getName().equals(grammarAccess.getPropertyAccessRule().getName())) {
 			EObject currentModel = context.getCurrentModel();
 			if (currentModel instanceof PropertyRef) {
 				BeanUtil.Property currentModelType = xtextModelHelper.resolveType(currentModel.eContainer());

@@ -17,6 +17,8 @@ public class RuleEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
+	private Long priority;
 
 	@Column(name = "textraw", nullable = false)
 	private String textRaw;

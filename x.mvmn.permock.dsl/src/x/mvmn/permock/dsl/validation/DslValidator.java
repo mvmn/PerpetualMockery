@@ -106,7 +106,7 @@ public class DslValidator extends AbstractDslValidator {
 	@Check
 	public void check(ListFunction entity) {
 		try {
-			Property type = xtextModelHelper.resolveType(entity.eContainer());
+			Property type = xtextModelHelper.resolveType(entity.eContainer().eContainer());
 			if (type == null || !type.isCollection()) {
 				error("List functions only allowed for lists", entity, DslPackage.Literals.LIST_FUNCTION__ALIAS);
 				error("List functions only allowed for lists", entity, DslPackage.Literals.LIST_FUNCTION__SEPARATOR);

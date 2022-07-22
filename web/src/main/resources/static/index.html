@@ -19,11 +19,11 @@
 			"jquery" : "webjars/jquery/3.5.1/jquery.min",
 			"xtext/xtext-codemirror" : "xtext/2.25.0/xtext-codemirror"
 		},
-		packages : [ {
+		packages : [{
 			name : "codemirror",
 			location : "webjars/codemirror/5.65.6",
 			main : "lib/codemirror"
-		} ]
+		}]
 	});
 	require([ "xtext/xtext-codemirror" ], function(xtext) {
 		window.editor = xtext.createEditor({
@@ -32,6 +32,60 @@
 			sendFullText : true
 		});
 	});
+	
+	function setStatus(status) {
+		document.getElementById("status").innerHTML = status;
+	}
+	
+	function saveRule() {
+		setStatus("saving...");
+		var path = '/api/rules';
+		var method = 'POST';
+		if(currentRuleId) {
+			path += '/' + currentRuleId;
+			method = 'PUT';
+		}
+		const ruleData = {
+			ruleText: window.editor.getDoc().getValue(),
+			priority: parseInt(document.getElementById("priority").value)
+		}
+		fetch(path, {method:method, headers:{ 'Content-Type': 'application/json' }, body: JSON.stringify(ruleData)})
+		.then((response) => {
+			if (response.ok) {
+				setStatus("Save success");
+				loadRulesList();
+			} else {
+				setStatus("Save error");
+			}
+		});
+	}
+	
+	function loadRulesList() {
+		fetch("/api/rules").then(async (response) => {
+			if(response.ok) {
+				const rules = await response.json();
+				window.rules = rules;
+				const contentArray = [];
+				rules.forEach((val) => {
+					const content = '<div class="ruleListItem" id="rule_$id" onclick="ruleSelect($id)">$id ($priority)</div>'
+						.replaceAll('$id', val.id)
+						.replaceAll('$priority', val.priority? val.priority : 0);
+					contentArray.push(content);
+				});
+				document.getElementById("rulesList").innerHTML = contentArray.join("\n");
+			}
+		});
+	}
+	
+	var currentRuleId = null;
+	var rules = [];
+	function ruleSelect(id) {
+		currentRuleId = id;
+		const rule = rules.filter((val)=> val.id == id)[0];
+		window.editor.doc.setValue(rule.ruleText);
+	}
+	
+	loadRulesList();
 </script>
 <style type="text/css">
 .keyword {
@@ -64,15 +118,41 @@
 .boolean {
 	color: red;
 }
+
+.header {
+	width: 100%
+}
+
+.editorContent {
+	float: left;
+	width: 69%;
+	border: solid 1px grey;
+}
+
+.rulesContainer {
+	float: right;
+	width: 29%;
+	overflow: auto;
+	height: 90%;
+}
 </style>
 </head>
 <body>
 	<div class="container">
 		<div class="header">
-			<h1>Editor</h1>
+			<h1>Mock management</h1>
 		</div>
-		<div class="content">
+		<div class="editorContent">
 			<div id="xtext-editor" data-editor-xtext-lang="prmk"></div>
+			<div>Priority: <input id="priority" type="text" value="0" /></div>
+			<div id="status"></div>
+		</div>
+		<div class="rulesContainer">
+			<div>
+				<input type="button" value="Create" onclick="newRule()" /> 
+				<input type="button" value="Save" onclick="saveRule()" />
+			</div>
+			<div id="rulesList"></div>
 		</div>
 	</div>
 </body>

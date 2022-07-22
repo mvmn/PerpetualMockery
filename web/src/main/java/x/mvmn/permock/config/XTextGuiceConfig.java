@@ -2,6 +2,7 @@ package x.mvmn.permock.config;
 
 import org.eclipse.xtext.resource.XtextResourceFactory;
 import org.eclipse.xtext.resource.XtextResourceSet;
+import org.eclipse.xtext.validation.IResourceValidator;
 import org.eclipse.xtext.web.servlet.XtextServlet;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,5 +32,10 @@ public class XTextGuiceConfig {
 	@Bean
 	public XtextResourceFactory xtextResourceFactory() {
 		return xtextInjector.getInstance(XtextResourceFactory.class);
+	}
+
+	@Bean
+	public IResourceValidator resourceValidator() {
+		return xtextInjector.getInstance(IResourceValidator.class);
 	}
 }

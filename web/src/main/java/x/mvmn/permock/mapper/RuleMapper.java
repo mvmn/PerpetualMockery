@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import x.mvmn.permock.model.dto.RuleDto;
+import x.mvmn.permock.model.dto.RuleViewDto;
 import x.mvmn.permock.persistence.entity.RuleEntity;
 
 @Mapper(componentModel = "spring")
@@ -16,4 +17,7 @@ public interface RuleMapper {
 
 	@Mapping(target = "ruleText", source = "textRaw")
 	RuleDto map(RuleEntity entity);
+
+	@Mapping(target = "ruleText", source = "textRaw")
+	RuleViewDto mapToViewDto(RuleEntity entity);
 }

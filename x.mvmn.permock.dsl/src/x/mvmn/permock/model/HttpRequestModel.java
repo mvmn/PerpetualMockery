@@ -10,28 +10,49 @@ public class HttpRequestModel {
 	private final String httpMethod;
 	private final HeaderDictionary headersByName;
 	private final CookieDictionary cookiesByName;
+	private final QueryParameterDictionary queryParamsByName;
 	private final byte[] body;
 	private final List<HttpHeader> headers;
 	private final List<Cookie> cookies;
+	private final List<QueryParameter> queryParams;
 	private final ContentTypeModel contentType;
+	private final String path;
+	private final String query;
 
-	public HttpRequestModel(String httpMethod, HeaderDictionary headersByName, CookieDictionary cookiesByName,
-			byte[] body, List<HttpHeader> headers, List<Cookie> cookies) {
+	public HttpRequestModel(String httpMethod, String path, String query, HeaderDictionary headersByName,
+			CookieDictionary cookiesByName, QueryParameterDictionary queryParamsByName, byte[] body,
+			List<HttpHeader> headers, List<Cookie> cookies, List<QueryParameter> queryParams) {
 		this.httpMethod = httpMethod;
 		this.headersByName = headersByName;
 		this.cookiesByName = cookiesByName;
+		this.queryParamsByName = queryParamsByName;
 		this.body = body;
 		this.headers = headers;
 		this.cookies = cookies;
+		this.queryParams = queryParams;
 		this.contentType = new ContentTypeModel(
 				headersByName.get("Content-Type") != null ? headersByName.get("Content-Type").getValue() : null);
+		this.path = path;
+		this.query = query;
+	}
+
+	private Charset requestCharset() {
+		Charset result = StandardCharsets.UTF_8;
+		String charsetStr = contentType.getCharSet();
+		if (charsetStr != null) {
+			try {
+				return Charset.forName(charsetStr.toUpperCase());
+			} catch (IllegalCharsetNameException | UnsupportedCharsetException e) {
+			}
+		}
+		return result;
 	}
 
 	public String getHttpMethod() {
 		return httpMethod;
 	}
 
-	public HeaderDictionary getHeadersByName() {
+	public HeaderDictionary getHttpHeadersByName() {
 		return headersByName;
 	}
 
@@ -59,15 +80,19 @@ public class HttpRequestModel {
 		return contentType;
 	}
 
-	private Charset requestCharset() {
-		Charset result = StandardCharsets.UTF_8;
-		String charsetStr = contentType.getCharSet();
-		if (charsetStr != null) {
-			try {
-				return Charset.forName(charsetStr.toUpperCase());
-			} catch (IllegalCharsetNameException | UnsupportedCharsetException e) {
-			}
-		}
-		return result;
+	public String getPath() {
+		return path;
+	}
+
+	public String getQuery() {
+		return query;
+	}
+
+	public QueryParameterDictionary getQueryParamsByName() {
+		return queryParamsByName;
+	}
+
+	public List<QueryParameter> getQueryParams() {
+		return queryParams;
 	}
 }
