@@ -15,6 +15,10 @@ public class BeanUtil {
 		private final Class<?> type;
 		private final boolean isCollection;
 
+		public Property(String name, Class<?> type) {
+			this(name, type, false);
+		}
+
 		public Property(String name, Class<?> type, boolean isCollection) {
 			this.name = name;
 			this.type = type;
@@ -31,6 +35,22 @@ public class BeanUtil {
 
 		public boolean isCollection() {
 			return isCollection;
+		}
+
+		public boolean isNumber() {
+			return !isCollection && Number.class.isAssignableFrom(type);
+		}
+
+		public boolean isBoolean() {
+			return !isCollection && Boolean.class.isAssignableFrom(type);
+		}
+
+		public boolean isString() {
+			return !isCollection && String.class.isAssignableFrom(type);
+		}
+
+		public boolean isPrimitive() {
+			return !isCollection && (isNumber() || isBoolean() || isString());
 		}
 
 		public static Property of(String name, Class<?> type, boolean isCollection) {

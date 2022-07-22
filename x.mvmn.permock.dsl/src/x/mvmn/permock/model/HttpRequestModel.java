@@ -43,7 +43,7 @@ public class HttpRequestModel {
 		return body;
 	}
 
-	public List<HttpHeader> getHeaders() {
+	public List<HttpHeader> getHttpHeaders() {
 		return headers;
 	}
 

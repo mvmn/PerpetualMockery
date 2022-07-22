@@ -3,23 +3,202 @@
  */
 package x.mvmn.permock.dsl.validation;
 
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.xtext.validation.Check;
+
+import com.google.inject.Inject;
+
+import x.mvmn.permock.dsl.dsl.CollectionAccess;
+import x.mvmn.permock.dsl.dsl.Constant;
+import x.mvmn.permock.dsl.dsl.DslPackage;
+import x.mvmn.permock.dsl.dsl.Entity;
+import x.mvmn.permock.dsl.dsl.Expression;
+import x.mvmn.permock.dsl.dsl.ListElementReference;
+import x.mvmn.permock.dsl.dsl.ListFunction;
+import x.mvmn.permock.dsl.dsl.Operand;
+import x.mvmn.permock.dsl.dsl.Operator;
+import x.mvmn.permock.dsl.dsl.PropertyAccess;
+import x.mvmn.permock.dsl.dsl.PropertyRef;
+import x.mvmn.permock.dsl.dsl.Reference;
+import x.mvmn.permock.dsl.model.ModelHelper;
+import x.mvmn.permock.dsl.model.XtextModelHelper;
+import x.mvmn.permock.util.BeanUtil.Property;
 
 /**
- * This class contains custom validation rules. 
+ * This class contains custom validation rules.
  *
- * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#validation
+ * See
+ * https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#validation
  */
 public class DslValidator extends AbstractDslValidator {
-	
-//	public static final String INVALID_NAME = "invalidName";
-//
-//	@Check
-//	public void checkGreetingStartsWithCapital(Greeting greeting) {
-//		if (!Character.isUpperCase(greeting.getName().charAt(0))) {
-//			warning("Name should start with a capital",
-//					DslPackage.Literals.GREETING__NAME,
-//					INVALID_NAME);
-//		}
-//	}
-	
+
+	public static final String INVALID_NAME = "invalidName";
+
+	@Inject
+	private XtextModelHelper xtextModelHelper;
+
+	@Inject
+	private ModelHelper modelHelper;
+
+	@Check
+	public void check(Expression expression) {
+		try {
+			Property leftOpType = calculateType(expression.getLeft());
+			Property rightOpType = null;
+			if (leftOpType != null) {
+				if (expression.getRight() == null && !leftOpType.getType().equals(Boolean.class)) {
+					error("Missing comparison operation", DslPackage.Literals.EXPRESSION__LEFT);
+				} else {
+					rightOpType = calculateType(expression.getRight());
+					if (rightOpType != null) {
+						if (expression.getOp() != null
+								&& !allowedExpression(leftOpType, expression.getOp(), rightOpType)) {
+							error("Cannot apply " + expression.getOp().getLiteral() + " to "
+									+ leftOpType.getType().getSimpleName() + " and "
+									+ rightOpType.getType().getSimpleName(), DslPackage.Literals.EXPRESSION__OP);
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Check
+	public void check(Entity entity) {
+		try {
+			if (entity.getName() != null && !modelHelper.entities().stream()
+					.filter(e -> e.getName().equals(entity.getName())).findAny().isPresent()) {
+				error("Cannot resolve", DslPackage.Literals.ENTITY__NAME);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Check
+	public void check(PropertyAccess entity) {
+		try {
+			if (xtextModelHelper.resolveType(entity) == null) {
+				error("Cannot resolve", DslPackage.Literals.PROPERTY_ACCESS__NAME);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Check
+	public void check(CollectionAccess entity) {
+		try {
+			Property type = xtextModelHelper.resolveType(entity.eContainer().eContainer());
+			if (entity.getIndex() != null && (type == null || !type.isCollection())) {
+				error("Index access only allowed for lists", DslPackage.Literals.COLLECTION_ACCESS__INDEX);
+			}
+			if (entity.getKey() != null && (type == null || !modelHelper.isDictionary(type))) {
+				error("Key access only allowed for dictionaries", DslPackage.Literals.COLLECTION_ACCESS__INDEX);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Check
+	public void check(ListFunction entity) {
+		try {
+			Property type = xtextModelHelper.resolveType(entity.eContainer());
+			if (type == null || !type.isCollection()) {
+				error("List functions only allowed for lists", entity, DslPackage.Literals.LIST_FUNCTION__ALIAS);
+				error("List functions only allowed for lists", entity, DslPackage.Literals.LIST_FUNCTION__SEPARATOR);
+				error("List functions only allowed for lists", entity, DslPackage.Literals.LIST_FUNCTION__OP);
+				error("List functions only allowed for lists", entity, DslPackage.Literals.LIST_FUNCTION__CONDITION);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private boolean allowedExpression(Property leftOpType, Operator op, Property rightOpType) {
+		if (Operator.REGEX.getName().equals(op.getName())) {
+			// For Regex both sides must be strings
+			return leftOpType.isString() && rightOpType.isString();
+		}
+		if (leftOpType.isNumber()) {
+			return rightOpType.isNumber();
+		} else if (leftOpType.isBoolean()) {
+			if (!rightOpType.isBoolean()) {
+				return false;
+			}
+			// For boolean we only allow equals and not equals
+			return Operator.EQ.getName().equals(op.getName()) || Operator.NEQ.getName().equals(op.getName());
+		} else if (leftOpType.isString()) {
+			// Any op on lefthand string is fine - we can convert righthand value to string
+			// as long as it is a primitive
+			return rightOpType.isString() || rightOpType.isBoolean() || rightOpType.isNumber();
+		} else {
+			// No operations are allowed on non-primitives
+			return false;
+		}
+	}
+
+	private Property calculateType(Operand operand) {
+		if (operand == null) {
+			return null;
+		}
+		Constant constantVal = operand.getConst();
+		if (constantVal != null) {
+			if (constantVal.getBoolVal() != null) {
+				return new Property("const", Boolean.class, false);
+			} else if (constantVal.getIntVal() != null) {
+				return new Property("const", Long.class, false);
+			} else if (constantVal.getFloatVal() != null) {
+				return new Property("const", Double.class, false);
+			} else if (constantVal.getStrVal() != null) {
+				return new Property("const", String.class, false);
+			}
+		} else {
+			if (operand.getRef() != null) {
+				return calculateType(operand.getRef());
+			} else if (operand.getListElementRef() != null) {
+				return calculateType(operand.getListElementRef());
+			}
+		}
+
+		return null;
+	}
+
+	private Property calculateType(ListElementReference listElementRef) {
+		return xtextModelHelper.resolveType(getDeepestNode(listElementRef));
+	}
+
+	private Property calculateType(Reference ref) {
+		return xtextModelHelper.resolveType(getDeepestNode(ref));
+	}
+
+	private EObject getDeepestNode(ListElementReference listElementRef) {
+		if (listElementRef.getProp() != null) {
+			return getDeepestNode(listElementRef.getProp());
+		}
+		return listElementRef;
+	}
+
+	private EObject getDeepestNode(Reference ref) {
+		if (ref.getProp() != null) {
+			return getDeepestNode(ref.getProp());
+		}
+		return ref;
+	}
+
+	private EObject getDeepestNode(PropertyRef prop) {
+		if (prop.getSubPropery() != null) {
+			return getDeepestNode(prop.getSubPropery());
+		} else if (prop.getCollectionAccess() != null) {
+			return prop.getCollectionAccess();
+		} else if (prop.getListFunc() != null) {
+			return prop.getListFunc();
+		} else if (prop.getCollectionAccess() != null) {
+			return prop.getCollectionAccess();
+		}
+		return prop;
+	}
 }

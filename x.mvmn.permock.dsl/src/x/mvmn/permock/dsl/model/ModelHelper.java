@@ -20,10 +20,13 @@ public class ModelHelper {
 			Property.of("first", prop.getType(), BeanUtil.isCollection(prop.getType())),
 			Property.of("last", prop.getType(), BeanUtil.isCollection(prop.getType())));
 
-	private final Map<Class<?>, List<Property>> PRIMITIVE_TYPES_PROPERTIES = Map.of(String.class,
-			List.of(Property.of("length", Integer.class, false), Property.of("isEmpty", Boolean.class, false),
-					Property.of("isBlank", Boolean.class, false)),
-			Double.class, List.of(Property.of("round", Long.class, false), Property.of("ceil", Long.class, false),
+	private final Map<Class<?>, List<Property>> PRIMITIVE_TYPES_PROPERTIES = Map.of(
+			String.class, List.of(Property.of("length", Integer.class, false),
+					Property.of("isEmpty", Boolean.class, false), Property.of("isBlank", Boolean.class, false)),
+			Double.class,
+			List.of(Property.of("round", Long.class, false), Property.of("ceil", Long.class, false),
+					Property.of("floor", Long.class, false)),
+			Float.class, List.of(Property.of("round", Long.class, false), Property.of("ceil", Long.class, false),
 					Property.of("floor", Long.class, false)));
 
 	protected boolean isFromDslPackage(Class<?> clazz) {
@@ -48,6 +51,10 @@ public class ModelHelper {
 			return GET_COLLECTION_FUNCTIONS.apply(property).stream().filter(prop -> prop.getName().equals(name))
 					.findAny().orElse(null);
 		}
+		if (property.isPrimitive()) {
+			return PRIMITIVE_TYPES_PROPERTIES.getOrDefault(property.getType(), Collections.emptyList()).stream()
+					.filter(prop -> prop.getName().equals(name)).findAny().orElse(null);
+		}
 		return BeanUtil.getPropertyType(property.getType(), name);
 	}
 
@@ -68,7 +75,7 @@ public class ModelHelper {
 	}
 
 	public boolean isDictionary(Property property) {
-		return Dictionary.class.isAssignableFrom(property.getType());
+		return property != null && property.getType() != null && Dictionary.class.isAssignableFrom(property.getType());
 	}
 
 	public Property getDictionaryValueType(Property dictionary) {
@@ -80,5 +87,4 @@ public class ModelHelper {
 				.map(Method::getReturnType).orElse(null);
 		return type != null ? Property.of("value", type, BeanUtil.isCollection(type)) : null;
 	}
-
 }

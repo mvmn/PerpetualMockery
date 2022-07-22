@@ -81,7 +81,7 @@ terminal BOOLEAN returns ecore::EBooleanObject:
 terminal FLOAT returns ecore::EDoubleObject:
 	INTEGER '.' INTEGER;
 
-terminal INTEGER returns ecore::EIntegerObject:
+terminal INTEGER returns ecore::ELongObject:
 	('0'..'9')+;
 
 terminal ID:

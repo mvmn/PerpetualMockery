@@ -2,13 +2,11 @@ package x.mvmn.permock.dsl.ide.contentassist;
 
 import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.AbstractElement;
 import org.eclipse.xtext.AbstractRule;
 import org.eclipse.xtext.Assignment;
-import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.TerminalRule;
@@ -21,13 +19,9 @@ import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalProvider;
 
 import com.google.inject.Inject;
 
-import x.mvmn.permock.dsl.dsl.CollectionAccess;
-import x.mvmn.permock.dsl.dsl.ListElementReference;
-import x.mvmn.permock.dsl.dsl.ListFunction;
-import x.mvmn.permock.dsl.dsl.PropertyAccess;
 import x.mvmn.permock.dsl.dsl.PropertyRef;
-import x.mvmn.permock.dsl.dsl.Reference;
 import x.mvmn.permock.dsl.model.ModelHelper;
+import x.mvmn.permock.dsl.model.XtextModelHelper;
 import x.mvmn.permock.dsl.services.DslGrammarAccess;
 import x.mvmn.permock.util.BeanUtil;
 import x.mvmn.permock.util.BeanUtil.Property;
@@ -46,6 +40,9 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 	@Inject
 	private ModelHelper modelHelper;
 
+	@Inject
+	private XtextModelHelper xtextModelHelper;
+
 	private Set<String> primitiveValRuleNames = Set.of("ID", "STRING", "INTEGER", "FLOAT");
 
 	@Override
@@ -57,112 +54,11 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 		} else if (ruleCall.getRule().getName().equals("PropertyAccess")) {
 			EObject currentModel = context.getCurrentModel();
 			if (currentModel instanceof PropertyRef) {
-				BeanUtil.Property currentModelType = resolveType(currentModel.eContainer());
+				BeanUtil.Property currentModelType = xtextModelHelper.resolveType(currentModel.eContainer());
 				if (currentModelType != null) {
 					createProposals(modelHelper.properties(currentModelType), prefix, context, acceptor);
 				}
-			} else {
-				// Can this even happen for rule call PropertyRef?
-				System.err.println(currentModel);
 			}
-		}
-	}
-
-	private void createProposals(List<BeanUtil.Property> options, String prefix, ContentAssistContext context,
-			IIdeContentProposalAcceptor acceptor) {
-		boolean appendDot = prefix != null && prefix.startsWith(".");
-		options.stream()
-				.forEach(n -> createProposal(appendDot ? ("." + n.getName()) : n.getName(),
-						(n.isCollection() ? "List of " : "") + n.getType().getSimpleName(),
-						ContentAssistEntry.KIND_KEYWORD, context, acceptor));
-	}
-
-	private BeanUtil.Property resolveType(EObject currentModel) {
-		if (currentModel instanceof Reference) {
-			return getReferenceType((Reference) currentModel);
-		} else if (currentModel instanceof PropertyAccess) {
-			return getPropertyType((PropertyAccess) currentModel);
-		} else if (currentModel instanceof CollectionAccess) {
-			return getCollectionType((CollectionAccess) currentModel);
-		} else if (currentModel instanceof PropertyRef) {
-			PropertyRef propertyRef = (PropertyRef) currentModel;
-			if (propertyRef.getCollectionAccess() != null) {
-				return getCollectionType(propertyRef.getCollectionAccess());
-			} else if (propertyRef.getPropAccess() != null) {
-				return getPropertyType(propertyRef.getPropAccess());
-			} else if (propertyRef.getListFunc() != null) {
-				ListFunction listFunction = propertyRef.getListFunc();
-				if (grammarAccess.getListOperationAccess().getFILTEREnumLiteralDeclaration_0().getLiteral().getValue()
-						.equals(listFunction.getOp().getLiteral())) {
-					return resolveType(propertyRef.eContainer());
-				} else { // ALL, ANY - boolean result
-					return BeanUtil.Property.of("list", Boolean.class, false);
-				}
-			}
-		} else if (currentModel instanceof ListElementReference) {
-			ListElementReference listElRef = (ListElementReference) currentModel;
-			String alias = listElRef.getName() != null ? listElRef.getName().getName() : null;
-			if (alias != null) {
-				ListFunction parentListFunction = findMatchingContainerOfType(currentModel, ListFunction.class,
-						lf -> lf.getAlias().getName().equals(alias));
-				if (parentListFunction != null) {
-					BeanUtil.Property parentCollection = resolveType(parentListFunction.eContainer());
-					if (parentCollection != null) {
-						return new BeanUtil.Property(alias, parentCollection.getType(),
-								BeanUtil.isCollection(parentCollection.getType()));
-					}
-				}
-			}
-		}
-		return null;
-	}
-
-	private <T extends EObject> T findMatchingContainerOfType(EObject currentModel, Class<T> clazz,
-			Predicate<T> check) {
-		T candidate = EcoreUtil2.getContainerOfType(currentModel, clazz);
-		while (candidate != null) {
-			if (check.test(candidate)) {
-				return candidate;
-			} else {
-				if (candidate.eContainer() != null) {
-					candidate = EcoreUtil2.getContainerOfType(candidate.eContainer(), clazz);
-				} else {
-					return null;
-				}
-			}
-		}
-		return null;
-	}
-
-	private BeanUtil.Property getReferenceType(Reference reference) {
-		String entityName = reference.getName().getName();
-		return modelHelper.entityType(entityName);
-	}
-
-	private BeanUtil.Property getPropertyType(PropertyAccess propertyRef) {
-		BeanUtil.Property parentType = resolveType(propertyRef.eContainer().eContainer());
-		if (parentType == null) {
-			return null;
-		}
-		return propertyRef.getName() != null ? modelHelper.typeOfProperty(parentType, propertyRef.getName()) : null;
-	}
-
-	private BeanUtil.Property getCollectionType(CollectionAccess collectionAccess) {
-		BeanUtil.Property parentType = resolveType(collectionAccess.eContainer().eContainer());
-		if (collectionAccess.getKey() != null) {
-			return modelHelper.getDictionaryValueType(parentType);
-		}
-
-		if (parentType == null) {
-			return null;
-		}
-		if (collectionAccess.getIndex() == null) {
-			return null;
-		}
-		if (!parentType.isCollection()) {
-			return null;
-		} else {
-			return new BeanUtil.Property(collectionAccess.getIndex().toString(), parentType.getType(), false);
 		}
 	}
 
@@ -186,12 +82,21 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 		Set<Keyword> collectionOps = Set.of(grammarAccess.getListFunctionAccess().getLeftCurlyBracketKeyword_0(),
 				grammarAccess.getCollectionAccessAccess().getLeftSquareBracketKeyword_0());
 
-		Property currentModelType = resolveType(context.getCurrentModel());
+		Property currentModelType = xtextModelHelper.resolveType(context.getCurrentModel());
 		if (currentModelType == null) {
 			return true;
 		}
 		return grammarAccess.getPropertyRefAccess().getFullStopKeyword_0_0_0().equals(keyword)
 				|| currentModelType.isCollection() == collectionOps.contains(keyword);
+	}
+
+	private void createProposals(List<BeanUtil.Property> options, String prefix, ContentAssistContext context,
+			IIdeContentProposalAcceptor acceptor) {
+		boolean appendDot = prefix != null && prefix.startsWith(".");
+		options.stream()
+				.forEach(n -> createProposal(appendDot ? ("." + n.getName()) : n.getName(),
+						(n.isCollection() ? "List of " : "") + n.getType().getSimpleName(),
+						ContentAssistEntry.KIND_KEYWORD, context, acceptor));
 	}
 
 	protected void createProposal(String value, String description, String kind, ContentAssistContext context,
