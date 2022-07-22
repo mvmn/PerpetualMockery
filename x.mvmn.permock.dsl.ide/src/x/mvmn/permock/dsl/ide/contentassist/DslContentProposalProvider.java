@@ -19,6 +19,7 @@ import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalProvider;
 
 import com.google.inject.Inject;
 
+import x.mvmn.permock.dsl.dsl.ListFunction;
 import x.mvmn.permock.dsl.dsl.PropertyRef;
 import x.mvmn.permock.dsl.model.ModelHelper;
 import x.mvmn.permock.dsl.model.XtextModelHelper;
@@ -80,14 +81,25 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 	@Override
 	protected boolean filterKeyword(Keyword keyword, ContentAssistContext context) {
 		Set<Keyword> collectionOps = Set.of(grammarAccess.getListFunctionAccess().getLeftCurlyBracketKeyword_0(),
-				grammarAccess.getCollectionAccessAccess().getLeftSquareBracketKeyword_0());
+				grammarAccess.getCollectionAccessAccess().getLeftSquareBracketKeyword_0(),
+				grammarAccess.getListOperationAccess().getALLAllKeyword_1_0(),
+				grammarAccess.getListOperationAccess().getANYAnyKeyword_2_0(),
+				grammarAccess.getListOperationAccess().getFILTERWhereKeyword_0_0());
 
-		Property currentModelType = xtextModelHelper.resolveType(context.getCurrentModel());
-		if (currentModelType == null) {
-			return true;
+		boolean collectionOp = false;
+		if (context.getCurrentModel() instanceof ListFunction) {
+			collectionOp = true;
+		} else {
+			Property currentModelType = xtextModelHelper.resolveType(context.getCurrentModel());
+			if (currentModelType == null) {
+				return true;
+			}
+			if (currentModelType.isCollection()) {
+				collectionOp = true;
+			}
 		}
 		return grammarAccess.getPropertyRefAccess().getFullStopKeyword_0_0_0().equals(keyword)
-				|| currentModelType.isCollection() == collectionOps.contains(keyword);
+				|| collectionOp == collectionOps.contains(keyword);
 	}
 
 	private void createProposals(List<BeanUtil.Property> options, String prefix, ContentAssistContext context,

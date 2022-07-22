@@ -39,16 +39,8 @@ public class XtextModelHelper {
 				return getPropertyType(propertyRef.getPropAccess());
 			} else if (propertyRef.getListFunc() != null) {
 				ListFunction listFunction = propertyRef.getListFunc();
-				if (grammarAccess.getListOperationAccess().getFILTEREnumLiteralDeclaration_0().getLiteral().getValue()
-						.equals(listFunction.getOp().getLiteral())) {
-					return resolveType(propertyRef.eContainer());
-				} else { // ALL, ANY - boolean result
-					return BeanUtil.Property.of("list", Boolean.class, false);
-				}
+				return resolveType(listFunction);
 			}
-//			else if (propertyRef.getSubPropery() != null) {
-//				return resolveType(propertyRef.getSubPropery());
-//			}
 		} else if (currentModel instanceof ListElementReference) {
 			ListElementReference listElRef = (ListElementReference) currentModel;
 			String alias = listElRef.getName() != null ? listElRef.getName().getName() : null;
