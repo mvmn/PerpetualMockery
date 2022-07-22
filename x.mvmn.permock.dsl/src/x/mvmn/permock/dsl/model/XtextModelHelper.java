@@ -45,7 +45,7 @@ public class XtextModelHelper {
 				} else { // ALL, ANY - boolean result
 					return BeanUtil.Property.of("list", Boolean.class, false);
 				}
-			} 
+			}
 //			else if (propertyRef.getSubPropery() != null) {
 //				return resolveType(propertyRef.getSubPropery());
 //			}
@@ -62,6 +62,14 @@ public class XtextModelHelper {
 								BeanUtil.isCollection(parentCollection.getType()));
 					}
 				}
+			}
+		} else if (currentModel instanceof ListFunction) {
+			ListFunction listFunction = (ListFunction) currentModel;
+			if (grammarAccess.getListOperationAccess().getFILTEREnumLiteralDeclaration_0().getLiteral().getValue()
+					.equals(listFunction.getOp().getLiteral())) {
+				return resolveType(currentModel.eContainer().eContainer());
+			} else { // ALL, ANY - boolean result
+				return BeanUtil.Property.of("list", Boolean.class, false);
 			}
 		}
 		return null;
