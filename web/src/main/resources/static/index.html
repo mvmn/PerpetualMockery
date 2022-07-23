@@ -38,12 +38,14 @@
 	}
 	
 	function saveRule() {
-		setStatus("saving...");
 		var path = '/api/rules';
 		var method = 'POST';
 		if(currentRuleId) {
 			path += '/' + currentRuleId;
 			method = 'PUT';
+			setStatus("saving rule " + currentRuleId + "...");
+		} else {
+			setStatus("saving new rule...");
 		}
 		const ruleData = {
 			ruleText: window.editor.getDoc().getValue(),
@@ -67,7 +69,7 @@
 				window.rules = rules;
 				const contentArray = [];
 				rules.forEach((val) => {
-					const content = '<div class="ruleListItem" id="rule_$id" onclick="ruleSelect($id)">$id ($priority)</div>'
+					const content = '<div class="ruleListItem" id="rule_$id" onclick="ruleSelect($id)">$id ($priority) <input type="button" value="X" onclick="deleteRule($id)" /></div>'
 						.replaceAll('$id', val.id)
 						.replaceAll('$priority', val.priority? val.priority : 0);
 					contentArray.push(content);
@@ -83,6 +85,24 @@
 		currentRuleId = id;
 		const rule = rules.filter((val)=> val.id == id)[0];
 		window.editor.doc.setValue(rule.ruleText);
+	}
+	
+	function newRule() {
+		currentRuleId = null;
+		window.editor.doc.setValue('');
+	}
+	
+	function deleteRule(id) {
+		setStatus("deleting rule " + id + "...");
+		fetch("/api/rules/"+id, {method: 'DELETE'})
+		.then((response) => {
+			if (response.ok) {
+				setStatus("Delete success");
+				loadRulesList();
+			} else {
+				setStatus("Delete error");
+			}
+		});
 	}
 	
 	loadRulesList();
@@ -144,12 +164,14 @@
 		</div>
 		<div class="editorContent">
 			<div id="xtext-editor" data-editor-xtext-lang="prmk"></div>
-			<div>Priority: <input id="priority" type="text" value="0" /></div>
+			<div>
+				Priority: <input id="priority" type="text" value="0" />
+			</div>
 			<div id="status"></div>
 		</div>
 		<div class="rulesContainer">
 			<div>
-				<input type="button" value="Create" onclick="newRule()" /> 
+				<input type="button" value="Create" onclick="newRule()" />
 				<input type="button" value="Save" onclick="saveRule()" />
 			</div>
 			<div id="rulesList"></div>

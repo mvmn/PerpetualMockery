@@ -15,13 +15,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import x.mvmn.permock.exception.NotFound;
 import x.mvmn.permock.mapper.RuleMapper;
 import x.mvmn.permock.model.dto.RuleDto;
 import x.mvmn.permock.model.dto.RuleViewDto;
+import x.mvmn.permock.model.rules.MockRule;
 import x.mvmn.permock.persistence.entity.RuleEntity;
 import x.mvmn.permock.persistence.repository.RuleRepository;
-import x.mvmn.permock.xtext.service.XtextService;
+import x.mvmn.permock.service.RuleParsingService;
 
 @RestController
 @RequestMapping("/api/rules")
@@ -30,10 +34,13 @@ public class RulesController {
 	private RuleMapper ruleMapper;
 
 	@Autowired
-	private XtextService xtextService;
+	private RuleParsingService ruleParsingService;
 
 	@Autowired
 	private RuleRepository ruleRepository;
+
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	@GetMapping
 	public List<RuleViewDto> list() {
@@ -47,8 +54,9 @@ public class RulesController {
 
 	@PostMapping
 	public RuleDto create(@RequestBody @Validated RuleDto rule) {
-		System.out.println(xtextService.parse(rule.getRuleText()));
-		return ruleMapper.map(ruleRepository.save(ruleMapper.map(rule)));
+		RuleEntity ruleEntity = ruleMapper.map(rule);
+		ruleEntity.setSerialized(parseAndSerialize(rule.getRuleText()));
+		return ruleMapper.map(ruleRepository.save(ruleEntity));
 	}
 
 	@DeleteMapping("{ruleId}")
@@ -60,9 +68,21 @@ public class RulesController {
 	public void update(@PathVariable("ruleId") Long ruleId, @RequestBody @Validated RuleDto rule) {
 		RuleEntity ruleEntity = ruleRepository.findById(ruleId)
 				.orElseThrow(() -> new NotFound("Rule not found by id " + ruleId));
-		System.out.println(xtextService.parse(rule.getRuleText()));
+		ruleEntity.setSerialized(parseAndSerialize(rule.getRuleText()));
 		ruleEntity.setTextRaw(rule.getRuleText());
 		ruleEntity.setPriority(rule.getPriority());
 		ruleRepository.save(ruleEntity);
+	}
+
+	protected String parseAndSerialize(String text) {
+		try {
+			MockRule ruleModel = ruleParsingService.parse(text);
+			System.out.println("---\n" + ruleModel + "\n---");
+			String serialized = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(ruleModel);
+			System.out.println("---\n" + serialized + "\n---");
+			return serialized;
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException("Rule model serialization failed", e);
+		}
 	}
 }
