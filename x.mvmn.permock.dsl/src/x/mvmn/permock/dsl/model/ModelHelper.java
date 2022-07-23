@@ -52,8 +52,8 @@ public class ModelHelper {
 					.findAny().orElse(null);
 		}
 		if (property.isPrimitive()) {
-			return PRIMITIVE_TYPES_PROPERTIES.getOrDefault(property.getType(), Collections.emptyList()).stream()
-					.filter(prop -> prop.getName().equals(name)).findAny().orElse(null);
+			return getPrimitiveTypeProps(property.getType()).stream().filter(prop -> prop.getName().equals(name))
+					.findAny().orElse(null);
 		}
 		return BeanUtil.getPropertyType(property.getType(), name);
 	}

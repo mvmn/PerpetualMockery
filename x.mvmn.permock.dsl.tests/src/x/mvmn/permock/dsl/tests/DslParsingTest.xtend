@@ -19,9 +19,19 @@ class DslParsingTest {
 	ParseHelper<Rule> parseHelper
 	
 	@Test
-	def void loadModel() {
+	def void testParse() {
 		val result = parseHelper.parse('''
-			Hello Xtext!
+			if
+				httpHeaders{
+						any header:
+					$header.name = 'MockMe' and $header.value = 'false'
+				}.isNotEmpty or path ~= "/mockery/.*" and httpMethod = 'GET'
+			respond with
+				status 302
+				content 'asdasd'
+				headers
+					'Location': 'https://www.google.com',
+					'Test': "blah blah test"
 		''')
 		Assertions.assertNotNull(result)
 		val errors = result.eResource.errors
