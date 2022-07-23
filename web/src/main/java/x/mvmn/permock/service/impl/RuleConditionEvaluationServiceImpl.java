@@ -252,6 +252,23 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 
 	private EvaluationResult evaluatePropertyRef(Tuple2<Object, Property> parentValue,
 			MockRulePropertyReference propRef, EvaluationContext context) {
+		EvaluationResult result = doEvaluatePropertyRef(parentValue, propRef, context);
+		return normalizeTypes(result);
+	}
+
+	private EvaluationResult normalizeTypes(EvaluationResult param) {
+		if (param.getValue() instanceof Integer) {
+			param.setValue(Long.valueOf((Integer) param.getValue()));
+		}
+		if (param.getValue() instanceof Float) {
+			param.setValue(Double.valueOf((Float) param.getValue()));
+		}
+
+		return param;
+	}
+
+	private EvaluationResult doEvaluatePropertyRef(Tuple2<Object, Property> parentValue,
+			MockRulePropertyReference propRef, EvaluationContext context) {
 		if (propRef.isListFunction()) {
 			MockRuleListFunction listFunct = (MockRuleListFunction) propRef;
 
