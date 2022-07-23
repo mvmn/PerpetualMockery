@@ -83,9 +83,11 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 
 	@Override
 	public boolean evaluate(MockRuleCondition conditions, HttpRequestModel requestModel) {
+		long startTime = System.currentTimeMillis();
 		Object result = evaluate(conditions, EvaluationContext.builder().requestModel(requestModel).build());
 		if (debug) {
-			System.err.println("Evaluated to " + result + " conditions:\n" + conditions);
+			System.out.println("Evaluated to " + result + " conditions:\n" + conditions + " - took "
+					+ (System.currentTimeMillis() - startTime) + " millisec.");
 		}
 		return result instanceof Boolean && ((Boolean) result).booleanValue();
 	}

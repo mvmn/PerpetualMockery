@@ -52,10 +52,12 @@
 			priority: parseInt(document.getElementById("priority").value)
 		}
 		fetch(path, {method:method, headers:{ 'Content-Type': 'application/json' }, body: JSON.stringify(ruleData)})
-		.then((response) => {
+		.then(async (response) => {
 			if (response.ok) {
 				setStatus("Save success");
 				loadRulesList();
+				const ruleData = await response.json();
+				currentRuleId = ruleData.id;
 			} else {
 				setStatus("Save error");
 			}

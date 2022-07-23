@@ -53,10 +53,10 @@ public class RulesController {
 	}
 
 	@PostMapping
-	public RuleDto create(@RequestBody @Validated RuleDto rule) {
+	public RuleViewDto create(@RequestBody @Validated RuleDto rule) {
 		RuleEntity ruleEntity = ruleMapper.map(rule);
 		ruleEntity.setSerialized(parseAndSerialize(rule.getRuleText()));
-		return ruleMapper.map(ruleRepository.save(ruleEntity));
+		return ruleMapper.mapToViewDto(ruleRepository.save(ruleEntity));
 	}
 
 	@DeleteMapping("{ruleId}")

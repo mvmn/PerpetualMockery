@@ -63,7 +63,7 @@ public class RuleParsingServiceImpl implements RuleParsingService {
 	private MockRule map(Rule parsedRule) {
 		return MockRule.builder()
 				.responseConfig(
-						parsedRule.getResponse() != null ? map(parsedRule.getResponse()) : map(parsedRule.getProxy()))
+						parsedRule.getProxy() == null ? map(parsedRule.getResponse()) : map(parsedRule.getProxy()))
 				.conditions(map(parsedRule.getConditions())).build();
 	}
 
@@ -75,15 +75,17 @@ public class RuleParsingServiceImpl implements RuleParsingService {
 		MockResponseConfig result = new MockResponseConfig();
 		result.setProxy(false);
 		result.setResponseStatus(200);
-		result.setResposeBody(response.getContent());
-		if (response.getHttpStatus() != null) {
-			result.setResponseStatus(response.getHttpStatus().intValue());
-		}
-		if (response.getHeaders() != null && response.getHeaders().getHeaders() != null) {
-			List<MockResponseConfigHeader> headers = response.getHeaders().getHeaders().stream()
-					.map(header -> new MockResponseConfigHeader(header.getHeaderName(), header.getHeaderValue()))
-					.collect(Collectors.toList());
-			result.setResponseHeaders(headers);
+		if (response != null) {
+			result.setResposeBody(response.getContent());
+			if (response.getHttpStatus() != null) {
+				result.setResponseStatus(response.getHttpStatus().intValue());
+			}
+			if (response.getHeaders() != null && response.getHeaders().getHeaders() != null) {
+				List<MockResponseConfigHeader> headers = response.getHeaders().getHeaders().stream()
+						.map(header -> new MockResponseConfigHeader(header.getHeaderName(), header.getHeaderValue()))
+						.collect(Collectors.toList());
+				result.setResponseHeaders(headers);
+			}
 		}
 		return result;
 	}
