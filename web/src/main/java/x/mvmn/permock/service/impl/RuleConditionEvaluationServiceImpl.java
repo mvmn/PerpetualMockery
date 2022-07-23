@@ -66,6 +66,13 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 				}
 			}
 		}
+
+		public HttpRequestModel getRequestModel() {
+			if (requestModel == null && parent != null) {
+				return parent.getRequestModel();
+			}
+			return requestModel;
+		}
 	}
 
 	@Data
