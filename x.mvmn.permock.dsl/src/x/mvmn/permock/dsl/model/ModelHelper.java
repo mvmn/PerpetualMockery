@@ -14,23 +14,30 @@ import x.mvmn.permock.util.BeanUtil.Property;
 
 public class ModelHelper {
 
+	private static final String MODEL_PACKAGE_NAME = "x.mvmn.permock.model";
+
 	private final Function<Property, List<Property>> GET_COLLECTION_FUNCTIONS = prop -> List.of(
-			Property.of("size", Integer.class, false), Property.of("isEmpty", Boolean.class, false),
-			Property.of("isNotEmpty", Boolean.class, false),
-			Property.of("first", prop.getType(), BeanUtil.isCollection(prop.getType())),
+			Property.of("size", Long.class, false), //
+			Property.of("isEmpty", Boolean.class, false), //
+			Property.of("isNotEmpty", Boolean.class, false), //
+			Property.of("first", prop.getType(), BeanUtil.isCollection(prop.getType())), //
 			Property.of("last", prop.getType(), BeanUtil.isCollection(prop.getType())));
 
-	private final Map<Class<?>, List<Property>> PRIMITIVE_TYPES_PROPERTIES = Map.of(
-			String.class, List.of(Property.of("length", Integer.class, false),
-					Property.of("isEmpty", Boolean.class, false), Property.of("isBlank", Boolean.class, false)),
-			Double.class,
-			List.of(Property.of("round", Long.class, false), Property.of("ceil", Long.class, false),
-					Property.of("floor", Long.class, false)),
-			Float.class, List.of(Property.of("round", Long.class, false), Property.of("ceil", Long.class, false),
+	private final Map<Class<?>, List<Property>> PRIMITIVE_TYPES_PROPERTIES = Map.of(String.class, // String functions
+			List.of(Property.of("length", Long.class, false), //
+					Property.of("isEmpty", Boolean.class, false), //
+					Property.of("isBlank", Boolean.class, false)), //
+			Double.class, // Float Number functions
+			List.of(Property.of("round", Long.class, false), //
+					Property.of("ceil", Long.class, false), //
+					Property.of("floor", Long.class, false)), //
+			Float.class, // Float Number functions
+			List.of(Property.of("round", Long.class, false), //
+					Property.of("ceil", Long.class, false), //
 					Property.of("floor", Long.class, false)));
 
 	protected boolean isFromDslPackage(Class<?> clazz) {
-		return clazz.getCanonicalName().startsWith("x.mvmn.permock.model");
+		return clazz.getCanonicalName().startsWith(MODEL_PACKAGE_NAME);
 	}
 
 	protected boolean isSupportedPrimitiveType(Class<?> clazz) {

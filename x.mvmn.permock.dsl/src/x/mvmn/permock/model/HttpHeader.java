@@ -24,4 +24,9 @@ public class HttpHeader {
 	public List<String> getValues() {
 		return values;
 	}
+
+	@Override
+	public String toString() {
+		return "HttpHeader [name=" + name + ", value=" + value + ", values=" + values + "]";
+	}
 }

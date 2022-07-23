@@ -24,6 +24,7 @@ import x.mvmn.permock.dsl.dsl.Reference;
 import x.mvmn.permock.dsl.dsl.ResponseConf;
 import x.mvmn.permock.dsl.dsl.Rule;
 import x.mvmn.permock.model.rules.MockResponseConfig;
+import x.mvmn.permock.model.rules.MockResponseConfig.MockResponseConfigHeader;
 import x.mvmn.permock.model.rules.MockRule;
 import x.mvmn.permock.model.rules.MockRuleBiLogicalCondition;
 import x.mvmn.permock.model.rules.MockRuleCondition;
@@ -39,7 +40,6 @@ import x.mvmn.permock.model.rules.MockRulePropertyAccess;
 import x.mvmn.permock.model.rules.MockRulePropertyReference;
 import x.mvmn.permock.model.rules.MockRuleReference;
 import x.mvmn.permock.model.rules.MockRuleUnaryCondition;
-import x.mvmn.permock.model.rules.Tuple2;
 import x.mvmn.permock.service.RuleParsingService;
 import x.mvmn.permock.xtext.service.XtextService;
 
@@ -80,8 +80,8 @@ public class RuleParsingServiceImpl implements RuleParsingService {
 			result.setResponseStatus(response.getHttpStatus().intValue());
 		}
 		if (response.getHeaders() != null && response.getHeaders().getHeaders() != null) {
-			List<Tuple2<String, String>> headers = response.getHeaders().getHeaders().stream()
-					.map(header -> new Tuple2<String, String>(header.getHeaderName(), header.getHeaderValue()))
+			List<MockResponseConfigHeader> headers = response.getHeaders().getHeaders().stream()
+					.map(header -> new MockResponseConfigHeader(header.getHeaderName(), header.getHeaderValue()))
 					.collect(Collectors.toList());
 			result.setResponseHeaders(headers);
 		}

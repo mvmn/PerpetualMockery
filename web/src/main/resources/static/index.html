@@ -85,6 +85,7 @@
 		currentRuleId = id;
 		const rule = rules.filter((val)=> val.id == id)[0];
 		window.editor.doc.setValue(rule.ruleText);
+		document.getElementById("priority").value = rule.priority;
 	}
 	
 	function newRule() {

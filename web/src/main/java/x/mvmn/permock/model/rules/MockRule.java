@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class MockRule {
+	private Long id;
 	private MockRuleCondition conditions;
 	private MockResponseConfig responseConfig;
 

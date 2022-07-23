@@ -4,32 +4,33 @@ import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
+import java.util.Arrays;
 import java.util.List;
 
 public class HttpRequestModel {
 	private final String httpMethod;
-	private final HeaderDictionary headersByName;
+	private final HttpHeaderDictionary headersByName;
 	private final CookieDictionary cookiesByName;
-	private final QueryParameterDictionary queryParamsByName;
+	private final RequestParameterDictionary queryParamsByName;
 	private final byte[] body;
 	private final List<HttpHeader> headers;
 	private final List<Cookie> cookies;
-	private final List<QueryParameter> queryParams;
+	private final List<RequestParameter> requestParams;
 	private final ContentTypeModel contentType;
 	private final String path;
 	private final String query;
 
-	public HttpRequestModel(String httpMethod, String path, String query, HeaderDictionary headersByName,
-			CookieDictionary cookiesByName, QueryParameterDictionary queryParamsByName, byte[] body,
-			List<HttpHeader> headers, List<Cookie> cookies, List<QueryParameter> queryParams) {
+	public HttpRequestModel(String httpMethod, String path, String query, HttpHeaderDictionary headersByName,
+			CookieDictionary cookiesByName, RequestParameterDictionary requestParamsByName, byte[] body,
+			List<HttpHeader> headers, List<Cookie> cookies, List<RequestParameter> requestParams) {
 		this.httpMethod = httpMethod;
 		this.headersByName = headersByName;
 		this.cookiesByName = cookiesByName;
-		this.queryParamsByName = queryParamsByName;
+		this.queryParamsByName = requestParamsByName;
 		this.body = body;
 		this.headers = headers;
 		this.cookies = cookies;
-		this.queryParams = queryParams;
+		this.requestParams = requestParams;
 		this.contentType = new ContentTypeModel(
 				headersByName.get("Content-Type") != null ? headersByName.get("Content-Type").getValue() : null);
 		this.path = path;
@@ -52,7 +53,7 @@ public class HttpRequestModel {
 		return httpMethod;
 	}
 
-	public HeaderDictionary getHttpHeadersByName() {
+	public HttpHeaderDictionary getHttpHeadersByName() {
 		return headersByName;
 	}
 
@@ -88,11 +89,19 @@ public class HttpRequestModel {
 		return query;
 	}
 
-	public QueryParameterDictionary getQueryParamsByName() {
+	public RequestParameterDictionary getRequestParamsByName() {
 		return queryParamsByName;
 	}
 
-	public List<QueryParameter> getQueryParams() {
-		return queryParams;
+	public List<RequestParameter> getRequestParams() {
+		return requestParams;
+	}
+
+	@Override
+	public String toString() {
+		return "HttpRequestModel [httpMethod=" + httpMethod + ", headersByName=" + headersByName + ", cookiesByName="
+				+ cookiesByName + ", queryParamsByName=" + queryParamsByName + ", body=" + Arrays.toString(body)
+				+ ", headers=" + headers + ", cookies=" + cookies + ", requestParams=" + requestParams
+				+ ", contentType=" + contentType + ", path=" + path + ", query=" + query + "]";
 	}
 }

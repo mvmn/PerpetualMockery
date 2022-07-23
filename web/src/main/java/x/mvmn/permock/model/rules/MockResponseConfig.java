@@ -13,11 +13,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class MockResponseConfig {
+
+	@Data
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static class MockResponseConfigHeader {
+		private String name;
+		private String value;
+	}
+
 	private boolean proxy;
 	private String proxyUrl;
 	private Integer responseStatus;
 	private String resposeBody;
-	private List<Tuple2<String, String>> responseHeaders;
+	private List<MockResponseConfigHeader> responseHeaders;
 
 	@Override
 	public String toString() {
@@ -32,7 +41,7 @@ public class MockResponseConfig {
 		if (responseHeaders == null || responseHeaders.isEmpty()) {
 			return "";
 		}
-		return "\theaders\n" + responseHeaders.stream().map(h -> "\t\t\t'" + h.getA() + "': '" + h.getB() + "'")
+		return "\theaders\n" + responseHeaders.stream().map(h -> "\t\t\t'" + h.getName() + "': '" + h.getValue() + "'")
 				.collect(Collectors.joining(",\n")); // TODO: Escape strings
 	}
 

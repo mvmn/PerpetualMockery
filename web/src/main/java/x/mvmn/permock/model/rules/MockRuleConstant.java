@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import x.mvmn.permock.util.BeanUtil;
+import x.mvmn.permock.util.BeanUtil.Property;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -14,7 +16,17 @@ import lombok.NoArgsConstructor;
 public class MockRuleConstant extends MockRuleOperand {
 
 	public static enum Type {
-		BOOL, INT, FLOAT, STR
+		BOOL(Boolean.class), INT(Long.class), FLOAT(Double.class), STR(String.class);
+
+		private final Property type;
+
+		private Type(Class<?> type) {
+			this.type = new BeanUtil.Property("const", type);
+		}
+
+		public Property getType() {
+			return type;
+		}
 	}
 
 	private Type type;
@@ -45,6 +57,20 @@ public class MockRuleConstant extends MockRuleOperand {
 		case STR:
 		default:
 			return "'" + strVal + "'"; // TODO: escape string
+		}
+	}
+
+	public Object getValue() {
+		switch (type) {
+		case BOOL:
+			return boolVal;
+		case FLOAT:
+			return floatVal;
+		case INT:
+			return intVal;
+		case STR:
+		default:
+			return strVal;
 		}
 	}
 }

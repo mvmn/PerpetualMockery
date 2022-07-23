@@ -41,6 +41,10 @@ public class BeanUtil {
 			return !isCollection && Number.class.isAssignableFrom(type);
 		}
 
+		public boolean isInteger() {
+			return !isCollection && (Long.class.isAssignableFrom(type) || Integer.class.isAssignableFrom(type));
+		}
+
 		public boolean isBoolean() {
 			return !isCollection && Boolean.class.isAssignableFrom(type);
 		}
