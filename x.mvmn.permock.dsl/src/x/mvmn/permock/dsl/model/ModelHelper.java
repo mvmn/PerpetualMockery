@@ -90,8 +90,9 @@ public class ModelHelper {
 			return null;
 		}
 		Class<?> type = Stream.of(dictionary.getType().getDeclaredMethods())
-				.filter(method -> method.getName().equals("get") && method.getParameterCount() == 1).findAny()
-				.map(Method::getReturnType).orElse(null);
+				.filter(method -> method.getName().equals("get") && method.getParameterCount() == 1
+						&& method.getParameterTypes()[0].equals(String.class))
+				.findAny().map(Method::getReturnType).orElse(null);
 		return type != null ? Property.of("value", type, BeanUtil.isCollection(type)) : null;
 	}
 }
