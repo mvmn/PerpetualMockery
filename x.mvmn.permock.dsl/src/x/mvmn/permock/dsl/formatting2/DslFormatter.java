@@ -139,8 +139,4 @@ public class DslFormatter extends AbstractJavaFormatter {
 			doc.format(expression.getRight());
 		}
 	}
-
-	// TODO: implement for Headers, OrCondition, AndCondition, Negation, Condition,
-	// Expression, Operand, ListFunction, Reference, ListElementReference,
-	// PropertyRef
 }

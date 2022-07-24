@@ -33,6 +33,10 @@ public class BeanUtil {
 			return type;
 		}
 
+		public String getTypeName() {
+			return (this.isCollection ? "List of " : "") + this.type.getSimpleName();
+		}
+
 		public boolean isCollection() {
 			return isCollection;
 		}

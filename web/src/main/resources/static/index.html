@@ -68,6 +68,7 @@
 		fetch("/api/rules").then(async (response) => {
 			if(response.ok) {
 				const rules = await response.json();
+				rules.sort((a,b) => b.priority - a.priority);
 				window.rules = rules;
 				const contentArray = [];
 				rules.forEach((val) => {

@@ -99,6 +99,3 @@ terminal SL_COMMENT:
 
 terminal WS:
 	(' ' | '\t' | '\r' | '\n')+;
-
-terminal ANY_OTHER:
-	.;
