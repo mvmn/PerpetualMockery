@@ -53,9 +53,8 @@ public class DslValidator extends AbstractDslValidator {
 					if (rightOpType != null) {
 						if (expression.getOp() != null
 								&& !allowedExpression(leftOpType, expression.getOp(), rightOpType)) {
-							error("Cannot apply " + expression.getOp().getLiteral() + " to "
-									+ leftOpType.getType().getSimpleName() + " and "
-									+ rightOpType.getType().getSimpleName(), DslPackage.Literals.EXPRESSION__OP);
+							error("Cannot apply " + expression.getOp().getLiteral() + " to " + getTypeName(leftOpType)
+									+ " and " + getTypeName(rightOpType), DslPackage.Literals.EXPRESSION__OP);
 						}
 					}
 				}
@@ -63,6 +62,10 @@ public class DslValidator extends AbstractDslValidator {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private String getTypeName(Property type) {
+		return (type.isCollection() ? "List of " : "") + type.getClass().getSimpleName();
 	}
 
 	@Check
