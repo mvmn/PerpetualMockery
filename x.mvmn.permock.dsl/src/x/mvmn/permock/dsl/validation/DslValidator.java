@@ -65,7 +65,7 @@ public class DslValidator extends AbstractDslValidator {
 	}
 
 	private String getTypeName(Property type) {
-		return (type.isCollection() ? "List of " : "") + type.getClass().getSimpleName();
+		return (type.isCollection() ? "List of " : "") + type.getType().getSimpleName();
 	}
 
 	@Check
