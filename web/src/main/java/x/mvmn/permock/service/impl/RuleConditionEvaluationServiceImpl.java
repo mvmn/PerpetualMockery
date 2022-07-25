@@ -280,25 +280,26 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 			MockRuleListFunction listFunct = (MockRuleListFunction) propRef;
 
 			List<?> parentList = (List<?>) parentValue.getA();
+			boolean parentListNullOrEmpty = parentList == null || parentList.isEmpty();
 
 			Object value = null;
 			Property expectedType;
 			switch (listFunct.getType()) {
 			case ALL:
-				if (parentList == null) {
+				if (parentListNullOrEmpty) {
 					value = true;
 				}
 				expectedType = new Property(listFunct.getType().name().toLowerCase(), Boolean.class, false);
 				break;
 			case ANY:
-				if (parentList == null) {
+				if (parentListNullOrEmpty) {
 					value = false;
 				}
 				expectedType = new Property(listFunct.getType().name().toLowerCase(), Boolean.class, false);
 				break;
 			default:
 			case WHERE:
-				if (parentList == null) {
+				if (parentListNullOrEmpty) {
 					value = Collections.emptyList();
 				}
 				expectedType = parentValue.getB(); // Same type as parent collection - we're just filtering some
@@ -306,7 +307,7 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 				break;
 			}
 
-			if (value == null) {
+			if (value == null) { // true if not parentListNullOrEmpty
 				Property listElementType = new Property(listFunct.getListElementAlias(), parentValue.getB().getType(),
 						BeanUtil.isCollection(parentValue.getB().getType()));
 
