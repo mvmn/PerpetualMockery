@@ -72,7 +72,9 @@
 				window.rules = rules;
 				const contentArray = [];
 				rules.forEach((val) => {
-					const content = '<div class="ruleListItem" id="rule_$id" onclick="ruleSelect($id)">$id ($priority) <input type="button" value="X" onclick="deleteRule($id)" /></div>'
+					const content = ('<div class="ruleListItem" id="rule_$id" onclick="ruleSelect($id)">'
+					+'<span class="ruleId">$id</span> <span class="rulePriority">($priority)</span>'
+					+'<input type="button" value="X" onclick="deleteRule($id)" /></div>')
 						.replaceAll('$id', val.id)
 						.replaceAll('$priority', val.priority? val.priority : 0);
 					contentArray.push(content);
@@ -159,12 +161,26 @@
 	overflow: auto;
 	height: 90%;
 }
+
+.ruleListItem {
+	border-bottom: 1px solid #aaa;
+	width: 140pt;
+}
+
+.ruleId, .rulePriority {
+	width: 50pt;
+	display: inline-block;
+}
+
+.CodeMirror {
+	height: 80%;
+}
 </style>
 </head>
 <body>
 	<div class="container">
 		<div class="header">
-			<h1>Mock management</h1>
+			<h3>Mocks management</h3>
 		</div>
 		<div class="editorContent">
 			<div id="xtext-editor" data-editor-xtext-lang="prmk"></div>
@@ -175,7 +191,7 @@
 		</div>
 		<div class="rulesContainer">
 			<div>
-				<input type="button" value="Create" onclick="newRule()" />
+				<input type="button" value="New" onclick="newRule()" />
 				<input type="button" value="Save" onclick="saveRule()" />
 			</div>
 			<div id="rulesList"></div>

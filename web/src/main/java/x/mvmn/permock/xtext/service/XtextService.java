@@ -33,7 +33,7 @@ public class XtextService {
 	public EObject parse(String text) {
 		XtextResourceSet resourceSet = xtextResourceSetProvider.get();
 
-		Resource resource = resourceFactory.createResource(URI.createURI(UUID.randomUUID() + ".xttone"));
+		Resource resource = resourceFactory.createResource(URI.createURI(UUID.randomUUID() + ".prmk"));
 		resourceSet.getResources().add(resource);
 		try {
 			resource.load(new StringInputStream(text), null);
