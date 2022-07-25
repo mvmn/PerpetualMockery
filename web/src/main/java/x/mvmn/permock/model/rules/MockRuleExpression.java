@@ -1,5 +1,7 @@
 package x.mvmn.permock.model.rules;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,16 +24,19 @@ public class MockRuleExpression extends MockRuleCondition {
 	private MockRuleOperand right;
 
 	@Override
+	@JsonIgnore
 	public boolean isUnaryLogicalCondition() {
 		return false;
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isBinaryLogicalCondition() {
 		return false;
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isExpression() {
 		return true;
 	}

@@ -1,5 +1,7 @@
 package x.mvmn.permock.model.rules;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,16 +18,19 @@ public class MockRulePropertyAccess extends MockRulePropertyReference {
 	private String property;
 
 	@Override
+	@JsonIgnore
 	public boolean isListFunction() {
 		return false;
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isListAccess() {
 		return false;
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isDictionaryAccess() {
 		return false;
 	}

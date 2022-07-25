@@ -11,7 +11,6 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Provider;
 
-import x.mvmn.permock.dsl.model.ModelHelper;
 import x.mvmn.permock.xtext.guice.DslWebSetup;
 
 @Configuration
@@ -38,10 +37,5 @@ public class XTextGuiceConfig {
 	@Bean
 	public IResourceValidator resourceValidator() {
 		return xtextInjector.getInstance(IResourceValidator.class);
-	}
-
-	@Bean
-	public ModelHelper modelHelper() {
-		return new ModelHelper();
 	}
 }

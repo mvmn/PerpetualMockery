@@ -1,5 +1,7 @@
 package x.mvmn.permock.model.rules;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,28 +24,32 @@ public class MockRuleListFunction extends MockRulePropertyReference {
 	private MockRuleCondition condition;
 
 	@Override
+	@JsonIgnore
 	public boolean isListAccess() {
 		return false;
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isDictionaryAccess() {
 		return false;
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isListFunction() {
 		return true;
 	}
 
+	@JsonIgnore
 	public boolean producesBoolean() {
 		return type != Type.WHERE;
 	}
 
 	@Override
 	public String toString() {
-		String result = "{\n\t" + type.toString().toLowerCase() + " " + listElementAlias + ":\n\t\t" + condition.toString()
-				+ "\n\t}";
+		String result = "{\n\t" + type.toString().toLowerCase() + " " + listElementAlias + ":\n\t\t"
+				+ condition.toString() + "\n\t}";
 
 		if (subProp != null) {
 			result += subProp;

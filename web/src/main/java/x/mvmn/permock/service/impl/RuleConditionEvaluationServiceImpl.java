@@ -288,6 +288,8 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 				if (parentList == null) {
 					value = true;
 				}
+				expectedType = new Property(listFunct.getType().name().toLowerCase(), Boolean.class, false);
+				break;
 			case ANY:
 				if (parentList == null) {
 					value = false;

@@ -1,5 +1,7 @@
 package x.mvmn.permock.model.rules;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -36,11 +38,13 @@ public class MockRuleConstant extends MockRuleOperand {
 	private String strVal;
 
 	@Override
+	@JsonIgnore
 	public boolean isConstant() {
 		return true;
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isListElementRef() {
 		return false;
 	}
@@ -60,6 +64,7 @@ public class MockRuleConstant extends MockRuleOperand {
 		}
 	}
 
+	@JsonIgnore
 	public Object getValue() {
 		switch (type) {
 		case BOOL:

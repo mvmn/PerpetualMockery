@@ -78,7 +78,7 @@ public class RulesController {
 		try {
 			MockRule ruleModel = ruleParsingService.parse(text);
 			System.out.println("---\n" + ruleModel + "\n---");
-			String serialized = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(ruleModel);
+			String serialized = objectMapper.writeValueAsString(ruleModel);
 			System.out.println("---\n" + serialized + "\n---");
 			return serialized;
 		} catch (JsonProcessingException e) {

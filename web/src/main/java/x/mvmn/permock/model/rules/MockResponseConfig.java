@@ -49,7 +49,7 @@ public class MockResponseConfig {
 		return resposeBody != null ? "content '" + resposeBody + "'" : ""; // TODO: Escape string
 	}
 
-	protected String statusToString() {
+	private String statusToString() {
 		return responseStatus != null ? "status " + responseStatus.intValue() : "";
 	}
 }
