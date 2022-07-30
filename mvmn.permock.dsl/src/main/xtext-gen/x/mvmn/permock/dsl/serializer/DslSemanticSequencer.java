@@ -21,6 +21,7 @@ import x.mvmn.permock.dsl.dsl.Constant;
 import x.mvmn.permock.dsl.dsl.DslPackage;
 import x.mvmn.permock.dsl.dsl.Entity;
 import x.mvmn.permock.dsl.dsl.Expression;
+import x.mvmn.permock.dsl.dsl.FunctionCall;
 import x.mvmn.permock.dsl.dsl.Header;
 import x.mvmn.permock.dsl.dsl.Headers;
 import x.mvmn.permock.dsl.dsl.ListElementAlias;
@@ -68,6 +69,9 @@ public class DslSemanticSequencer extends AbstractDelegatingSemanticSequencer {
 				return; 
 			case DslPackage.EXPRESSION:
 				sequence_Expression(context, (Expression) semanticObject); 
+				return; 
+			case DslPackage.FUNCTION_CALL:
+				sequence_FunctionCall(context, (FunctionCall) semanticObject); 
 				return; 
 			case DslPackage.HEADER:
 				sequence_Header(context, (Header) semanticObject); 
@@ -209,6 +213,18 @@ public class DslSemanticSequencer extends AbstractDelegatingSemanticSequencer {
 	 *     (left=Operand (op=Operator right=Operand)?)
 	 */
 	protected void sequence_Expression(ISerializationContext context, Expression semanticObject) {
+		genericSequencer.createSequence(context, semanticObject);
+	}
+	
+	
+	/**
+	 * Contexts:
+	 *     FunctionCall returns FunctionCall
+	 *
+	 * Constraint:
+	 *     (name=ID functionParameters+=Operand? functionParameters+=Operand*)
+	 */
+	protected void sequence_FunctionCall(ISerializationContext context, FunctionCall semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);
 	}
 	
@@ -384,7 +400,7 @@ public class DslSemanticSequencer extends AbstractDelegatingSemanticSequencer {
 	 *     PropertyRef returns PropertyRef
 	 *
 	 * Constraint:
-	 *     ((propAccess=PropertyAccess | collectionAccess=CollectionAccess | listFunc=ListFunction) subPropery=PropertyRef?)
+	 *     ((propAccess=PropertyAccess | functionCall=FunctionCall | collectionAccess=CollectionAccess | listFunc=ListFunction) subPropery=PropertyRef?)
 	 */
 	protected void sequence_PropertyRef(ISerializationContext context, PropertyRef semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);

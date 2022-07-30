@@ -598,21 +598,6 @@ public class DslGrammarAccess extends AbstractElementFinder.AbstractGrammarEleme
 		//PropertyRef
 		public RuleCall getPropPropertyRefParserRuleCall_2_0() { return cPropPropertyRefParserRuleCall_2_0; }
 	}
-	public class PropertyAccessElements extends AbstractParserRuleElementFinder {
-		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "x.mvmn.permock.dsl.Dsl.PropertyAccess");
-		private final Assignment cNameAssignment = (Assignment)rule.eContents().get(1);
-		private final RuleCall cNameIDTerminalRuleCall_0 = (RuleCall)cNameAssignment.eContents().get(0);
-		
-		//PropertyAccess:
-		//    name=ID;
-		@Override public ParserRule getRule() { return rule; }
-		
-		//name=ID
-		public Assignment getNameAssignment() { return cNameAssignment; }
-		
-		//ID
-		public RuleCall getNameIDTerminalRuleCall_0() { return cNameIDTerminalRuleCall_0; }
-	}
 	public class CollectionAccessElements extends AbstractParserRuleElementFinder {
 		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "x.mvmn.permock.dsl.Dsl.CollectionAccess");
 		private final Group cGroup = (Group)rule.eContents().get(1);
@@ -652,6 +637,72 @@ public class DslGrammarAccess extends AbstractElementFinder.AbstractGrammarEleme
 		//']'
 		public Keyword getRightSquareBracketKeyword_2() { return cRightSquareBracketKeyword_2; }
 	}
+	public class PropertyAccessElements extends AbstractParserRuleElementFinder {
+		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "x.mvmn.permock.dsl.Dsl.PropertyAccess");
+		private final Assignment cNameAssignment = (Assignment)rule.eContents().get(1);
+		private final RuleCall cNameIDTerminalRuleCall_0 = (RuleCall)cNameAssignment.eContents().get(0);
+		
+		//PropertyAccess:
+		//    name=ID;
+		@Override public ParserRule getRule() { return rule; }
+		
+		//name=ID
+		public Assignment getNameAssignment() { return cNameAssignment; }
+		
+		//ID
+		public RuleCall getNameIDTerminalRuleCall_0() { return cNameIDTerminalRuleCall_0; }
+	}
+	public class FunctionCallElements extends AbstractParserRuleElementFinder {
+		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "x.mvmn.permock.dsl.Dsl.FunctionCall");
+		private final Group cGroup = (Group)rule.eContents().get(1);
+		private final Assignment cNameAssignment_0 = (Assignment)cGroup.eContents().get(0);
+		private final RuleCall cNameIDTerminalRuleCall_0_0 = (RuleCall)cNameAssignment_0.eContents().get(0);
+		private final Keyword cLeftParenthesisKeyword_1 = (Keyword)cGroup.eContents().get(1);
+		private final Assignment cFunctionParametersAssignment_2 = (Assignment)cGroup.eContents().get(2);
+		private final RuleCall cFunctionParametersOperandParserRuleCall_2_0 = (RuleCall)cFunctionParametersAssignment_2.eContents().get(0);
+		private final Group cGroup_3 = (Group)cGroup.eContents().get(3);
+		private final Keyword cCommaKeyword_3_0 = (Keyword)cGroup_3.eContents().get(0);
+		private final Assignment cFunctionParametersAssignment_3_1 = (Assignment)cGroup_3.eContents().get(1);
+		private final RuleCall cFunctionParametersOperandParserRuleCall_3_1_0 = (RuleCall)cFunctionParametersAssignment_3_1.eContents().get(0);
+		private final Keyword cRightParenthesisKeyword_4 = (Keyword)cGroup.eContents().get(4);
+		
+		//FunctionCall:
+		//    name=ID '(' functionParameters+=Operand? (',' functionParameters+=Operand)* ')';
+		@Override public ParserRule getRule() { return rule; }
+		
+		//name=ID '(' functionParameters+=Operand? (',' functionParameters+=Operand)* ')'
+		public Group getGroup() { return cGroup; }
+		
+		//name=ID
+		public Assignment getNameAssignment_0() { return cNameAssignment_0; }
+		
+		//ID
+		public RuleCall getNameIDTerminalRuleCall_0_0() { return cNameIDTerminalRuleCall_0_0; }
+		
+		//'('
+		public Keyword getLeftParenthesisKeyword_1() { return cLeftParenthesisKeyword_1; }
+		
+		//functionParameters+=Operand?
+		public Assignment getFunctionParametersAssignment_2() { return cFunctionParametersAssignment_2; }
+		
+		//Operand
+		public RuleCall getFunctionParametersOperandParserRuleCall_2_0() { return cFunctionParametersOperandParserRuleCall_2_0; }
+		
+		//(',' functionParameters+=Operand)*
+		public Group getGroup_3() { return cGroup_3; }
+		
+		//','
+		public Keyword getCommaKeyword_3_0() { return cCommaKeyword_3_0; }
+		
+		//functionParameters+=Operand
+		public Assignment getFunctionParametersAssignment_3_1() { return cFunctionParametersAssignment_3_1; }
+		
+		//Operand
+		public RuleCall getFunctionParametersOperandParserRuleCall_3_1_0() { return cFunctionParametersOperandParserRuleCall_3_1_0; }
+		
+		//')'
+		public Keyword getRightParenthesisKeyword_4() { return cRightParenthesisKeyword_4; }
+	}
 	public class PropertyRefElements extends AbstractParserRuleElementFinder {
 		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "x.mvmn.permock.dsl.Dsl.PropertyRef");
 		private final Group cGroup = (Group)rule.eContents().get(1);
@@ -660,23 +711,30 @@ public class DslGrammarAccess extends AbstractElementFinder.AbstractGrammarEleme
 		private final Keyword cFullStopKeyword_0_0_0 = (Keyword)cGroup_0_0.eContents().get(0);
 		private final Assignment cPropAccessAssignment_0_0_1 = (Assignment)cGroup_0_0.eContents().get(1);
 		private final RuleCall cPropAccessPropertyAccessParserRuleCall_0_0_1_0 = (RuleCall)cPropAccessAssignment_0_0_1.eContents().get(0);
-		private final Assignment cCollectionAccessAssignment_0_1 = (Assignment)cAlternatives_0.eContents().get(1);
-		private final RuleCall cCollectionAccessCollectionAccessParserRuleCall_0_1_0 = (RuleCall)cCollectionAccessAssignment_0_1.eContents().get(0);
-		private final Assignment cListFuncAssignment_0_2 = (Assignment)cAlternatives_0.eContents().get(2);
-		private final RuleCall cListFuncListFunctionParserRuleCall_0_2_0 = (RuleCall)cListFuncAssignment_0_2.eContents().get(0);
+		private final Group cGroup_0_1 = (Group)cAlternatives_0.eContents().get(1);
+		private final Keyword cFullStopKeyword_0_1_0 = (Keyword)cGroup_0_1.eContents().get(0);
+		private final Assignment cFunctionCallAssignment_0_1_1 = (Assignment)cGroup_0_1.eContents().get(1);
+		private final RuleCall cFunctionCallFunctionCallParserRuleCall_0_1_1_0 = (RuleCall)cFunctionCallAssignment_0_1_1.eContents().get(0);
+		private final Assignment cCollectionAccessAssignment_0_2 = (Assignment)cAlternatives_0.eContents().get(2);
+		private final RuleCall cCollectionAccessCollectionAccessParserRuleCall_0_2_0 = (RuleCall)cCollectionAccessAssignment_0_2.eContents().get(0);
+		private final Assignment cListFuncAssignment_0_3 = (Assignment)cAlternatives_0.eContents().get(3);
+		private final RuleCall cListFuncListFunctionParserRuleCall_0_3_0 = (RuleCall)cListFuncAssignment_0_3.eContents().get(0);
 		private final Assignment cSubProperyAssignment_1 = (Assignment)cGroup.eContents().get(1);
 		private final RuleCall cSubProperyPropertyRefParserRuleCall_1_0 = (RuleCall)cSubProperyAssignment_1.eContents().get(0);
 		
 		//PropertyRef hidden(WS):
-		//    ('.' propAccess=PropertyAccess | collectionAccess=CollectionAccess | listFunc=ListFunction)
+		//    ('.' propAccess=PropertyAccess | '.' functionCall=FunctionCall | collectionAccess=CollectionAccess |
+		//    listFunc=ListFunction)
 		//    (subPropery=PropertyRef)?;
 		@Override public ParserRule getRule() { return rule; }
 		
-		//('.' propAccess=PropertyAccess | collectionAccess=CollectionAccess | listFunc=ListFunction)
+		//('.' propAccess=PropertyAccess | '.' functionCall=FunctionCall | collectionAccess=CollectionAccess |
+		//listFunc=ListFunction)
 		//(subPropery=PropertyRef)?
 		public Group getGroup() { return cGroup; }
 		
-		//('.' propAccess=PropertyAccess | collectionAccess=CollectionAccess | listFunc=ListFunction)
+		//('.' propAccess=PropertyAccess | '.' functionCall=FunctionCall | collectionAccess=CollectionAccess |
+		//listFunc=ListFunction)
 		public Alternatives getAlternatives_0() { return cAlternatives_0; }
 		
 		//'.' propAccess=PropertyAccess
@@ -691,17 +749,29 @@ public class DslGrammarAccess extends AbstractElementFinder.AbstractGrammarEleme
 		//PropertyAccess
 		public RuleCall getPropAccessPropertyAccessParserRuleCall_0_0_1_0() { return cPropAccessPropertyAccessParserRuleCall_0_0_1_0; }
 		
+		//'.' functionCall=FunctionCall
+		public Group getGroup_0_1() { return cGroup_0_1; }
+		
+		//'.'
+		public Keyword getFullStopKeyword_0_1_0() { return cFullStopKeyword_0_1_0; }
+		
+		//functionCall=FunctionCall
+		public Assignment getFunctionCallAssignment_0_1_1() { return cFunctionCallAssignment_0_1_1; }
+		
+		//FunctionCall
+		public RuleCall getFunctionCallFunctionCallParserRuleCall_0_1_1_0() { return cFunctionCallFunctionCallParserRuleCall_0_1_1_0; }
+		
 		//collectionAccess=CollectionAccess
-		public Assignment getCollectionAccessAssignment_0_1() { return cCollectionAccessAssignment_0_1; }
+		public Assignment getCollectionAccessAssignment_0_2() { return cCollectionAccessAssignment_0_2; }
 		
 		//CollectionAccess
-		public RuleCall getCollectionAccessCollectionAccessParserRuleCall_0_1_0() { return cCollectionAccessCollectionAccessParserRuleCall_0_1_0; }
+		public RuleCall getCollectionAccessCollectionAccessParserRuleCall_0_2_0() { return cCollectionAccessCollectionAccessParserRuleCall_0_2_0; }
 		
 		//listFunc=ListFunction
-		public Assignment getListFuncAssignment_0_2() { return cListFuncAssignment_0_2; }
+		public Assignment getListFuncAssignment_0_3() { return cListFuncAssignment_0_3; }
 		
 		//ListFunction
-		public RuleCall getListFuncListFunctionParserRuleCall_0_2_0() { return cListFuncListFunctionParserRuleCall_0_2_0; }
+		public RuleCall getListFuncListFunctionParserRuleCall_0_3_0() { return cListFuncListFunctionParserRuleCall_0_3_0; }
 		
 		//(subPropery=PropertyRef)?
 		public Assignment getSubProperyAssignment_1() { return cSubProperyAssignment_1; }
@@ -887,8 +957,9 @@ public class DslGrammarAccess extends AbstractElementFinder.AbstractGrammarEleme
 	private final ListElementAliasElements pListElementAlias;
 	private final ReferenceElements pReference;
 	private final ListElementReferenceElements pListElementReference;
-	private final PropertyAccessElements pPropertyAccess;
 	private final CollectionAccessElements pCollectionAccess;
+	private final PropertyAccessElements pPropertyAccess;
+	private final FunctionCallElements pFunctionCall;
 	private final PropertyRefElements pPropertyRef;
 	private final OperatorElements eOperator;
 	private final ConstantElements pConstant;
@@ -924,8 +995,9 @@ public class DslGrammarAccess extends AbstractElementFinder.AbstractGrammarEleme
 		this.pListElementAlias = new ListElementAliasElements();
 		this.pReference = new ReferenceElements();
 		this.pListElementReference = new ListElementReferenceElements();
-		this.pPropertyAccess = new PropertyAccessElements();
 		this.pCollectionAccess = new CollectionAccessElements();
+		this.pPropertyAccess = new PropertyAccessElements();
+		this.pFunctionCall = new FunctionCallElements();
 		this.pPropertyRef = new PropertyRefElements();
 		this.eOperator = new OperatorElements();
 		this.pConstant = new ConstantElements();
@@ -1126,16 +1198,6 @@ public class DslGrammarAccess extends AbstractElementFinder.AbstractGrammarEleme
 		return getListElementReferenceAccess().getRule();
 	}
 	
-	//PropertyAccess:
-	//    name=ID;
-	public PropertyAccessElements getPropertyAccessAccess() {
-		return pPropertyAccess;
-	}
-	
-	public ParserRule getPropertyAccessRule() {
-		return getPropertyAccessAccess().getRule();
-	}
-	
 	//CollectionAccess:
 	//    '[' (key=STRING | index=INTEGER) ']';
 	public CollectionAccessElements getCollectionAccessAccess() {
@@ -1146,8 +1208,29 @@ public class DslGrammarAccess extends AbstractElementFinder.AbstractGrammarEleme
 		return getCollectionAccessAccess().getRule();
 	}
 	
+	//PropertyAccess:
+	//    name=ID;
+	public PropertyAccessElements getPropertyAccessAccess() {
+		return pPropertyAccess;
+	}
+	
+	public ParserRule getPropertyAccessRule() {
+		return getPropertyAccessAccess().getRule();
+	}
+	
+	//FunctionCall:
+	//    name=ID '(' functionParameters+=Operand? (',' functionParameters+=Operand)* ')';
+	public FunctionCallElements getFunctionCallAccess() {
+		return pFunctionCall;
+	}
+	
+	public ParserRule getFunctionCallRule() {
+		return getFunctionCallAccess().getRule();
+	}
+	
 	//PropertyRef hidden(WS):
-	//    ('.' propAccess=PropertyAccess | collectionAccess=CollectionAccess | listFunc=ListFunction)
+	//    ('.' propAccess=PropertyAccess | '.' functionCall=FunctionCall | collectionAccess=CollectionAccess |
+	//    listFunc=ListFunction)
 	//    (subPropery=PropertyRef)?;
 	public PropertyRefElements getPropertyRefAccess() {
 		return pPropertyRef;

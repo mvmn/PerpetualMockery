@@ -78,8 +78,9 @@ public class DslFactoryImpl extends EFactoryImpl implements DslFactory
       case DslPackage.LIST_ELEMENT_ALIAS: return createListElementAlias();
       case DslPackage.REFERENCE: return createReference();
       case DslPackage.LIST_ELEMENT_REFERENCE: return createListElementReference();
-      case DslPackage.PROPERTY_ACCESS: return createPropertyAccess();
       case DslPackage.COLLECTION_ACCESS: return createCollectionAccess();
+      case DslPackage.PROPERTY_ACCESS: return createPropertyAccess();
+      case DslPackage.FUNCTION_CALL: return createFunctionCall();
       case DslPackage.PROPERTY_REF: return createPropertyRef();
       case DslPackage.CONSTANT: return createConstant();
       case DslPackage.ENTITY: return createEntity();
@@ -279,6 +280,18 @@ public class DslFactoryImpl extends EFactoryImpl implements DslFactory
    * @generated
    */
   @Override
+  public CollectionAccess createCollectionAccess()
+  {
+    CollectionAccessImpl collectionAccess = new CollectionAccessImpl();
+    return collectionAccess;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
   public PropertyAccess createPropertyAccess()
   {
     PropertyAccessImpl propertyAccess = new PropertyAccessImpl();
@@ -291,10 +304,10 @@ public class DslFactoryImpl extends EFactoryImpl implements DslFactory
    * @generated
    */
   @Override
-  public CollectionAccess createCollectionAccess()
+  public FunctionCall createFunctionCall()
   {
-    CollectionAccessImpl collectionAccess = new CollectionAccessImpl();
-    return collectionAccess;
+    FunctionCallImpl functionCall = new FunctionCallImpl();
+    return functionCall;
   }
 
   /**

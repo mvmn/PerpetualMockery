@@ -4,6 +4,7 @@
 package x.mvmn.permock.dsl.validation;
 
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EReference;
 import org.eclipse.xtext.validation.Check;
 
 import com.google.inject.Inject;
@@ -13,6 +14,7 @@ import x.mvmn.permock.dsl.dsl.Constant;
 import x.mvmn.permock.dsl.dsl.DslPackage;
 import x.mvmn.permock.dsl.dsl.Entity;
 import x.mvmn.permock.dsl.dsl.Expression;
+import x.mvmn.permock.dsl.dsl.FunctionCall;
 import x.mvmn.permock.dsl.dsl.ListElementReference;
 import x.mvmn.permock.dsl.dsl.ListFunction;
 import x.mvmn.permock.dsl.dsl.Operand;
@@ -21,8 +23,9 @@ import x.mvmn.permock.dsl.dsl.PropertyAccess;
 import x.mvmn.permock.dsl.dsl.PropertyRef;
 import x.mvmn.permock.dsl.dsl.Reference;
 import x.mvmn.permock.dsl.model.ModelHelper;
+import x.mvmn.permock.dsl.model.ModelHelper.FunctionDescriptor;
 import x.mvmn.permock.dsl.model.XtextModelHelper;
-import x.mvmn.permock.util.BeanUtil.Property;
+import x.mvmn.permock.util.Property;
 
 /**
  * This class contains custom validation rules.
@@ -81,6 +84,71 @@ public class DslValidator extends AbstractDslValidator {
 		try {
 			if (xtextModelHelper.resolveType(entity) == null) {
 				error("Cannot resolve", DslPackage.Literals.PROPERTY_ACCESS__NAME);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Check
+	public void check(FunctionCall functionCall) {
+		try {
+			FunctionDescriptor function = xtextModelHelper.getFunctionDescriptor(functionCall);
+			if (function == null) {
+				error("Unknown function", DslPackage.Literals.FUNCTION_CALL__NAME);
+			} else {
+				if (functionCall.getFunctionParameters().size() + 1 != function.getArgs().size()) {
+					error("Incorrect parameter number - expected " + (function.getArgs().size() - 1) + " paramer(s)",
+							DslPackage.Literals.FUNCTION_CALL__NAME);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Check
+	public void check(Operand operand) {
+		try {
+			EReference structuralFeature;
+			if (operand.getRef() != null) {
+				structuralFeature = DslPackage.Literals.OPERAND__REF;
+			} else if (operand.getListElementRef() != null) {
+				structuralFeature = DslPackage.Literals.OPERAND__LIST_ELEMENT_REF;
+			} else {
+				structuralFeature = DslPackage.Literals.OPERAND__CONST;
+			}
+
+			if (operand.eContainer() instanceof FunctionCall) {
+				try {
+					int index = operand.eContainer().eContents().indexOf(operand);
+					FunctionDescriptor function = xtextModelHelper
+							.getFunctionDescriptor((FunctionCall) operand.eContainer());
+					if (function != null) {
+						Property operandType;
+						if (operand.getRef() != null) {
+							operandType = xtextModelHelper.resolveType(getDeepestNode(operand.getRef()));
+						} else if (operand.getListElementRef() != null) {
+							operandType = xtextModelHelper.resolveType(getDeepestNode(operand.getListElementRef()));
+						} else {
+							operandType = xtextModelHelper.resolveType(operand.getConst());
+						}
+						if (operandType != null) {
+							Property paramType = function.getArgs().get(index + 1);
+							if (paramType.isCollection() != operandType.isCollection()
+									|| !paramType.getType().isAssignableFrom(operandType.getType())) {
+								error("Incorrect function parameter type - expected " + paramType.getTypeName()
+										+ " but got " + operandType.getTypeName(), structuralFeature);
+							}
+						} else {
+//							System.err.println("Failed to resolve operand type " + operand);
+						}
+					} else {
+//						System.err.println("Failed to resolve function " + operand.eContainer());
+					}
+				} catch (IndexOutOfBoundsException iobe) {
+					error("Incorrect function parameter", structuralFeature);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

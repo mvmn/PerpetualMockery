@@ -1,5 +1,6 @@
 package x.mvmn.permock.model.rules;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -12,14 +13,34 @@ import lombok.Data;
 @JsonSubTypes({ @JsonSubTypes.Type(value = MockRuleDictionaryAccess.class, name = "_type"),
 		@JsonSubTypes.Type(value = MockRuleListAccess.class, name = "_type"),
 		@JsonSubTypes.Type(value = MockRulePropertyAccess.class, name = "_type"),
-		@JsonSubTypes.Type(value = MockRuleListFunction.class, name = "_type") })
+		@JsonSubTypes.Type(value = MockRuleListFunction.class, name = "_type"),
+		@JsonSubTypes.Type(value = MockRuleFunctionCall.class, name = "_type") })
 public abstract class MockRulePropertyReference {
 
 	protected MockRulePropertyReference subProp;
 
-	public abstract boolean isListAccess();
+	@JsonIgnore
+	public boolean isListAccess() {
+		return false;
+	}
 
-	public abstract boolean isDictionaryAccess();
+	@JsonIgnore
+	public boolean isPropertyAccess() {
+		return false;
+	}
 
-	public abstract boolean isListFunction();
+	@JsonIgnore
+	public boolean isDictionaryAccess() {
+		return false;
+	}
+
+	@JsonIgnore
+	public boolean isListFunction() {
+		return false;
+	}
+
+	@JsonIgnore
+	public boolean isFunctionCall() {
+		return false;
+	}
 }

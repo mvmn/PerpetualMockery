@@ -132,6 +132,15 @@ public interface DslFactory extends EFactory
   ListElementReference createListElementReference();
 
   /**
+   * Returns a new object of class '<em>Collection Access</em>'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return a new object of class '<em>Collection Access</em>'.
+   * @generated
+   */
+  CollectionAccess createCollectionAccess();
+
+  /**
    * Returns a new object of class '<em>Property Access</em>'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -141,13 +150,13 @@ public interface DslFactory extends EFactory
   PropertyAccess createPropertyAccess();
 
   /**
-   * Returns a new object of class '<em>Collection Access</em>'.
+   * Returns a new object of class '<em>Function Call</em>'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @return a new object of class '<em>Collection Access</em>'.
+   * @return a new object of class '<em>Function Call</em>'.
    * @generated
    */
-  CollectionAccess createCollectionAccess();
+  FunctionCall createFunctionCall();
 
   /**
    * Returns a new object of class '<em>Property Ref</em>'.

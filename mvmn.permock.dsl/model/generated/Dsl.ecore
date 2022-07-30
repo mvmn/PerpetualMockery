@@ -69,15 +69,22 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="prop" eType="#//PropertyRef"
         containment="true"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="PropertyAccess">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-  </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="CollectionAccess">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="index" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELongObject"/>
   </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="PropertyAccess">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="FunctionCall">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="functionParameters" upperBound="-1"
+        eType="#//Operand" containment="true"/>
+  </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="PropertyRef">
     <eStructuralFeatures xsi:type="ecore:EReference" name="propAccess" eType="#//PropertyAccess"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="functionCall" eType="#//FunctionCall"
         containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="collectionAccess" eType="#//CollectionAccess"
         containment="true"/>

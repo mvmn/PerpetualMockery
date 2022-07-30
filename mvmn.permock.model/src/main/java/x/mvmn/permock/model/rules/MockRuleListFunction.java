@@ -1,6 +1,7 @@
 package x.mvmn.permock.model.rules;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonPropertyOrder({ "type", "listElementAlias", "condition", "subProp" })
 public class MockRuleListFunction extends MockRulePropertyReference {
 
 	public static enum Type {
@@ -22,18 +24,6 @@ public class MockRuleListFunction extends MockRulePropertyReference {
 	private Type type;
 	private String listElementAlias;
 	private MockRuleCondition condition;
-
-	@Override
-	@JsonIgnore
-	public boolean isListAccess() {
-		return false;
-	}
-
-	@Override
-	@JsonIgnore
-	public boolean isDictionaryAccess() {
-		return false;
-	}
 
 	@Override
 	@JsonIgnore

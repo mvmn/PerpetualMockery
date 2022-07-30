@@ -1,7 +1,10 @@
 package x.mvmn.permock.service.impl;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -14,6 +17,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import x.mvmn.permock.dsl.model.ModelHelper;
+import x.mvmn.permock.functions.PerpetualMockeryFunctions;
 import x.mvmn.permock.model.Dictionary;
 import x.mvmn.permock.model.HttpRequestModel;
 import x.mvmn.permock.model.rules.MockRuleBiLogicalCondition;
@@ -22,6 +26,7 @@ import x.mvmn.permock.model.rules.MockRuleConstant;
 import x.mvmn.permock.model.rules.MockRuleDictionaryAccess;
 import x.mvmn.permock.model.rules.MockRuleExpression;
 import x.mvmn.permock.model.rules.MockRuleExpression.Type;
+import x.mvmn.permock.model.rules.MockRuleFunctionCall;
 import x.mvmn.permock.model.rules.MockRuleListAccess;
 import x.mvmn.permock.model.rules.MockRuleListElementReference;
 import x.mvmn.permock.model.rules.MockRuleListFunction;
@@ -33,13 +38,16 @@ import x.mvmn.permock.model.rules.MockRuleUnaryCondition;
 import x.mvmn.permock.model.rules.Tuple2;
 import x.mvmn.permock.service.RuleConditionEvaluationService;
 import x.mvmn.permock.util.BeanUtil;
-import x.mvmn.permock.util.BeanUtil.Property;
+import x.mvmn.permock.util.Property;
 
 @Service
 public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluationService {
 
 	@Autowired
 	private ModelHelper modelHelper;
+
+	@Autowired
+	private PerpetualMockeryFunctions functions;
 
 	@Value("${mock.eval.debug:false}")
 	private boolean debug;
@@ -367,12 +375,12 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 				}
 			}
 
+			if (debug) {
+				System.err.println("Evaluated list function to " + value + " for " + listFunct);
+			}
 			if (listFunct.getSubProp() != null) {
 				return evaluatePropertyRef(new Tuple2<>(value, expectedType), listFunct.getSubProp(), context);
 			} else {
-				if (debug) {
-					System.err.println("Evaluated list function to " + value + " for " + listFunct);
-				}
 				return EvaluationResult.builder().value(value).type(expectedType).build();
 			}
 		} else if (propRef.isDictionaryAccess()) {
@@ -386,13 +394,13 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 				value = parentDictionary.get(dictAccess.getKey());
 			}
 
+			if (debug) {
+				System.err.println("Evaluated dict access to " + value + " for key " + dictAccess.getKey()
+						+ " on dictionary " + parentDictionary);
+			}
 			if (dictAccess.getSubProp() != null) {
 				return evaluatePropertyRef(new Tuple2<>(value, elementType), dictAccess.getSubProp(), context);
 			} else {
-				if (debug) {
-					System.err.println("Evaluated dict access to " + value + " for key " + dictAccess.getKey()
-							+ " on dictionary " + parentDictionary);
-				}
 				return EvaluationResult.builder().value(value).type(elementType).build();
 			}
 		} else if (propRef.isListAccess()) {
@@ -407,49 +415,52 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 			}
 			Property type = new Property(parentValue.getB().getName(), parentValue.getB().getType(),
 					BeanUtil.isCollection(parentValue.getB().getType()));
+			if (debug) {
+				System.err.println("Evaluated list access to " + value + " for index " + listAccess.getIndex()
+						+ " on list " + parentList);
+			}
 			if (listAccess.getSubProp() != null) {
 				return evaluatePropertyRef(new Tuple2<>(value, type), listAccess.getSubProp(), context);
 			} else {
-				if (debug) {
-					System.err.println("Evaluated list access to " + value + " for index " + listAccess.getIndex()
-							+ " on list " + parentList);
-				}
 				return EvaluationResult.builder().value(value).type(type).build();
+			}
+		} else if (propRef.isFunctionCall()) {
+			MockRuleFunctionCall functCall = (MockRuleFunctionCall) propRef;
+			Method funct = modelHelper.getFunction(functCall.getName(), functCall.getArgs().size())
+					.orElseThrow(() -> new IllegalStateException("Can't resolve function " + functCall.getName()
+							+ " with args " + (functCall.getArgs().size() + 1)));
+			Object[] args = new Object[funct.getParameterCount()];
+			args[0] = parentValue.getA();
+			Iterator<MockRuleOperand> functArgIterator = functCall.getArgs().iterator();
+			for (int i = 1; i < args.length; i++) {
+				MockRuleOperand operand = functArgIterator.next();
+				args[i] = normalizeTypes(evaluate(operand, context)).getValue();
+				if (debug) {
+					System.err.println("Evaluated function parameter " + operand + " to " + args[i]);
+				}
+			}
+			try {
+				Property expectedType = BeanUtil.fromMethod(funct, parentValue.getB());
+				Object result = funct.invoke(functions, args);
+
+				if (debug) {
+					System.err.println(
+							"Evaluated function " + functCall.getName() + " with " + (functCall.getArgs().size() + 1)
+									+ " args to " + result + ". Args = " + Arrays.toString(args));
+				}
+				if (functCall.getSubProp() != null) {
+					return evaluatePropertyRef(new Tuple2<>(result, expectedType), functCall.getSubProp(), context);
+				} else {
+					return EvaluationResult.builder().value(result).type(expectedType).build();
+				}
+			} catch (Exception e) {
+				throw new RuntimeException(e);
 			}
 		} else {
 			MockRulePropertyAccess propAccess = (MockRulePropertyAccess) propRef;
 			// Property access. Can be a primitive function or collection function
 			String propertyName = propAccess.getProperty();
 			if (parentValue.getA() == null) {
-				// Parent val is null
-				// For null strings or null collections - isEmpty return true, isNotEmpty return
-				// false
-				if (parentValue.getB().isCollection() || parentValue.getB().isString()) {
-					if ("isEmpty".equals(propertyName)) {
-						if (debug) {
-							System.err.println(
-									"Evaluated isEmpty to true for null value of String/Collection " + propAccess);
-						}
-						return EvaluationResult.builder().value(true).type(new Property("isEmpty", Boolean.class))
-								.build();
-					} else if ("isNotEmpty".equals(propertyName)) {
-						if (debug) {
-							System.err.println(
-									"Evaluated isNotEmpty to false for null value of String/Collection " + propAccess);
-						}
-						return EvaluationResult.builder().value(false).type(new Property("isNotEmpty", Boolean.class))
-								.build();
-					} else if (parentValue.getB().isCollection() && "size".equals(propertyName)
-							|| "length".equals(propertyName)) {
-						// For null list return 0 for size
-						if (debug) {
-							System.err.println(
-									"Evaluated size/length to 0 for null value of String/Collection " + propAccess);
-						}
-						return EvaluationResult.builder().value(Long.valueOf(0L)).type(new Property("size", Long.class))
-								.build();
-					}
-				}
 				if (debug) {
 					System.err.println("Evaluated null value of property " + propAccess);
 				}
@@ -458,86 +469,23 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 			} else {
 				// Parent val is not null
 				Property expectedType = modelHelper.typeOfProperty(parentValue.getB(), propertyName);
-				if (parentValue.getB().isPrimitive()) {
-					Object value;
-					// Try primitive functions
-					if (parentValue.getB().isString()) {
-						String parentVal = parentValue.getA().toString();
 
-						// We have functions for strings: length, isEmpty, isBlank
-						if ("length".equals(propertyName)) {
-							value = Long.valueOf(parentVal.length());
-						} else if ("isEmpty".equals(propertyName)) {
-							value = parentVal.isEmpty();
-						} else if ("isBlank".equals(propertyName)) {
-							value = parentVal.trim().isEmpty();
-						} else {
-							throw new IllegalStateException(
-									"No function " + propertyName + " for primitive type " + parentValue.getB());
-						}
-					} else if (parentValue.getB().isNumber() && !parentValue.getB().isInteger()) {
-						Double parentVal = ((Number) parentValue.getA()).doubleValue();
-						// We have functions for floats: round, ceil, floor
-						if ("round".equals(propertyName)) {
-							value = Math.round(parentVal);
-						} else if ("ceil".equals(propertyName)) {
-							value = Double.valueOf(Math.ceil(parentVal)).longValue();
-						} else if ("floor".equals(propertyName)) {
-							value = Double.valueOf(Math.floor(parentVal)).longValue();
-						} else {
-							throw new IllegalStateException(
-									"No function " + propertyName + " for primitive type " + parentValue.getB());
-						}
+				// Get property
+				try {
+					Object value = parentValue.getB().getType()
+							.getDeclaredMethod(BeanUtil.propertyNameToGetterName(propertyName))
+							.invoke(parentValue.getA());
+					if (propAccess.getSubProp() != null) {
+						return evaluatePropertyRef(new Tuple2<>(value, expectedType), propAccess.getSubProp(), context);
 					} else {
-						throw new IllegalStateException(
-								"No function " + propertyName + " for primitive type " + parentValue.getB());
-					}
-					if (debug) {
-						System.err.println("Evaluated to " + value + " value of property " + propAccess);
-					}
-					return EvaluationResult.builder().value(value).type(expectedType).build();
-				} else if (parentValue.getB().isCollection()) {
-					// Try collection functions
-					List<?> parentVal = (List<?>) parentValue.getA();
-					Object value;
-					// We have functions for strings: length, isEmpty, isBlank
-					if ("size".equals(propertyName)) {
-						value = parentVal.size();
-					} else if ("isEmpty".equals(propertyName)) {
-						value = parentVal.isEmpty();
-					} else if ("isNotEmpty".equals(propertyName)) {
-						value = !parentVal.isEmpty();
-					} else if ("first".equals(propertyName)) {
-						value = parentVal.size() > 0 ? parentVal.get(0) : null;
-					} else if ("last".equals(propertyName)) {
-						value = parentVal.size() > 0 ? parentVal.get(parentVal.size() - 1) : null;
-					} else {
-						throw new IllegalStateException(
-								"No function " + propertyName + " for List type " + parentValue.getB());
-					}
-					if (debug) {
-						System.err.println("Evaluated to " + value + " value of property " + propAccess);
-					}
-					return EvaluationResult.builder().value(value).type(expectedType).build();
-				} else {
-					// Get property
-					try {
-						Object value = parentValue.getB().getType()
-								.getDeclaredMethod(BeanUtil.propertyNameToGetterName(propertyName))
-								.invoke(parentValue.getA());
-						if (propAccess.getSubProp() != null) {
-							return evaluatePropertyRef(new Tuple2<>(value, expectedType), propAccess.getSubProp(),
-									context);
-						} else {
-							if (debug) {
-								System.err.println("Evaluated to " + value + " value of property " + propAccess);
-							}
-							return EvaluationResult.builder().value(value).type(expectedType).build();
+						if (debug) {
+							System.err.println("Evaluated to " + value + " value of property " + propAccess);
 						}
-					} catch (Exception e) {
-						throw new RuntimeException(
-								"Failed to obtain property " + propertyName + " from " + parentValue.getA() + " ", e);
+						return EvaluationResult.builder().value(value).type(expectedType).build();
 					}
+				} catch (Exception e) {
+					throw new RuntimeException(
+							"Failed to obtain property " + propertyName + " from " + parentValue.getA() + " ", e);
 				}
 			}
 		}

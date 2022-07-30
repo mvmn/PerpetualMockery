@@ -14,7 +14,7 @@ import com.google.inject.Inject;
 import x.mvmn.permock.dsl.dsl.ListElementAlias;
 import x.mvmn.permock.dsl.dsl.ListElementReference;
 import x.mvmn.permock.dsl.model.XtextModelHelper;
-import x.mvmn.permock.util.BeanUtil.Property;
+import x.mvmn.permock.util.Property;
 
 public class DslCrossrefProposalProvider extends IdeCrossrefProposalProvider {
 

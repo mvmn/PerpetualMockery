@@ -1,45 +1,36 @@
 package x.mvmn.permock.dsl.model;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import x.mvmn.permock.functions.PerpetualMockeryFunctions;
 import x.mvmn.permock.model.Dictionary;
 import x.mvmn.permock.model.HttpRequestModel;
 import x.mvmn.permock.util.BeanUtil;
-import x.mvmn.permock.util.BeanUtil.Property;
-import x.mvmn.permock.util.CollectionsUtil;
+import x.mvmn.permock.util.Property;
 
 public class ModelHelper {
 
 	private static final String MODEL_PACKAGE_NAME = "x.mvmn.permock.model";
 
-	private final Function<Property, List<Property>> GET_COLLECTION_FUNCTIONS = prop -> Arrays.asList(
-			Property.of("size", Long.class, false), //
-			Property.of("isEmpty", Boolean.class, false), //
-			Property.of("isNotEmpty", Boolean.class, false), //
-			Property.of("first", prop.getType(), BeanUtil.isCollection(prop.getType())), //
-			Property.of("last", prop.getType(), BeanUtil.isCollection(prop.getType())));
-
-	private final Map<Class<?>, List<Property>> PRIMITIVE_TYPES_PROPERTIES = CollectionsUtil
-			.<Class<?>, List<Property>>mapOf(String.class, // String functions
-					Arrays.asList(Property.of("length", Long.class, false), //
-							Property.of("isEmpty", Boolean.class, false), //
-							Property.of("isBlank", Boolean.class, false)))
-			.and( //
-					Double.class, // Float Number functions
-					Arrays.asList(Property.of("round", Long.class, false), //
-							Property.of("ceil", Long.class, false), //
-							Property.of("floor", Long.class, false)))
-			.and(Float.class, // Float Number functions
-					Arrays.asList(Property.of("round", Long.class, false), //
-							Property.of("ceil", Long.class, false), //
-							Property.of("floor", Long.class, false)))
-			.build();
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	public static class FunctionDescriptor {
+		private String name;
+		private List<Property> args;
+		private Property returnType;
+	}
 
 	protected boolean isFromDslPackage(Class<?> clazz) {
 		return clazz.getCanonicalName().startsWith(MODEL_PACKAGE_NAME);
@@ -59,31 +50,40 @@ public class ModelHelper {
 	}
 
 	public Property typeOfProperty(Property property, String name) {
-		if (property.isCollection()) {
-			return GET_COLLECTION_FUNCTIONS.apply(property).stream().filter(prop -> prop.getName().equals(name))
-					.findAny().orElse(null);
-		}
-		if (property.isPrimitive()) {
-			return getPrimitiveTypeProps(property.getType()).stream().filter(prop -> prop.getName().equals(name))
-					.findAny().orElse(null);
-		}
 		return BeanUtil.getPropertyType(property.getType(), name);
 	}
 
 	public List<Property> properties(Property property) {
-		if (property.isCollection()) {
-			return GET_COLLECTION_FUNCTIONS.apply(property);
-		} else if (isFromDslPackage(property.getType())) {
+		if (isFromDslPackage(property.getType())) {
 			return BeanUtil.listPropertiesFromGetters(property.getType());
-		} else if (isSupportedPrimitiveType(property.getType())) {
-			return getPrimitiveTypeProps(property.getType());
 		} else {
 			return Collections.emptyList();
 		}
 	}
 
-	private List<Property> getPrimitiveTypeProps(Class<?> type) {
-		return PRIMITIVE_TYPES_PROPERTIES.getOrDefault(type, Collections.emptyList());
+	public List<FunctionDescriptor> getFunctionDescriptors(Property property) {
+		if (property == null) {
+			return Collections.emptyList();
+		}
+		return Stream.of(PerpetualMockeryFunctions.class.getDeclaredMethods())
+				.filter(method -> Modifier.isPublic(method.getModifiers()))
+				.filter(method -> method.getParameterCount() > 0)
+				.filter(method -> property.isCollection()
+						? method.getParameters()[0].getType().isAssignableFrom(List.class)
+						: method.getParameters()[0].getType().isAssignableFrom(property.getType()))
+				.map(method -> {
+					return FunctionDescriptor.builder().name(method.getName())
+							.args(Stream.of(method.getParameters()).map(BeanUtil::fromParameter)
+									.collect(Collectors.toList()))
+							.returnType(BeanUtil.fromMethod(method, property)).build();
+				}).collect(Collectors.toList());
+	}
+
+	public Optional<Method> getFunction(String name, int argsCount) {
+		return Stream.of(PerpetualMockeryFunctions.class.getDeclaredMethods()) //
+				.filter(method -> Modifier.isPublic(method.getModifiers())) //
+				.filter(func -> func.getName().equals(name)) //
+				.filter(method -> method.getParameterCount() == argsCount + 1).findFirst();
 	}
 
 	public boolean isDictionary(Property property) {

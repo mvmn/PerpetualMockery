@@ -157,6 +157,13 @@ public class DslSwitch<T> extends Switch<T>
         if (result == null) result = defaultCase(theEObject);
         return result;
       }
+      case DslPackage.COLLECTION_ACCESS:
+      {
+        CollectionAccess collectionAccess = (CollectionAccess)theEObject;
+        T result = caseCollectionAccess(collectionAccess);
+        if (result == null) result = defaultCase(theEObject);
+        return result;
+      }
       case DslPackage.PROPERTY_ACCESS:
       {
         PropertyAccess propertyAccess = (PropertyAccess)theEObject;
@@ -164,10 +171,10 @@ public class DslSwitch<T> extends Switch<T>
         if (result == null) result = defaultCase(theEObject);
         return result;
       }
-      case DslPackage.COLLECTION_ACCESS:
+      case DslPackage.FUNCTION_CALL:
       {
-        CollectionAccess collectionAccess = (CollectionAccess)theEObject;
-        T result = caseCollectionAccess(collectionAccess);
+        FunctionCall functionCall = (FunctionCall)theEObject;
+        T result = caseFunctionCall(functionCall);
         if (result == null) result = defaultCase(theEObject);
         return result;
       }
@@ -413,6 +420,22 @@ public class DslSwitch<T> extends Switch<T>
   }
 
   /**
+   * Returns the result of interpreting the object as an instance of '<em>Collection Access</em>'.
+   * <!-- begin-user-doc -->
+   * This implementation returns null;
+   * returning a non-null result will terminate the switch.
+   * <!-- end-user-doc -->
+   * @param object the target of the switch.
+   * @return the result of interpreting the object as an instance of '<em>Collection Access</em>'.
+   * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+   * @generated
+   */
+  public T caseCollectionAccess(CollectionAccess object)
+  {
+    return null;
+  }
+
+  /**
    * Returns the result of interpreting the object as an instance of '<em>Property Access</em>'.
    * <!-- begin-user-doc -->
    * This implementation returns null;
@@ -429,17 +452,17 @@ public class DslSwitch<T> extends Switch<T>
   }
 
   /**
-   * Returns the result of interpreting the object as an instance of '<em>Collection Access</em>'.
+   * Returns the result of interpreting the object as an instance of '<em>Function Call</em>'.
    * <!-- begin-user-doc -->
    * This implementation returns null;
    * returning a non-null result will terminate the switch.
    * <!-- end-user-doc -->
    * @param object the target of the switch.
-   * @return the result of interpreting the object as an instance of '<em>Collection Access</em>'.
+   * @return the result of interpreting the object as an instance of '<em>Function Call</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
    * @generated
    */
-  public T caseCollectionAccess(CollectionAccess object)
+  public T caseFunctionCall(FunctionCall object)
   {
     return null;
   }

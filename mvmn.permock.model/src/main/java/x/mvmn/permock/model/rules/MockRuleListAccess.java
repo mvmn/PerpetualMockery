@@ -13,31 +13,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MockRulePropertyAccess extends MockRulePropertyReference {
+public class MockRuleListAccess extends MockRulePropertyReference {
 
-	private String property;
-
-	@Override
-	@JsonIgnore
-	public boolean isListFunction() {
-		return false;
-	}
+	private Integer index;
 
 	@Override
 	@JsonIgnore
 	public boolean isListAccess() {
-		return false;
-	}
-
-	@Override
-	@JsonIgnore
-	public boolean isDictionaryAccess() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public String toString() {
-		String result = "." + property;
+		String result = "[" + index + "]";
 
 		if (subProp != null) {
 			result += subProp;

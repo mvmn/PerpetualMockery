@@ -14,6 +14,7 @@ import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
 
 import x.mvmn.permock.dsl.dsl.CollectionAccess;
 import x.mvmn.permock.dsl.dsl.DslPackage;
+import x.mvmn.permock.dsl.dsl.FunctionCall;
 import x.mvmn.permock.dsl.dsl.ListFunction;
 import x.mvmn.permock.dsl.dsl.PropertyAccess;
 import x.mvmn.permock.dsl.dsl.PropertyRef;
@@ -27,6 +28,7 @@ import x.mvmn.permock.dsl.dsl.PropertyRef;
  * </p>
  * <ul>
  *   <li>{@link x.mvmn.permock.dsl.dsl.impl.PropertyRefImpl#getPropAccess <em>Prop Access</em>}</li>
+ *   <li>{@link x.mvmn.permock.dsl.dsl.impl.PropertyRefImpl#getFunctionCall <em>Function Call</em>}</li>
  *   <li>{@link x.mvmn.permock.dsl.dsl.impl.PropertyRefImpl#getCollectionAccess <em>Collection Access</em>}</li>
  *   <li>{@link x.mvmn.permock.dsl.dsl.impl.PropertyRefImpl#getListFunc <em>List Func</em>}</li>
  *   <li>{@link x.mvmn.permock.dsl.dsl.impl.PropertyRefImpl#getSubPropery <em>Sub Propery</em>}</li>
@@ -45,6 +47,16 @@ public class PropertyRefImpl extends MinimalEObjectImpl.Container implements Pro
    * @ordered
    */
   protected PropertyAccess propAccess;
+
+  /**
+   * The cached value of the '{@link #getFunctionCall() <em>Function Call</em>}' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see #getFunctionCall()
+   * @generated
+   * @ordered
+   */
+  protected FunctionCall functionCall;
 
   /**
    * The cached value of the '{@link #getCollectionAccess() <em>Collection Access</em>}' containment reference.
@@ -145,6 +157,56 @@ public class PropertyRefImpl extends MinimalEObjectImpl.Container implements Pro
     }
     else if (eNotificationRequired())
       eNotify(new ENotificationImpl(this, Notification.SET, DslPackage.PROPERTY_REF__PROP_ACCESS, newPropAccess, newPropAccess));
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public FunctionCall getFunctionCall()
+  {
+    return functionCall;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public NotificationChain basicSetFunctionCall(FunctionCall newFunctionCall, NotificationChain msgs)
+  {
+    FunctionCall oldFunctionCall = functionCall;
+    functionCall = newFunctionCall;
+    if (eNotificationRequired())
+    {
+      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, DslPackage.PROPERTY_REF__FUNCTION_CALL, oldFunctionCall, newFunctionCall);
+      if (msgs == null) msgs = notification; else msgs.add(notification);
+    }
+    return msgs;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public void setFunctionCall(FunctionCall newFunctionCall)
+  {
+    if (newFunctionCall != functionCall)
+    {
+      NotificationChain msgs = null;
+      if (functionCall != null)
+        msgs = ((InternalEObject)functionCall).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - DslPackage.PROPERTY_REF__FUNCTION_CALL, null, msgs);
+      if (newFunctionCall != null)
+        msgs = ((InternalEObject)newFunctionCall).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - DslPackage.PROPERTY_REF__FUNCTION_CALL, null, msgs);
+      msgs = basicSetFunctionCall(newFunctionCall, msgs);
+      if (msgs != null) msgs.dispatch();
+    }
+    else if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, DslPackage.PROPERTY_REF__FUNCTION_CALL, newFunctionCall, newFunctionCall));
   }
 
   /**
@@ -309,6 +371,8 @@ public class PropertyRefImpl extends MinimalEObjectImpl.Container implements Pro
     {
       case DslPackage.PROPERTY_REF__PROP_ACCESS:
         return basicSetPropAccess(null, msgs);
+      case DslPackage.PROPERTY_REF__FUNCTION_CALL:
+        return basicSetFunctionCall(null, msgs);
       case DslPackage.PROPERTY_REF__COLLECTION_ACCESS:
         return basicSetCollectionAccess(null, msgs);
       case DslPackage.PROPERTY_REF__LIST_FUNC:
@@ -331,6 +395,8 @@ public class PropertyRefImpl extends MinimalEObjectImpl.Container implements Pro
     {
       case DslPackage.PROPERTY_REF__PROP_ACCESS:
         return getPropAccess();
+      case DslPackage.PROPERTY_REF__FUNCTION_CALL:
+        return getFunctionCall();
       case DslPackage.PROPERTY_REF__COLLECTION_ACCESS:
         return getCollectionAccess();
       case DslPackage.PROPERTY_REF__LIST_FUNC:
@@ -353,6 +419,9 @@ public class PropertyRefImpl extends MinimalEObjectImpl.Container implements Pro
     {
       case DslPackage.PROPERTY_REF__PROP_ACCESS:
         setPropAccess((PropertyAccess)newValue);
+        return;
+      case DslPackage.PROPERTY_REF__FUNCTION_CALL:
+        setFunctionCall((FunctionCall)newValue);
         return;
       case DslPackage.PROPERTY_REF__COLLECTION_ACCESS:
         setCollectionAccess((CollectionAccess)newValue);
@@ -380,6 +449,9 @@ public class PropertyRefImpl extends MinimalEObjectImpl.Container implements Pro
       case DslPackage.PROPERTY_REF__PROP_ACCESS:
         setPropAccess((PropertyAccess)null);
         return;
+      case DslPackage.PROPERTY_REF__FUNCTION_CALL:
+        setFunctionCall((FunctionCall)null);
+        return;
       case DslPackage.PROPERTY_REF__COLLECTION_ACCESS:
         setCollectionAccess((CollectionAccess)null);
         return;
@@ -405,6 +477,8 @@ public class PropertyRefImpl extends MinimalEObjectImpl.Container implements Pro
     {
       case DslPackage.PROPERTY_REF__PROP_ACCESS:
         return propAccess != null;
+      case DslPackage.PROPERTY_REF__FUNCTION_CALL:
+        return functionCall != null;
       case DslPackage.PROPERTY_REF__COLLECTION_ACCESS:
         return collectionAccess != null;
       case DslPackage.PROPERTY_REF__LIST_FUNC:

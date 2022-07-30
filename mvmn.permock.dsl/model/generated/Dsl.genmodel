@@ -71,15 +71,20 @@
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Dsl.ecore#//ListElementReference/name"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Dsl.ecore#//ListElementReference/prop"/>
     </genClasses>
-    <genClasses ecoreClass="Dsl.ecore#//PropertyAccess">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//PropertyAccess/name"/>
-    </genClasses>
     <genClasses ecoreClass="Dsl.ecore#//CollectionAccess">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//CollectionAccess/key"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//CollectionAccess/index"/>
     </genClasses>
+    <genClasses ecoreClass="Dsl.ecore#//PropertyAccess">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//PropertyAccess/name"/>
+    </genClasses>
+    <genClasses ecoreClass="Dsl.ecore#//FunctionCall">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//FunctionCall/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Dsl.ecore#//FunctionCall/functionParameters"/>
+    </genClasses>
     <genClasses ecoreClass="Dsl.ecore#//PropertyRef">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Dsl.ecore#//PropertyRef/propAccess"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Dsl.ecore#//PropertyRef/functionCall"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Dsl.ecore#//PropertyRef/collectionAccess"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Dsl.ecore#//PropertyRef/listFunc"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Dsl.ecore#//PropertyRef/subPropery"/>

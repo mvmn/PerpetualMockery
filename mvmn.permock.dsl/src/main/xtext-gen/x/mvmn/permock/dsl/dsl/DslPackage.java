@@ -530,34 +530,6 @@ public interface DslPackage extends EPackage
   int LIST_ELEMENT_REFERENCE_FEATURE_COUNT = 2;
 
   /**
-   * The meta object id for the '{@link x.mvmn.permock.dsl.dsl.impl.PropertyAccessImpl <em>Property Access</em>}' class.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @see x.mvmn.permock.dsl.dsl.impl.PropertyAccessImpl
-   * @see x.mvmn.permock.dsl.dsl.impl.DslPackageImpl#getPropertyAccess()
-   * @generated
-   */
-  int PROPERTY_ACCESS = 12;
-
-  /**
-   * The feature id for the '<em><b>Name</b></em>' attribute.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int PROPERTY_ACCESS__NAME = 0;
-
-  /**
-   * The number of structural features of the '<em>Property Access</em>' class.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int PROPERTY_ACCESS_FEATURE_COUNT = 1;
-
-  /**
    * The meta object id for the '{@link x.mvmn.permock.dsl.dsl.impl.CollectionAccessImpl <em>Collection Access</em>}' class.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -565,7 +537,7 @@ public interface DslPackage extends EPackage
    * @see x.mvmn.permock.dsl.dsl.impl.DslPackageImpl#getCollectionAccess()
    * @generated
    */
-  int COLLECTION_ACCESS = 13;
+  int COLLECTION_ACCESS = 12;
 
   /**
    * The feature id for the '<em><b>Key</b></em>' attribute.
@@ -595,6 +567,71 @@ public interface DslPackage extends EPackage
   int COLLECTION_ACCESS_FEATURE_COUNT = 2;
 
   /**
+   * The meta object id for the '{@link x.mvmn.permock.dsl.dsl.impl.PropertyAccessImpl <em>Property Access</em>}' class.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see x.mvmn.permock.dsl.dsl.impl.PropertyAccessImpl
+   * @see x.mvmn.permock.dsl.dsl.impl.DslPackageImpl#getPropertyAccess()
+   * @generated
+   */
+  int PROPERTY_ACCESS = 13;
+
+  /**
+   * The feature id for the '<em><b>Name</b></em>' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int PROPERTY_ACCESS__NAME = 0;
+
+  /**
+   * The number of structural features of the '<em>Property Access</em>' class.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int PROPERTY_ACCESS_FEATURE_COUNT = 1;
+
+  /**
+   * The meta object id for the '{@link x.mvmn.permock.dsl.dsl.impl.FunctionCallImpl <em>Function Call</em>}' class.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see x.mvmn.permock.dsl.dsl.impl.FunctionCallImpl
+   * @see x.mvmn.permock.dsl.dsl.impl.DslPackageImpl#getFunctionCall()
+   * @generated
+   */
+  int FUNCTION_CALL = 14;
+
+  /**
+   * The feature id for the '<em><b>Name</b></em>' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int FUNCTION_CALL__NAME = 0;
+
+  /**
+   * The feature id for the '<em><b>Function Parameters</b></em>' containment reference list.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int FUNCTION_CALL__FUNCTION_PARAMETERS = 1;
+
+  /**
+   * The number of structural features of the '<em>Function Call</em>' class.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int FUNCTION_CALL_FEATURE_COUNT = 2;
+
+  /**
    * The meta object id for the '{@link x.mvmn.permock.dsl.dsl.impl.PropertyRefImpl <em>Property Ref</em>}' class.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -602,7 +639,7 @@ public interface DslPackage extends EPackage
    * @see x.mvmn.permock.dsl.dsl.impl.DslPackageImpl#getPropertyRef()
    * @generated
    */
-  int PROPERTY_REF = 14;
+  int PROPERTY_REF = 15;
 
   /**
    * The feature id for the '<em><b>Prop Access</b></em>' containment reference.
@@ -614,13 +651,22 @@ public interface DslPackage extends EPackage
   int PROPERTY_REF__PROP_ACCESS = 0;
 
   /**
+   * The feature id for the '<em><b>Function Call</b></em>' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int PROPERTY_REF__FUNCTION_CALL = 1;
+
+  /**
    * The feature id for the '<em><b>Collection Access</b></em>' containment reference.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    * @ordered
    */
-  int PROPERTY_REF__COLLECTION_ACCESS = 1;
+  int PROPERTY_REF__COLLECTION_ACCESS = 2;
 
   /**
    * The feature id for the '<em><b>List Func</b></em>' containment reference.
@@ -629,7 +675,7 @@ public interface DslPackage extends EPackage
    * @generated
    * @ordered
    */
-  int PROPERTY_REF__LIST_FUNC = 2;
+  int PROPERTY_REF__LIST_FUNC = 3;
 
   /**
    * The feature id for the '<em><b>Sub Propery</b></em>' containment reference.
@@ -638,7 +684,7 @@ public interface DslPackage extends EPackage
    * @generated
    * @ordered
    */
-  int PROPERTY_REF__SUB_PROPERY = 3;
+  int PROPERTY_REF__SUB_PROPERY = 4;
 
   /**
    * The number of structural features of the '<em>Property Ref</em>' class.
@@ -647,7 +693,7 @@ public interface DslPackage extends EPackage
    * @generated
    * @ordered
    */
-  int PROPERTY_REF_FEATURE_COUNT = 4;
+  int PROPERTY_REF_FEATURE_COUNT = 5;
 
   /**
    * The meta object id for the '{@link x.mvmn.permock.dsl.dsl.impl.ConstantImpl <em>Constant</em>}' class.
@@ -657,7 +703,7 @@ public interface DslPackage extends EPackage
    * @see x.mvmn.permock.dsl.dsl.impl.DslPackageImpl#getConstant()
    * @generated
    */
-  int CONSTANT = 15;
+  int CONSTANT = 16;
 
   /**
    * The feature id for the '<em><b>Str Val</b></em>' attribute.
@@ -712,7 +758,7 @@ public interface DslPackage extends EPackage
    * @see x.mvmn.permock.dsl.dsl.impl.DslPackageImpl#getEntity()
    * @generated
    */
-  int ENTITY = 16;
+  int ENTITY = 17;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -740,7 +786,7 @@ public interface DslPackage extends EPackage
    * @see x.mvmn.permock.dsl.dsl.impl.DslPackageImpl#getOrCondition()
    * @generated
    */
-  int OR_CONDITION = 17;
+  int OR_CONDITION = 18;
 
   /**
    * The feature id for the '<em><b>Expression</b></em>' containment reference.
@@ -795,7 +841,7 @@ public interface DslPackage extends EPackage
    * @see x.mvmn.permock.dsl.dsl.impl.DslPackageImpl#getAndCondition()
    * @generated
    */
-  int AND_CONDITION = 18;
+  int AND_CONDITION = 19;
 
   /**
    * The feature id for the '<em><b>Expression</b></em>' containment reference.
@@ -850,7 +896,7 @@ public interface DslPackage extends EPackage
    * @see x.mvmn.permock.dsl.dsl.impl.DslPackageImpl#getNegation()
    * @generated
    */
-  int NEGATION = 19;
+  int NEGATION = 20;
 
   /**
    * The feature id for the '<em><b>Expression</b></em>' containment reference.
@@ -896,7 +942,7 @@ public interface DslPackage extends EPackage
    * @see x.mvmn.permock.dsl.dsl.impl.DslPackageImpl#getOperator()
    * @generated
    */
-  int OPERATOR = 20;
+  int OPERATOR = 21;
 
   /**
    * The meta object id for the '{@link x.mvmn.permock.dsl.dsl.ListOperation <em>List Operation</em>}' enum.
@@ -906,7 +952,7 @@ public interface DslPackage extends EPackage
    * @see x.mvmn.permock.dsl.dsl.impl.DslPackageImpl#getListOperation()
    * @generated
    */
-  int LIST_OPERATION = 21;
+  int LIST_OPERATION = 22;
 
 
   /**
@@ -1327,27 +1373,6 @@ public interface DslPackage extends EPackage
   EReference getListElementReference_Prop();
 
   /**
-   * Returns the meta object for class '{@link x.mvmn.permock.dsl.dsl.PropertyAccess <em>Property Access</em>}'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return the meta object for class '<em>Property Access</em>'.
-   * @see x.mvmn.permock.dsl.dsl.PropertyAccess
-   * @generated
-   */
-  EClass getPropertyAccess();
-
-  /**
-   * Returns the meta object for the attribute '{@link x.mvmn.permock.dsl.dsl.PropertyAccess#getName <em>Name</em>}'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return the meta object for the attribute '<em>Name</em>'.
-   * @see x.mvmn.permock.dsl.dsl.PropertyAccess#getName()
-   * @see #getPropertyAccess()
-   * @generated
-   */
-  EAttribute getPropertyAccess_Name();
-
-  /**
    * Returns the meta object for class '{@link x.mvmn.permock.dsl.dsl.CollectionAccess <em>Collection Access</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -1380,6 +1405,59 @@ public interface DslPackage extends EPackage
   EAttribute getCollectionAccess_Index();
 
   /**
+   * Returns the meta object for class '{@link x.mvmn.permock.dsl.dsl.PropertyAccess <em>Property Access</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for class '<em>Property Access</em>'.
+   * @see x.mvmn.permock.dsl.dsl.PropertyAccess
+   * @generated
+   */
+  EClass getPropertyAccess();
+
+  /**
+   * Returns the meta object for the attribute '{@link x.mvmn.permock.dsl.dsl.PropertyAccess#getName <em>Name</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for the attribute '<em>Name</em>'.
+   * @see x.mvmn.permock.dsl.dsl.PropertyAccess#getName()
+   * @see #getPropertyAccess()
+   * @generated
+   */
+  EAttribute getPropertyAccess_Name();
+
+  /**
+   * Returns the meta object for class '{@link x.mvmn.permock.dsl.dsl.FunctionCall <em>Function Call</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for class '<em>Function Call</em>'.
+   * @see x.mvmn.permock.dsl.dsl.FunctionCall
+   * @generated
+   */
+  EClass getFunctionCall();
+
+  /**
+   * Returns the meta object for the attribute '{@link x.mvmn.permock.dsl.dsl.FunctionCall#getName <em>Name</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for the attribute '<em>Name</em>'.
+   * @see x.mvmn.permock.dsl.dsl.FunctionCall#getName()
+   * @see #getFunctionCall()
+   * @generated
+   */
+  EAttribute getFunctionCall_Name();
+
+  /**
+   * Returns the meta object for the containment reference list '{@link x.mvmn.permock.dsl.dsl.FunctionCall#getFunctionParameters <em>Function Parameters</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for the containment reference list '<em>Function Parameters</em>'.
+   * @see x.mvmn.permock.dsl.dsl.FunctionCall#getFunctionParameters()
+   * @see #getFunctionCall()
+   * @generated
+   */
+  EReference getFunctionCall_FunctionParameters();
+
+  /**
    * Returns the meta object for class '{@link x.mvmn.permock.dsl.dsl.PropertyRef <em>Property Ref</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -1399,6 +1477,17 @@ public interface DslPackage extends EPackage
    * @generated
    */
   EReference getPropertyRef_PropAccess();
+
+  /**
+   * Returns the meta object for the containment reference '{@link x.mvmn.permock.dsl.dsl.PropertyRef#getFunctionCall <em>Function Call</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for the containment reference '<em>Function Call</em>'.
+   * @see x.mvmn.permock.dsl.dsl.PropertyRef#getFunctionCall()
+   * @see #getPropertyRef()
+   * @generated
+   */
+  EReference getPropertyRef_FunctionCall();
 
   /**
    * Returns the meta object for the containment reference '{@link x.mvmn.permock.dsl.dsl.PropertyRef#getCollectionAccess <em>Collection Access</em>}'.
@@ -1973,24 +2062,6 @@ public interface DslPackage extends EPackage
     EReference LIST_ELEMENT_REFERENCE__PROP = eINSTANCE.getListElementReference_Prop();
 
     /**
-     * The meta object literal for the '{@link x.mvmn.permock.dsl.dsl.impl.PropertyAccessImpl <em>Property Access</em>}' class.
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @see x.mvmn.permock.dsl.dsl.impl.PropertyAccessImpl
-     * @see x.mvmn.permock.dsl.dsl.impl.DslPackageImpl#getPropertyAccess()
-     * @generated
-     */
-    EClass PROPERTY_ACCESS = eINSTANCE.getPropertyAccess();
-
-    /**
-     * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @generated
-     */
-    EAttribute PROPERTY_ACCESS__NAME = eINSTANCE.getPropertyAccess_Name();
-
-    /**
      * The meta object literal for the '{@link x.mvmn.permock.dsl.dsl.impl.CollectionAccessImpl <em>Collection Access</em>}' class.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -2017,6 +2088,50 @@ public interface DslPackage extends EPackage
     EAttribute COLLECTION_ACCESS__INDEX = eINSTANCE.getCollectionAccess_Index();
 
     /**
+     * The meta object literal for the '{@link x.mvmn.permock.dsl.dsl.impl.PropertyAccessImpl <em>Property Access</em>}' class.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @see x.mvmn.permock.dsl.dsl.impl.PropertyAccessImpl
+     * @see x.mvmn.permock.dsl.dsl.impl.DslPackageImpl#getPropertyAccess()
+     * @generated
+     */
+    EClass PROPERTY_ACCESS = eINSTANCE.getPropertyAccess();
+
+    /**
+     * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    EAttribute PROPERTY_ACCESS__NAME = eINSTANCE.getPropertyAccess_Name();
+
+    /**
+     * The meta object literal for the '{@link x.mvmn.permock.dsl.dsl.impl.FunctionCallImpl <em>Function Call</em>}' class.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @see x.mvmn.permock.dsl.dsl.impl.FunctionCallImpl
+     * @see x.mvmn.permock.dsl.dsl.impl.DslPackageImpl#getFunctionCall()
+     * @generated
+     */
+    EClass FUNCTION_CALL = eINSTANCE.getFunctionCall();
+
+    /**
+     * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    EAttribute FUNCTION_CALL__NAME = eINSTANCE.getFunctionCall_Name();
+
+    /**
+     * The meta object literal for the '<em><b>Function Parameters</b></em>' containment reference list feature.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    EReference FUNCTION_CALL__FUNCTION_PARAMETERS = eINSTANCE.getFunctionCall_FunctionParameters();
+
+    /**
      * The meta object literal for the '{@link x.mvmn.permock.dsl.dsl.impl.PropertyRefImpl <em>Property Ref</em>}' class.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -2033,6 +2148,14 @@ public interface DslPackage extends EPackage
      * @generated
      */
     EReference PROPERTY_REF__PROP_ACCESS = eINSTANCE.getPropertyRef_PropAccess();
+
+    /**
+     * The meta object literal for the '<em><b>Function Call</b></em>' containment reference feature.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    EReference PROPERTY_REF__FUNCTION_CALL = eINSTANCE.getPropertyRef_FunctionCall();
 
     /**
      * The meta object literal for the '<em><b>Collection Access</b></em>' containment reference feature.

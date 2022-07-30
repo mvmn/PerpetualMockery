@@ -1,5 +1,6 @@
 package x.mvmn.permock.service.impl;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +33,7 @@ import x.mvmn.permock.model.rules.MockRuleConstant;
 import x.mvmn.permock.model.rules.MockRuleDictionaryAccess;
 import x.mvmn.permock.model.rules.MockRuleExpression;
 import x.mvmn.permock.model.rules.MockRuleExpression.Type;
+import x.mvmn.permock.model.rules.MockRuleFunctionCall;
 import x.mvmn.permock.model.rules.MockRuleListAccess;
 import x.mvmn.permock.model.rules.MockRuleListElementReference;
 import x.mvmn.permock.model.rules.MockRuleListFunction;
@@ -147,6 +149,13 @@ public class RuleParsingServiceImpl implements RuleParsingService {
 			result = MockRuleDictionaryAccess.builder().key(prop.getCollectionAccess().getKey()).build();
 		} else if (prop.getPropAccess() != null) {
 			result = MockRulePropertyAccess.builder().property(prop.getPropAccess().getName()).build();
+		} else if (prop.getFunctionCall() != null) {
+			List<Operand> params = prop.getFunctionCall().getFunctionParameters();
+			if (params == null) {
+				params = Collections.emptyList();
+			}
+			result = MockRuleFunctionCall.builder().name(prop.getFunctionCall().getName())
+					.args(params.stream().map(this::map).collect(Collectors.toList())).build();
 		} else {
 			ListFunction listFunct = prop.getListFunc();
 			result = MockRuleListFunction.builder().type(map(listFunct.getOp()))

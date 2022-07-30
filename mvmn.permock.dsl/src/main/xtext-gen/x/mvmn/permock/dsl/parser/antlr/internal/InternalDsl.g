@@ -1144,41 +1144,6 @@ finally {
 	myHiddenTokenState.restore();
 }
 
-// Entry rule entryRulePropertyAccess
-entryRulePropertyAccess returns [EObject current=null]:
-	{ newCompositeNode(grammarAccess.getPropertyAccessRule()); }
-	iv_rulePropertyAccess=rulePropertyAccess
-	{ $current=$iv_rulePropertyAccess.current; }
-	EOF;
-
-// Rule PropertyAccess
-rulePropertyAccess returns [EObject current=null]
-@init {
-	enterRule();
-}
-@after {
-	leaveRule();
-}:
-	(
-		(
-			lv_name_0_0=RULE_ID
-			{
-				newLeafNode(lv_name_0_0, grammarAccess.getPropertyAccessAccess().getNameIDTerminalRuleCall_0());
-			}
-			{
-				if ($current==null) {
-					$current = createModelElement(grammarAccess.getPropertyAccessRule());
-				}
-				setWithLastConsumed(
-					$current,
-					"name",
-					lv_name_0_0,
-					"x.mvmn.permock.dsl.Dsl.ID");
-			}
-		)
-	)
-;
-
 // Entry rule entryRuleCollectionAccess
 entryRuleCollectionAccess returns [EObject current=null]:
 	{ newCompositeNode(grammarAccess.getCollectionAccessRule()); }
@@ -1245,6 +1210,130 @@ ruleCollectionAccess returns [EObject current=null]
 	)
 ;
 
+// Entry rule entryRulePropertyAccess
+entryRulePropertyAccess returns [EObject current=null]:
+	{ newCompositeNode(grammarAccess.getPropertyAccessRule()); }
+	iv_rulePropertyAccess=rulePropertyAccess
+	{ $current=$iv_rulePropertyAccess.current; }
+	EOF;
+
+// Rule PropertyAccess
+rulePropertyAccess returns [EObject current=null]
+@init {
+	enterRule();
+}
+@after {
+	leaveRule();
+}:
+	(
+		(
+			lv_name_0_0=RULE_ID
+			{
+				newLeafNode(lv_name_0_0, grammarAccess.getPropertyAccessAccess().getNameIDTerminalRuleCall_0());
+			}
+			{
+				if ($current==null) {
+					$current = createModelElement(grammarAccess.getPropertyAccessRule());
+				}
+				setWithLastConsumed(
+					$current,
+					"name",
+					lv_name_0_0,
+					"x.mvmn.permock.dsl.Dsl.ID");
+			}
+		)
+	)
+;
+
+// Entry rule entryRuleFunctionCall
+entryRuleFunctionCall returns [EObject current=null]:
+	{ newCompositeNode(grammarAccess.getFunctionCallRule()); }
+	iv_ruleFunctionCall=ruleFunctionCall
+	{ $current=$iv_ruleFunctionCall.current; }
+	EOF;
+
+// Rule FunctionCall
+ruleFunctionCall returns [EObject current=null]
+@init {
+	enterRule();
+}
+@after {
+	leaveRule();
+}:
+	(
+		(
+			(
+				lv_name_0_0=RULE_ID
+				{
+					newLeafNode(lv_name_0_0, grammarAccess.getFunctionCallAccess().getNameIDTerminalRuleCall_0_0());
+				}
+				{
+					if ($current==null) {
+						$current = createModelElement(grammarAccess.getFunctionCallRule());
+					}
+					setWithLastConsumed(
+						$current,
+						"name",
+						lv_name_0_0,
+						"x.mvmn.permock.dsl.Dsl.ID");
+				}
+			)
+		)
+		otherlv_1='('
+		{
+			newLeafNode(otherlv_1, grammarAccess.getFunctionCallAccess().getLeftParenthesisKeyword_1());
+		}
+		(
+			(
+				{
+					newCompositeNode(grammarAccess.getFunctionCallAccess().getFunctionParametersOperandParserRuleCall_2_0());
+				}
+				lv_functionParameters_2_0=ruleOperand
+				{
+					if ($current==null) {
+						$current = createModelElementForParent(grammarAccess.getFunctionCallRule());
+					}
+					add(
+						$current,
+						"functionParameters",
+						lv_functionParameters_2_0,
+						"x.mvmn.permock.dsl.Dsl.Operand");
+					afterParserOrEnumRuleCall();
+				}
+			)
+		)?
+		(
+			otherlv_3=','
+			{
+				newLeafNode(otherlv_3, grammarAccess.getFunctionCallAccess().getCommaKeyword_3_0());
+			}
+			(
+				(
+					{
+						newCompositeNode(grammarAccess.getFunctionCallAccess().getFunctionParametersOperandParserRuleCall_3_1_0());
+					}
+					lv_functionParameters_4_0=ruleOperand
+					{
+						if ($current==null) {
+							$current = createModelElementForParent(grammarAccess.getFunctionCallRule());
+						}
+						add(
+							$current,
+							"functionParameters",
+							lv_functionParameters_4_0,
+							"x.mvmn.permock.dsl.Dsl.Operand");
+						afterParserOrEnumRuleCall();
+					}
+				)
+			)
+		)*
+		otherlv_5=')'
+		{
+			newLeafNode(otherlv_5, grammarAccess.getFunctionCallAccess().getRightParenthesisKeyword_4());
+		}
+	)
+;
+
 // Entry rule entryRulePropertyRef
 entryRulePropertyRef returns [EObject current=null]@init {
 	HiddenTokens myHiddenTokenState = ((XtextTokenStream)input).setHiddenTokens("RULE_WS");
@@ -1295,11 +1384,37 @@ rulePropertyRef returns [EObject current=null]
 			)
 			    |
 			(
+				otherlv_2='.'
+				{
+					newLeafNode(otherlv_2, grammarAccess.getPropertyRefAccess().getFullStopKeyword_0_1_0());
+				}
+				(
+					(
+						{
+							newCompositeNode(grammarAccess.getPropertyRefAccess().getFunctionCallFunctionCallParserRuleCall_0_1_1_0());
+						}
+						lv_functionCall_3_0=ruleFunctionCall
+						{
+							if ($current==null) {
+								$current = createModelElementForParent(grammarAccess.getPropertyRefRule());
+							}
+							set(
+								$current,
+								"functionCall",
+								lv_functionCall_3_0,
+								"x.mvmn.permock.dsl.Dsl.FunctionCall");
+							afterParserOrEnumRuleCall();
+						}
+					)
+				)
+			)
+			    |
+			(
 				(
 					{
-						newCompositeNode(grammarAccess.getPropertyRefAccess().getCollectionAccessCollectionAccessParserRuleCall_0_1_0());
+						newCompositeNode(grammarAccess.getPropertyRefAccess().getCollectionAccessCollectionAccessParserRuleCall_0_2_0());
 					}
-					lv_collectionAccess_2_0=ruleCollectionAccess
+					lv_collectionAccess_4_0=ruleCollectionAccess
 					{
 						if ($current==null) {
 							$current = createModelElementForParent(grammarAccess.getPropertyRefRule());
@@ -1307,7 +1422,7 @@ rulePropertyRef returns [EObject current=null]
 						set(
 							$current,
 							"collectionAccess",
-							lv_collectionAccess_2_0,
+							lv_collectionAccess_4_0,
 							"x.mvmn.permock.dsl.Dsl.CollectionAccess");
 						afterParserOrEnumRuleCall();
 					}
@@ -1317,9 +1432,9 @@ rulePropertyRef returns [EObject current=null]
 			(
 				(
 					{
-						newCompositeNode(grammarAccess.getPropertyRefAccess().getListFuncListFunctionParserRuleCall_0_2_0());
+						newCompositeNode(grammarAccess.getPropertyRefAccess().getListFuncListFunctionParserRuleCall_0_3_0());
 					}
-					lv_listFunc_3_0=ruleListFunction
+					lv_listFunc_5_0=ruleListFunction
 					{
 						if ($current==null) {
 							$current = createModelElementForParent(grammarAccess.getPropertyRefRule());
@@ -1327,7 +1442,7 @@ rulePropertyRef returns [EObject current=null]
 						set(
 							$current,
 							"listFunc",
-							lv_listFunc_3_0,
+							lv_listFunc_5_0,
 							"x.mvmn.permock.dsl.Dsl.ListFunction");
 						afterParserOrEnumRuleCall();
 					}
@@ -1339,7 +1454,7 @@ rulePropertyRef returns [EObject current=null]
 				{
 					newCompositeNode(grammarAccess.getPropertyRefAccess().getSubProperyPropertyRefParserRuleCall_1_0());
 				}
-				lv_subPropery_4_0=rulePropertyRef
+				lv_subPropery_6_0=rulePropertyRef
 				{
 					if ($current==null) {
 						$current = createModelElementForParent(grammarAccess.getPropertyRefRule());
@@ -1347,7 +1462,7 @@ rulePropertyRef returns [EObject current=null]
 					set(
 						$current,
 						"subPropery",
-						lv_subPropery_4_0,
+						lv_subPropery_6_0,
 						"x.mvmn.permock.dsl.Dsl.PropertyRef");
 					afterParserOrEnumRuleCall();
 				}

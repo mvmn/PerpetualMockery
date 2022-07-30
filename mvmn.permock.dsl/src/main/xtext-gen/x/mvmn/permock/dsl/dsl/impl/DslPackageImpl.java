@@ -19,6 +19,7 @@ import x.mvmn.permock.dsl.dsl.DslFactory;
 import x.mvmn.permock.dsl.dsl.DslPackage;
 import x.mvmn.permock.dsl.dsl.Entity;
 import x.mvmn.permock.dsl.dsl.Expression;
+import x.mvmn.permock.dsl.dsl.FunctionCall;
 import x.mvmn.permock.dsl.dsl.Header;
 import x.mvmn.permock.dsl.dsl.Headers;
 import x.mvmn.permock.dsl.dsl.ListElementAlias;
@@ -133,6 +134,13 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
    * <!-- end-user-doc -->
    * @generated
    */
+  private EClass collectionAccessEClass = null;
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
   private EClass propertyAccessEClass = null;
 
   /**
@@ -140,7 +148,7 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
    * <!-- end-user-doc -->
    * @generated
    */
-  private EClass collectionAccessEClass = null;
+  private EClass functionCallEClass = null;
 
   /**
    * <!-- begin-user-doc -->
@@ -696,28 +704,6 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
    * @generated
    */
   @Override
-  public EClass getPropertyAccess()
-  {
-    return propertyAccessEClass;
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  @Override
-  public EAttribute getPropertyAccess_Name()
-  {
-    return (EAttribute)propertyAccessEClass.getEStructuralFeatures().get(0);
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  @Override
   public EClass getCollectionAccess()
   {
     return collectionAccessEClass;
@@ -751,6 +737,61 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
    * @generated
    */
   @Override
+  public EClass getPropertyAccess()
+  {
+    return propertyAccessEClass;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public EAttribute getPropertyAccess_Name()
+  {
+    return (EAttribute)propertyAccessEClass.getEStructuralFeatures().get(0);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public EClass getFunctionCall()
+  {
+    return functionCallEClass;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public EAttribute getFunctionCall_Name()
+  {
+    return (EAttribute)functionCallEClass.getEStructuralFeatures().get(0);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public EReference getFunctionCall_FunctionParameters()
+  {
+    return (EReference)functionCallEClass.getEStructuralFeatures().get(1);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
   public EClass getPropertyRef()
   {
     return propertyRefEClass;
@@ -773,7 +814,7 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
    * @generated
    */
   @Override
-  public EReference getPropertyRef_CollectionAccess()
+  public EReference getPropertyRef_FunctionCall()
   {
     return (EReference)propertyRefEClass.getEStructuralFeatures().get(1);
   }
@@ -784,7 +825,7 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
    * @generated
    */
   @Override
-  public EReference getPropertyRef_ListFunc()
+  public EReference getPropertyRef_CollectionAccess()
   {
     return (EReference)propertyRefEClass.getEStructuralFeatures().get(2);
   }
@@ -795,9 +836,20 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
    * @generated
    */
   @Override
-  public EReference getPropertyRef_SubPropery()
+  public EReference getPropertyRef_ListFunc()
   {
     return (EReference)propertyRefEClass.getEStructuralFeatures().get(3);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public EReference getPropertyRef_SubPropery()
+  {
+    return (EReference)propertyRefEClass.getEStructuralFeatures().get(4);
   }
 
   /**
@@ -1069,15 +1121,20 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
     createEReference(listElementReferenceEClass, LIST_ELEMENT_REFERENCE__NAME);
     createEReference(listElementReferenceEClass, LIST_ELEMENT_REFERENCE__PROP);
 
-    propertyAccessEClass = createEClass(PROPERTY_ACCESS);
-    createEAttribute(propertyAccessEClass, PROPERTY_ACCESS__NAME);
-
     collectionAccessEClass = createEClass(COLLECTION_ACCESS);
     createEAttribute(collectionAccessEClass, COLLECTION_ACCESS__KEY);
     createEAttribute(collectionAccessEClass, COLLECTION_ACCESS__INDEX);
 
+    propertyAccessEClass = createEClass(PROPERTY_ACCESS);
+    createEAttribute(propertyAccessEClass, PROPERTY_ACCESS__NAME);
+
+    functionCallEClass = createEClass(FUNCTION_CALL);
+    createEAttribute(functionCallEClass, FUNCTION_CALL__NAME);
+    createEReference(functionCallEClass, FUNCTION_CALL__FUNCTION_PARAMETERS);
+
     propertyRefEClass = createEClass(PROPERTY_REF);
     createEReference(propertyRefEClass, PROPERTY_REF__PROP_ACCESS);
+    createEReference(propertyRefEClass, PROPERTY_REF__FUNCTION_CALL);
     createEReference(propertyRefEClass, PROPERTY_REF__COLLECTION_ACCESS);
     createEReference(propertyRefEClass, PROPERTY_REF__LIST_FUNC);
     createEReference(propertyRefEClass, PROPERTY_REF__SUB_PROPERY);
@@ -1192,15 +1249,20 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
     initEReference(getListElementReference_Name(), this.getListElementAlias(), null, "name", null, 0, 1, ListElementReference.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEReference(getListElementReference_Prop(), this.getPropertyRef(), null, "prop", null, 0, 1, ListElementReference.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-    initEClass(propertyAccessEClass, PropertyAccess.class, "PropertyAccess", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-    initEAttribute(getPropertyAccess_Name(), ecorePackage.getEString(), "name", null, 0, 1, PropertyAccess.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
     initEClass(collectionAccessEClass, CollectionAccess.class, "CollectionAccess", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEAttribute(getCollectionAccess_Key(), ecorePackage.getEString(), "key", null, 0, 1, CollectionAccess.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEAttribute(getCollectionAccess_Index(), ecorePackage.getELongObject(), "index", null, 0, 1, CollectionAccess.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
+    initEClass(propertyAccessEClass, PropertyAccess.class, "PropertyAccess", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+    initEAttribute(getPropertyAccess_Name(), ecorePackage.getEString(), "name", null, 0, 1, PropertyAccess.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+    initEClass(functionCallEClass, FunctionCall.class, "FunctionCall", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+    initEAttribute(getFunctionCall_Name(), ecorePackage.getEString(), "name", null, 0, 1, FunctionCall.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEReference(getFunctionCall_FunctionParameters(), this.getOperand(), null, "functionParameters", null, 0, -1, FunctionCall.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
     initEClass(propertyRefEClass, PropertyRef.class, "PropertyRef", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEReference(getPropertyRef_PropAccess(), this.getPropertyAccess(), null, "propAccess", null, 0, 1, PropertyRef.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEReference(getPropertyRef_FunctionCall(), this.getFunctionCall(), null, "functionCall", null, 0, 1, PropertyRef.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEReference(getPropertyRef_CollectionAccess(), this.getCollectionAccess(), null, "collectionAccess", null, 0, 1, PropertyRef.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEReference(getPropertyRef_ListFunc(), this.getListFunction(), null, "listFunc", null, 0, 1, PropertyRef.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEReference(getPropertyRef_SubPropery(), this.getPropertyRef(), null, "subPropery", null, 0, 1, PropertyRef.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

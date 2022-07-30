@@ -19,18 +19,6 @@ public class MockRuleDictionaryAccess extends MockRulePropertyReference {
 
 	@Override
 	@JsonIgnore
-	public boolean isListFunction() {
-		return false;
-	}
-
-	@Override
-	@JsonIgnore
-	public boolean isListAccess() {
-		return false;
-	}
-
-	@Override
-	@JsonIgnore
 	public boolean isDictionaryAccess() {
 		return true;
 	}

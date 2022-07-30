@@ -7,8 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import x.mvmn.permock.util.BeanUtil;
-import x.mvmn.permock.util.BeanUtil.Property;
+import x.mvmn.permock.util.Property;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -23,7 +22,7 @@ public class MockRuleConstant extends MockRuleOperand {
 		private final Property type;
 
 		private Type(Class<?> type) {
-			this.type = new BeanUtil.Property("const", type);
+			this.type = new Property("const", type);
 		}
 
 		public Property getType() {

@@ -15,6 +15,7 @@ import org.eclipse.emf.ecore.EObject;
  * </p>
  * <ul>
  *   <li>{@link x.mvmn.permock.dsl.dsl.PropertyRef#getPropAccess <em>Prop Access</em>}</li>
+ *   <li>{@link x.mvmn.permock.dsl.dsl.PropertyRef#getFunctionCall <em>Function Call</em>}</li>
  *   <li>{@link x.mvmn.permock.dsl.dsl.PropertyRef#getCollectionAccess <em>Collection Access</em>}</li>
  *   <li>{@link x.mvmn.permock.dsl.dsl.PropertyRef#getListFunc <em>List Func</em>}</li>
  *   <li>{@link x.mvmn.permock.dsl.dsl.PropertyRef#getSubPropery <em>Sub Propery</em>}</li>
@@ -47,6 +48,28 @@ public interface PropertyRef extends EObject
    * @generated
    */
   void setPropAccess(PropertyAccess value);
+
+  /**
+   * Returns the value of the '<em><b>Function Call</b></em>' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the value of the '<em>Function Call</em>' containment reference.
+   * @see #setFunctionCall(FunctionCall)
+   * @see x.mvmn.permock.dsl.dsl.DslPackage#getPropertyRef_FunctionCall()
+   * @model containment="true"
+   * @generated
+   */
+  FunctionCall getFunctionCall();
+
+  /**
+   * Sets the value of the '{@link x.mvmn.permock.dsl.dsl.PropertyRef#getFunctionCall <em>Function Call</em>}' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @param value the new value of the '<em>Function Call</em>' containment reference.
+   * @see #getFunctionCall()
+   * @generated
+   */
+  void setFunctionCall(FunctionCall value);
 
   /**
    * Returns the value of the '<em><b>Collection Access</b></em>' containment reference.

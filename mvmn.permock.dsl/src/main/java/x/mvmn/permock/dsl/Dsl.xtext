@@ -53,14 +53,18 @@ Reference hidden(WS):
 ListElementReference hidden(WS):
 	'$' name=[ListElementAlias|ID] (prop=PropertyRef)?;
 
-PropertyAccess:
-	name=ID;
-
 CollectionAccess:
 	'[' (key=STRING | index=INTEGER) ']';
 
+PropertyAccess:
+	name=ID;
+
+FunctionCall:
+	name=ID '(' functionParameters+=Operand? (',' functionParameters+=Operand)* ')';
+
 PropertyRef hidden(WS):
-	('.' propAccess=PropertyAccess | collectionAccess=CollectionAccess | listFunc=ListFunction)
+	('.' propAccess=PropertyAccess | '.' functionCall=FunctionCall | collectionAccess=CollectionAccess |
+	listFunc=ListFunction)
 	(subPropery=PropertyRef)?;
 
 enum Operator:

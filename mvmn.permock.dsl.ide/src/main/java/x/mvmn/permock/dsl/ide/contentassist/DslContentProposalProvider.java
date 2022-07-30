@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.AbstractElement;
@@ -21,13 +22,16 @@ import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalProvider;
 
 import com.google.inject.Inject;
 
+import x.mvmn.permock.dsl.dsl.FunctionCall;
+import x.mvmn.permock.dsl.dsl.ListElementReference;
 import x.mvmn.permock.dsl.dsl.ListFunction;
 import x.mvmn.permock.dsl.dsl.PropertyRef;
+import x.mvmn.permock.dsl.dsl.Reference;
 import x.mvmn.permock.dsl.model.ModelHelper;
+import x.mvmn.permock.dsl.model.ModelHelper.FunctionDescriptor;
 import x.mvmn.permock.dsl.model.XtextModelHelper;
 import x.mvmn.permock.dsl.services.DslGrammarAccess;
-import x.mvmn.permock.util.BeanUtil;
-import x.mvmn.permock.util.BeanUtil.Property;
+import x.mvmn.permock.util.Property;
 
 public class DslContentProposalProvider extends IdeContentProposalProvider {
 
@@ -65,15 +69,27 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 	protected void _createProposals(RuleCall ruleCall, ContentAssistContext context,
 			IIdeContentProposalAcceptor acceptor) {
 		String prefix = context.getPrefix();
-		if (ruleCall.getRule().getName().equals("Entity")) {
+		if (ruleCall.getRule().getName().equals(grammarAccess.getEntityRule().getName())) {
 			createProposals(modelHelper.entities(), prefix, context, acceptor);
 		} else if (ruleCall.getRule().getName().equals(grammarAccess.getPropertyAccessRule().getName())) {
 			EObject currentModel = context.getCurrentModel();
 			if (currentModel instanceof PropertyRef) {
-				BeanUtil.Property currentModelType = xtextModelHelper.resolveType(currentModel.eContainer());
+				Property currentModelType = xtextModelHelper.resolveType(currentModel.eContainer());
 				if (currentModelType != null) {
 					createProposals(modelHelper.properties(currentModelType), prefix, context, acceptor);
+					createFunctionProposals(modelHelper.getFunctionDescriptors(currentModelType), prefix, context,
+							acceptor);
 				}
+			} else if (currentModel instanceof Reference || currentModel instanceof FunctionCall
+					|| currentModel instanceof ListElementReference) {
+				Property currentModelType = xtextModelHelper.resolveType(currentModel);
+				if (currentModelType != null) {
+					createProposals(modelHelper.properties(currentModelType), prefix, context, acceptor);
+					createFunctionProposals(modelHelper.getFunctionDescriptors(currentModelType), prefix, context,
+							acceptor);
+				}
+			} else {
+				System.err.println("Uncovered " + currentModel);
 			}
 		}
 	}
@@ -111,13 +127,37 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 				|| collectionOp == collectionOps.contains(keyword);
 	}
 
-	private void createProposals(List<BeanUtil.Property> options, String prefix, ContentAssistContext context,
+	private void createProposals(List<Property> options, String prefix, ContentAssistContext context,
 			IIdeContentProposalAcceptor acceptor) {
 		boolean appendDot = prefix != null && prefix.startsWith(".");
-		options.stream()
-				.forEach(n -> createProposal(appendDot ? ("." + n.getName()) : n.getName(),
-						(n.isCollection() ? "List of " : "") + n.getType().getSimpleName(),
-						ContentAssistEntry.KIND_KEYWORD, context, acceptor));
+		options.stream().forEach(n -> createProposal(appendDot ? ("." + n.getName()) : n.getName(), toDescription(n),
+				ContentAssistEntry.KIND_KEYWORD, context, acceptor));
+	}
+
+	private void createFunctionProposals(List<FunctionDescriptor> functionDescriptor, String prefix,
+			ContentAssistContext context, IIdeContentProposalAcceptor acceptor) {
+		boolean appendDot = prefix != null && prefix.startsWith(".");
+
+		functionDescriptor.stream()
+				.forEach(functionDesc -> createProposal(
+						(appendDot ? "." : "") + functionDescriptorToCompletion(functionDesc),
+						functionDescriptorToDescription(functionDesc), ContentAssistEntry.KIND_KEYWORD, context,
+						acceptor));
+	}
+
+	private String toDescription(Property prop) {
+		return (prop.isCollection() ? "List of " : "") + prop.getType().getSimpleName();
+	}
+
+	private String functionDescriptorToCompletion(FunctionDescriptor functionDescription) {
+		return functionDescription.getName() + "(" + functionDescription.getArgs().stream().skip(1)
+				.map(arg -> arg.getName()).collect(Collectors.joining(", ")) + ")";
+	}
+
+	private String functionDescriptorToDescription(FunctionDescriptor functionDescription) {
+		String params = functionDescription.getArgs().stream().skip(1).map(arg -> toDescription(arg))
+				.collect(Collectors.joining(", "));
+		return (params.isEmpty() ? "" : params + " -> ") + toDescription(functionDescription.getReturnType());
 	}
 
 	protected void createProposal(String value, String description, String kind, ContentAssistContext context,

@@ -136,14 +136,19 @@ public class DslAdapterFactory extends AdapterFactoryImpl
         return createListElementReferenceAdapter();
       }
       @Override
+      public Adapter caseCollectionAccess(CollectionAccess object)
+      {
+        return createCollectionAccessAdapter();
+      }
+      @Override
       public Adapter casePropertyAccess(PropertyAccess object)
       {
         return createPropertyAccessAdapter();
       }
       @Override
-      public Adapter caseCollectionAccess(CollectionAccess object)
+      public Adapter caseFunctionCall(FunctionCall object)
       {
-        return createCollectionAccessAdapter();
+        return createFunctionCallAdapter();
       }
       @Override
       public Adapter casePropertyRef(PropertyRef object)
@@ -378,6 +383,21 @@ public class DslAdapterFactory extends AdapterFactoryImpl
   }
 
   /**
+   * Creates a new adapter for an object of class '{@link x.mvmn.permock.dsl.dsl.CollectionAccess <em>Collection Access</em>}'.
+   * <!-- begin-user-doc -->
+   * This default implementation returns null so that we can easily ignore cases;
+   * it's useful to ignore a case when inheritance will catch all the cases anyway.
+   * <!-- end-user-doc -->
+   * @return the new adapter.
+   * @see x.mvmn.permock.dsl.dsl.CollectionAccess
+   * @generated
+   */
+  public Adapter createCollectionAccessAdapter()
+  {
+    return null;
+  }
+
+  /**
    * Creates a new adapter for an object of class '{@link x.mvmn.permock.dsl.dsl.PropertyAccess <em>Property Access</em>}'.
    * <!-- begin-user-doc -->
    * This default implementation returns null so that we can easily ignore cases;
@@ -393,16 +413,16 @@ public class DslAdapterFactory extends AdapterFactoryImpl
   }
 
   /**
-   * Creates a new adapter for an object of class '{@link x.mvmn.permock.dsl.dsl.CollectionAccess <em>Collection Access</em>}'.
+   * Creates a new adapter for an object of class '{@link x.mvmn.permock.dsl.dsl.FunctionCall <em>Function Call</em>}'.
    * <!-- begin-user-doc -->
    * This default implementation returns null so that we can easily ignore cases;
    * it's useful to ignore a case when inheritance will catch all the cases anyway.
    * <!-- end-user-doc -->
    * @return the new adapter.
-   * @see x.mvmn.permock.dsl.dsl.CollectionAccess
+   * @see x.mvmn.permock.dsl.dsl.FunctionCall
    * @generated
    */
-  public Adapter createCollectionAccessAdapter()
+  public Adapter createFunctionCallAdapter()
   {
     return null;
   }

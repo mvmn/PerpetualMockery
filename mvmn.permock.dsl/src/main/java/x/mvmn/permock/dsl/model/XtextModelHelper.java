@@ -8,14 +8,17 @@ import org.eclipse.xtext.EcoreUtil2;
 import com.google.inject.Inject;
 
 import x.mvmn.permock.dsl.dsl.CollectionAccess;
+import x.mvmn.permock.dsl.dsl.Constant;
+import x.mvmn.permock.dsl.dsl.FunctionCall;
 import x.mvmn.permock.dsl.dsl.ListElementReference;
 import x.mvmn.permock.dsl.dsl.ListFunction;
 import x.mvmn.permock.dsl.dsl.PropertyAccess;
 import x.mvmn.permock.dsl.dsl.PropertyRef;
 import x.mvmn.permock.dsl.dsl.Reference;
+import x.mvmn.permock.dsl.model.ModelHelper.FunctionDescriptor;
 import x.mvmn.permock.dsl.services.DslGrammarAccess;
 import x.mvmn.permock.util.BeanUtil;
-import x.mvmn.permock.util.BeanUtil.Property;
+import x.mvmn.permock.util.Property;
 
 public class XtextModelHelper {
 
@@ -25,7 +28,7 @@ public class XtextModelHelper {
 	@Inject
 	private DslGrammarAccess grammarAccess;
 
-	public BeanUtil.Property resolveType(EObject currentModel) {
+	public Property resolveType(EObject currentModel) {
 		if (currentModel instanceof Reference) {
 			return getReferenceType((Reference) currentModel);
 		} else if (currentModel instanceof PropertyAccess) {
@@ -41,6 +44,9 @@ public class XtextModelHelper {
 			} else if (propertyRef.getListFunc() != null) {
 				ListFunction listFunction = propertyRef.getListFunc();
 				return resolveType(listFunction);
+			} else if (propertyRef.getFunctionCall() != null) {
+				FunctionCall functionCall = propertyRef.getFunctionCall();
+				return getFunctionResultType(functionCall);
 			}
 		} else if (currentModel instanceof ListElementReference) {
 			ListElementReference listElRef = (ListElementReference) currentModel;
@@ -52,8 +58,49 @@ public class XtextModelHelper {
 					.equals(listFunction.getOp().getLiteral())) {
 				return resolveType(currentModel.eContainer().eContainer());
 			} else { // ALL, ANY - boolean result
-				return BeanUtil.Property.of("list", Boolean.class, false);
+				return Property.of("list", Boolean.class, false);
 			}
+		} else if (currentModel instanceof FunctionCall) {
+			return getFunctionResultType((FunctionCall) currentModel);
+		} else if (currentModel instanceof PropertyAccess) {
+			return getPropertyType((PropertyAccess) currentModel);
+		} else if (currentModel instanceof ListFunction) {
+			return resolveType((ListFunction) currentModel);
+		} else if (currentModel instanceof Constant) {
+			Constant constant = (Constant) currentModel;
+			if (constant.getBoolVal() != null) {
+				return Property.of("constant", Boolean.class, false);
+			} else if (constant.getStrVal() != null) {
+				return Property.of("constant", String.class, false);
+			} else if (constant.getIntVal() != null) {
+				return Property.of("constant", Long.class, false);
+			} else if (constant.getFloatVal() != null) {
+				return Property.of("constant", Double.class, false);
+			} else {
+				System.err.println("Unknown constant type: " + constant);
+			}
+		}
+		// else {
+//			System.err.println("Not covered " + currentModel);
+//		}
+		return null;
+	}
+
+	private Property getFunctionResultType(FunctionCall functionCall) {
+		FunctionDescriptor function = getFunctionDescriptor(functionCall);
+		return function != null ? function.getReturnType() : null;
+	}
+
+	public FunctionDescriptor getFunctionDescriptor(FunctionCall functionCall) {
+		Property parentType = resolveType(functionCall.eContainer().eContainer());
+
+		if (parentType != null) {
+			String functionName = functionCall.getName();
+
+			return modelHelper.getFunctionDescriptors(parentType).stream()
+					.filter(func -> func.getName().equals(functionName))
+					.filter(func -> func.getArgs().size() == functionCall.getFunctionParameters().size() + 1)
+					.findFirst().orElse(null);
 		}
 		return null;
 	}
@@ -63,9 +110,9 @@ public class XtextModelHelper {
 			ListFunction parentListFunction = findMatchingContainerOfType(listElRef, ListFunction.class,
 					lf -> lf.getAlias().getName().equals(alias));
 			if (parentListFunction != null) {
-				BeanUtil.Property parentCollection = resolveType(parentListFunction.eContainer().eContainer());
+				Property parentCollection = resolveType(parentListFunction.eContainer().eContainer());
 				if (parentCollection != null) {
-					return new BeanUtil.Property(alias, parentCollection.getType(),
+					return new Property(alias, parentCollection.getType(),
 							BeanUtil.isCollection(parentCollection.getType()));
 				}
 			}
@@ -73,21 +120,21 @@ public class XtextModelHelper {
 		return null;
 	}
 
-	private BeanUtil.Property getReferenceType(Reference reference) {
+	private Property getReferenceType(Reference reference) {
 		String entityName = reference.getName().getName();
 		return modelHelper.entityType(entityName);
 	}
 
-	private BeanUtil.Property getPropertyType(PropertyAccess propertyRef) {
-		BeanUtil.Property parentType = resolveType(propertyRef.eContainer().eContainer());
+	private Property getPropertyType(PropertyAccess propertyRef) {
+		Property parentType = resolveType(propertyRef.eContainer().eContainer());
 		if (parentType == null) {
 			return null;
 		}
 		return propertyRef.getName() != null ? modelHelper.typeOfProperty(parentType, propertyRef.getName()) : null;
 	}
 
-	private BeanUtil.Property getCollectionType(CollectionAccess collectionAccess) {
-		BeanUtil.Property parentType = resolveType(collectionAccess.eContainer().eContainer());
+	private Property getCollectionType(CollectionAccess collectionAccess) {
+		Property parentType = resolveType(collectionAccess.eContainer().eContainer());
 		if (collectionAccess.getKey() != null) {
 			return modelHelper.getDictionaryValueType(parentType);
 		}
@@ -100,7 +147,7 @@ public class XtextModelHelper {
 		if (!parentType.isCollection()) {
 			return null;
 		} else {
-			return new BeanUtil.Property(collectionAccess.getIndex().toString(), parentType.getType(), false);
+			return new Property(collectionAccess.getIndex().toString(), parentType.getType(), false);
 		}
 	}
 
