@@ -71,10 +71,10 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 		String prefix = context.getPrefix();
 		if (ruleCall.getRule().getName().equals(grammarAccess.getEntityRule().getName())) {
 			createProposals(modelHelper.entities(), prefix, context, acceptor);
-		} else if (ruleCall.getRule().getName().equals(grammarAccess.getPropertyAccessRule().getName())) {
+		} else if (ruleCall.getRule().getName().equals(grammarAccess.getPropertyRefRule().getName())) {
 			EObject currentModel = context.getCurrentModel();
 			if (currentModel instanceof PropertyRef) {
-				Property currentModelType = xtextModelHelper.resolveType(currentModel.eContainer());
+				Property currentModelType = xtextModelHelper.resolveType(currentModel);
 				if (currentModelType != null) {
 					createProposals(modelHelper.properties(currentModelType), prefix, context, acceptor);
 					createFunctionProposals(modelHelper.getFunctionDescriptors(currentModelType), prefix, context,
@@ -129,14 +129,14 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 
 	private void createProposals(List<Property> options, String prefix, ContentAssistContext context,
 			IIdeContentProposalAcceptor acceptor) {
-		boolean appendDot = prefix != null && prefix.startsWith(".");
+		boolean appendDot = true; // prefix != null && prefix.startsWith(".");
 		options.stream().forEach(n -> createProposal(appendDot ? ("." + n.getName()) : n.getName(), toDescription(n),
 				ContentAssistEntry.KIND_KEYWORD, context, acceptor));
 	}
 
 	private void createFunctionProposals(List<FunctionDescriptor> functionDescriptor, String prefix,
 			ContentAssistContext context, IIdeContentProposalAcceptor acceptor) {
-		boolean appendDot = prefix != null && prefix.startsWith(".");
+		boolean appendDot = true; // prefix != null && prefix.startsWith(".");
 
 		functionDescriptor.stream()
 				.forEach(functionDesc -> createProposal(
