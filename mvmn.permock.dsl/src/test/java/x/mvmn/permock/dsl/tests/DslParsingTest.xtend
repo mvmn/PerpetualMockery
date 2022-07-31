@@ -21,7 +21,7 @@ class DslParsingTest {
 	@Test
 	def void loadModel() {
 		val result = parseHelper.parse('''
-			Hello Xtext!
+			if true
 		''')
 		Assertions.assertNotNull(result)
 		val errors = result.eResource.errors
