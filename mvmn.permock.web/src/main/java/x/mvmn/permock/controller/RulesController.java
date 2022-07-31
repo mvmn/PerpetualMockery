@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,6 +43,9 @@ public class RulesController {
 	@Autowired
 	private ObjectMapper objectMapper;
 
+	@Value("${mock.parse.debug:false}")
+	private boolean debug;
+
 	@GetMapping
 	public List<RuleViewDto> list() {
 		return ruleRepository.findAll().stream().map(ruleMapper::mapToViewDto).collect(Collectors.toList());
@@ -77,9 +81,13 @@ public class RulesController {
 	protected String parseAndSerialize(String text) {
 		try {
 			MockRule ruleModel = ruleParsingService.parse(text);
-			System.out.println("---\n" + ruleModel + "\n---");
+			if (debug) {
+				System.out.println("---\n" + ruleModel + "\n---");
+			}
 			String serialized = objectMapper.writeValueAsString(ruleModel);
-			System.out.println("---\n" + serialized + "\n---");
+			if (debug) {
+				System.out.println("---\n" + serialized + "\n---");
+			}
 			return serialized;
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException("Rule model serialization failed", e);

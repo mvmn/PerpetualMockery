@@ -112,6 +112,7 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 	@Override
 	protected boolean filterKeyword(Keyword keyword, ContentAssistContext context) {
 		boolean collectionOp = false;
+		boolean isDictionary = false;
 		if (context.getCurrentModel() instanceof ListFunction) {
 			collectionOp = true;
 		} else {
@@ -121,9 +122,13 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 			}
 			if (currentModelType.isCollection()) {
 				collectionOp = true;
+			} else if (modelHelper.isDictionary(currentModelType)) {
+				isDictionary = true;
 			}
 		}
 		return grammarAccess.getPropertyRefAccess().getFullStopKeyword_0_0_0().equals(keyword)
+				|| isDictionary
+						&& grammarAccess.getCollectionAccessAccess().getLeftSquareBracketKeyword_0().equals(keyword)
 				|| collectionOp == collectionOps.contains(keyword);
 	}
 

@@ -54,7 +54,7 @@ public class ModelHelper {
 	}
 
 	public List<Property> properties(Property property) {
-		if (isFromDslPackage(property.getType())) {
+		if (isFromDslPackage(property.getType()) && !property.isCollection() && !property.isPrimitive()) {
 			return BeanUtil.listPropertiesFromGetters(property.getType());
 		} else {
 			return Collections.emptyList();

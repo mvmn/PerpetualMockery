@@ -22,10 +22,10 @@ Condition:
 	OrCondition;
 
 OrCondition returns Condition:
-	AndCondition ({OrCondition.left=current} 'or' right=AndCondition)*;
+	AndCondition ({OrCondition.left=current} 'or' right=AndCondition)?;
 
 AndCondition returns Condition:
-	OptionalNegationCondition ({AndCondition.left=current} 'and' right=OptionalNegationCondition)*;
+	OptionalNegationCondition ({AndCondition.left=current} 'and' right=OptionalNegationCondition)?;
 
 OptionalNegationCondition returns Condition:
 	BracketedCondition | {Negation} 'not' negated=BracketedCondition;

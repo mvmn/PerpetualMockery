@@ -51,3 +51,4 @@ pom.xml.versionsBackup
 xtext-gen/
 src-gen/
 
+mvmn.permock.dsl.web/src/main/webapp/META-INF/maven/
