@@ -20,8 +20,10 @@ import org.eclipse.xtext.util.CancelIndicator;
 import com.google.inject.Inject;
 
 import x.mvmn.permock.dsl.dsl.Condition;
+import x.mvmn.permock.dsl.dsl.FunctionCall;
 import x.mvmn.permock.dsl.dsl.Header;
 import x.mvmn.permock.dsl.dsl.ListFunction;
+import x.mvmn.permock.dsl.dsl.Reference;
 import x.mvmn.permock.dsl.dsl.ResponseConf;
 import x.mvmn.permock.dsl.dsl.Rule;
 import x.mvmn.permock.dsl.services.DslGrammarAccess;
@@ -36,6 +38,9 @@ public class DslSemanticHighlightingCalculator extends DefaultSemanticHighlighti
 		public static String RESPONSE_CONTENT_VALUE_ID = "responseContentValue";
 		public static String BOOLEAN_ID = "boolean";
 		public static String LOGICAL_CONDITION_ID = "logicalCondition";
+		public static String FUNCATION_NAME_ID = "functionName";
+		public static String FUNCATION_KEYWORDS_ID = "functionKeyword";
+		public static String ENTITY_NAME_ID = "entityName";
 	}
 
 	@Inject
@@ -50,6 +55,8 @@ public class DslSemanticHighlightingCalculator extends DefaultSemanticHighlighti
 	private Set<Keyword> logicalConditionSet;
 
 	private Set<Keyword> conditionKeywordSet;
+
+	private Set<Keyword> functionCallKeywordSet;
 
 	@Inject
 	private void init() {
@@ -75,6 +82,11 @@ public class DslSemanticHighlightingCalculator extends DefaultSemanticHighlighti
 		conditionKeywordSet = new HashSet<>(
 				Arrays.asList(grammarAccess.getBracketedConditionAccess().getLeftParenthesisKeyword_1_0(),
 						grammarAccess.getBracketedConditionAccess().getRightParenthesisKeyword_1_2()));
+
+		functionCallKeywordSet = new HashSet<>(
+				Arrays.asList(grammarAccess.getFunctionCallAccess().getLeftParenthesisKeyword_1(),
+						grammarAccess.getFunctionCallAccess().getRightParenthesisKeyword_4(),
+						grammarAccess.getFunctionCallAccess().getCommaKeyword_3_0()));
 	}
 
 	@Override
@@ -147,6 +159,37 @@ public class DslSemanticHighlightingCalculator extends DefaultSemanticHighlighti
 				}
 				if (n.getGrammarElement() != null && logicalConditionSet.contains(n.getGrammarElement())) {
 					acceptor.addPosition(n.getOffset(), n.getLength(), DslHighlightingStyles.LOGICAL_CONDITION_ID);
+				}
+			}
+		} else if (object instanceof FunctionCall) {
+			INode firstChild = node.getFirstChild();
+			if (firstChild.getGrammarElement() instanceof RuleCall) {
+				RuleCall ruleCall = (RuleCall) firstChild.getGrammarElement();
+				if (ruleCall.eContainer() instanceof Assignment) {
+					Assignment assignment = (Assignment) ruleCall.eContainer();
+					if (grammarAccess.getFunctionCallAccess().getNameAssignment_0().getFeature()
+							.equals(assignment.getFeature())) {
+						acceptor.addPosition(firstChild.getOffset(), firstChild.getLength(),
+								DslHighlightingStyles.FUNCATION_NAME_ID);
+					}
+				}
+			}
+			for (ILeafNode n : node.getLeafNodes()) {
+				if (n.getGrammarElement() != null && functionCallKeywordSet.contains(n.getGrammarElement())) {
+					acceptor.addPosition(n.getOffset(), n.getLength(), DslHighlightingStyles.FUNCATION_KEYWORDS_ID);
+				}
+			}
+		} else if (object instanceof Reference) {
+			INode firstChild = node.getFirstChild();
+			if (firstChild.getGrammarElement() instanceof RuleCall) {
+				RuleCall ruleCall = (RuleCall) firstChild.getGrammarElement();
+				if (ruleCall.eContainer() instanceof Assignment) {
+					Assignment assignment = (Assignment) ruleCall.eContainer();
+					if (grammarAccess.getReferenceAccess().getNameAssignment_0().getFeature()
+							.equals(assignment.getFeature())) {
+						acceptor.addPosition(firstChild.getOffset(), firstChild.getLength(),
+								DslHighlightingStyles.ENTITY_NAME_ID);
+					}
 				}
 			}
 		}

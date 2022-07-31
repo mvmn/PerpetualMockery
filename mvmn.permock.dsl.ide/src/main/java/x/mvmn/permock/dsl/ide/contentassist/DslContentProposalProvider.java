@@ -50,8 +50,8 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 	@Inject
 	private XtextModelHelper xtextModelHelper;
 
-	private static final Set<String> primitiveValRuleNames = new HashSet<>(
-			Arrays.asList("ID", "STRING", "INTEGER", "FLOAT"));
+	private Set<String> primitiveValRuleNames = new HashSet<>(
+			Arrays.asList("ID", "STRING", "INTEGER", "FLOAT", "BOOLEAN"));
 
 	private Set<Keyword> collectionOps;
 
@@ -129,7 +129,7 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 
 	private void createProposals(List<Property> options, String prefix, ContentAssistContext context,
 			IIdeContentProposalAcceptor acceptor) {
-		boolean appendDot = true; // prefix != null && prefix.startsWith(".");
+		boolean appendDot = prefix != null && prefix.startsWith(".");
 		options.stream().forEach(n -> createProposal(appendDot ? ("." + n.getName()) : n.getName(), toDescription(n),
 				ContentAssistEntry.KIND_KEYWORD, context, acceptor));
 	}

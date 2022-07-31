@@ -201,7 +201,8 @@ public class DslValidator extends AbstractDslValidator {
 		} else if (leftOpType.isString()) {
 			// Any op on lefthand string is fine - we can convert righthand value to string
 			// as long as it is a primitive
-			return rightOpType.isString() || rightOpType.isBoolean() || rightOpType.isNumber();
+			return (rightOpType.isString() || rightOpType.isBoolean() || rightOpType.isNumber())
+					&& Operator.EQ.getName().equals(op.getName()) || Operator.NEQ.getName().equals(op.getName());
 		} else {
 			// No operations are allowed on non-primitives
 			return false;
@@ -265,6 +266,8 @@ public class DslValidator extends AbstractDslValidator {
 			return prop.getListFunc();
 		} else if (prop.getCollectionAccess() != null) {
 			return prop.getCollectionAccess();
+		} else if (prop.getFunctionCall() != null) {
+			return prop.getFunctionCall();
 		}
 		return prop;
 	}

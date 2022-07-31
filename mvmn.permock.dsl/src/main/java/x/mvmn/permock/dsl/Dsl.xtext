@@ -4,15 +4,13 @@ generate dsl "http://www.mvmn.x/permock/dsl/Dsl"
 import "http://www.eclipse.org/emf/2002/Ecore" as ecore
 
 Rule:
-	'if' conditions=Condition
-	('proxy' proxy=ProxyConf | 'respond' 'with' response=ResponseConf)?;
+	'if' conditions=Condition ('proxy' proxy=ProxyConf | 'respond' 'with' response=ResponseConf)?;
 
 ProxyConf:
 	'url' proxyUrl=STRING;
 
 ResponseConf:
-	('status' httpStatus=INTEGER)? &
-	('content' content=STRING)? & ('headers' headers=Headers?)?;
+	('status' httpStatus=INTEGER)? & ('content' content=STRING)? & ('headers' headers=Headers?)?;
 
 Headers:
 	headers+=Header (',' headers+=Header)*;
@@ -64,8 +62,7 @@ FunctionCall:
 
 PropertyRef hidden(WS):
 	('.' propAccess=PropertyAccess | '.' functionCall=FunctionCall | collectionAccess=CollectionAccess |
-	listFunc=ListFunction)
-	(subPropery=PropertyRef)?;
+	listFunc=ListFunction) (subPropery=PropertyRef)?;
 
 enum Operator:
 	EQ='=' | NEQ='!=' | GT='>' | GTEQ='>=' | LT='<' | LTEQ='<=' | REGEX='~=';
