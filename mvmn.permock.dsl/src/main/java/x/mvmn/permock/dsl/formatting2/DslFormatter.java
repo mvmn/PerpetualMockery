@@ -62,13 +62,20 @@ public class DslFormatter extends AbstractJavaFormatter {
 		doc.format(condition.getExpression());
 		if (condition instanceof AndCondition) {
 			AndCondition andCondition = (AndCondition) condition;
-			doc.surround(textRegionExtensions.regionFor(andCondition).keyword("and"), i -> i.oneSpace());
+//			doc.surround(textRegionExtensions.regionFor(andCondition).keyword("and"), i -> i.oneSpace());
+			doc.interior(doc.append(textRegionExtensions.regionFor(condition).keyword("and"), i -> i.newLine()),
+					doc.prepend(textRegionExtensions.regionFor(condition).keyword("and"), i -> i.newLine()),
+					i -> i.indent());
 			doc.format(andCondition.getLeft());
 			doc.format(andCondition.getRight());
 		}
 		if (condition instanceof OrCondition) {
 			OrCondition orCondition = (OrCondition) condition;
-			doc.surround(textRegionExtensions.regionFor(orCondition).keyword("or"), i -> i.oneSpace());
+//			doc.surround(textRegionExtensions.regionFor(orCondition).keyword("or"), i -> i.oneSpace());
+			doc.interior(doc.append(textRegionExtensions.regionFor(condition).keyword("or"), i -> i.newLine()),
+					doc.prepend(textRegionExtensions.regionFor(condition).keyword("or"), i -> i.newLine()),
+					i -> i.indent());
+
 			doc.format(orCondition.getLeft());
 			doc.format(orCondition.getRight());
 		}
