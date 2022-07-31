@@ -45,4 +45,6 @@ dependency-reduced-pom.xml
 pom.xml.versionsBackup
 
 xtend-gen/
+xtext-gen/
 src-gen/
+
