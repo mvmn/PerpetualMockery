@@ -47,7 +47,7 @@ public class DslContentProposalTest {
 	public void testHeadersListCompletions() {
 		CompletionList completions = getCompletions("if httpHeaders ", -1);
 
-		assertMatches(completions, "httpHeadersByName # HeaderDictionary", "httpHeaders # List of HttpHeader",
+		assertMatches(completions, "httpHeadersByName # HttpHeaderDictionary", "httpHeaders # List of HttpHeader",
 				". # null", "[ # null", "{ # null");
 	}
 
@@ -55,15 +55,18 @@ public class DslContentProposalTest {
 	public void testListElementCompletions() {
 		CompletionList completions = getCompletions("if httpHeaders[0]. ", -1);
 
-		assertMatches(completions, "name # String", "value # String", "values # List of String", ". # null");
+		assertMatches(completions, "first() # HttpHeader", "isEmptyList() # Boolean", "isNotEmptyList() # Boolean",
+				"last() # HttpHeader", "name # String", "size() # Long", "value # String", "values # List of String",
+				". # null");
 	}
 
 	@Test
 	public void testSubListElementCompletions() {
 		CompletionList completions = getCompletions("if httpHeaders[0].values. ", -1);
 
-		assertMatches(completions, "first # String", "isEmpty # Boolean", "isNotEmpty # Boolean", "last # String",
-				"size # Integer", ". # null");
+		assertMatches(completions, "first() # HttpHeader", "isEmptyList() # Boolean", "isNotEmptyList() # Boolean",
+				"last() # HttpHeader", "name # String", "size() # Long", "value # String", "values # List of String",
+				". # null");
 	}
 
 	public void assertMatches(CompletionList completions, String... expectedItems) {
