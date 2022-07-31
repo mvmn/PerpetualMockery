@@ -44,7 +44,10 @@ target/
 dependency-reduced-pom.xml
 pom.xml.versionsBackup
 
-xtend-gen/
+*/src/*/xtend-gen/*
+#
+!**/.gitkeep
+
 xtext-gen/
 src-gen/
 
