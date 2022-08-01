@@ -50,13 +50,16 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 	@Inject
 	private XtextModelHelper xtextModelHelper;
 
-	private Set<String> primitiveValRuleNames = new HashSet<>(
-			Arrays.asList("ID", "STRING", "INTEGER", "FLOAT", "BOOLEAN"));
+	private Set<String> primitiveValRuleNames;
 
 	private Set<Keyword> collectionOps;
 
 	@Inject
 	public void init() {
+		primitiveValRuleNames = new HashSet<>(Arrays.asList(grammarAccess.getSTRINGRule().getName(),
+				grammarAccess.getFLOATRule().getName(), grammarAccess.getINTEGERRule().getName(),
+				grammarAccess.getBOOLEANRule().getName(), grammarAccess.getIDRule().getName()));
+
 		collectionOps = new HashSet<>(
 				Arrays.asList(grammarAccess.getListFunctionAccess().getLeftCurlyBracketKeyword_0(),
 						grammarAccess.getCollectionAccessAccess().getLeftSquareBracketKeyword_0(),
