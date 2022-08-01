@@ -73,15 +73,8 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 			createProposals(modelHelper.entities(), prefix, context, acceptor);
 		} else if (ruleCall.getRule().getName().equals(grammarAccess.getPropertyRefRule().getName())) {
 			EObject currentModel = context.getCurrentModel();
-			if (currentModel instanceof PropertyRef) {
-				Property currentModelType = xtextModelHelper.resolveType(currentModel);
-				if (currentModelType != null) {
-					createProposals(modelHelper.properties(currentModelType), prefix, context, acceptor);
-					createFunctionProposals(modelHelper.getFunctionDescriptors(currentModelType), prefix, context,
-							acceptor);
-				}
-			} else if (currentModel instanceof Reference || currentModel instanceof FunctionCall
-					|| currentModel instanceof ListElementReference) {
+			if (currentModel instanceof PropertyRef || currentModel instanceof Reference
+					|| currentModel instanceof FunctionCall || currentModel instanceof ListElementReference) {
 				Property currentModelType = xtextModelHelper.resolveType(currentModel);
 				if (currentModelType != null) {
 					createProposals(modelHelper.properties(currentModelType), prefix, context, acceptor);
