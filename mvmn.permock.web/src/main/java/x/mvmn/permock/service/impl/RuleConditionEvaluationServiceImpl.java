@@ -231,7 +231,13 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 	private EvaluationResult evaluate(MockRuleOperand operand, EvaluationContext context) {
 		if (operand.isConstant()) {
 			MockRuleConstant constant = (MockRuleConstant) operand;
-			return EvaluationResult.builder().type(constant.getType().getType()).value(constant.getValue()).build();
+
+			if (constant.getSubProp() != null) {
+				return evaluatePropertyRef(new Tuple2<>(constant.getValue(), constant.getType().getType()),
+						constant.getSubProp(), context);
+			} else {
+				return EvaluationResult.builder().type(constant.getType().getType()).value(constant.getValue()).build();
+			}
 		} else if (operand.isListElementRef()) {
 			MockRuleListElementReference listElemRef = (MockRuleListElementReference) operand;
 			String alias = listElemRef.getListElementAlias();

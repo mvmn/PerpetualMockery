@@ -7,9 +7,11 @@ import com.google.inject.Inject
 import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.extensions.InjectionExtension
 import org.eclipse.xtext.testing.util.ParseHelper
+import org.eclipse.xtext.testing.validation.ValidationTestHelper
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.^extension.ExtendWith
+import x.mvmn.permock.dsl.dsl.DslPackage
 import x.mvmn.permock.dsl.dsl.Rule
 
 @ExtendWith(InjectionExtension)
@@ -17,7 +19,10 @@ import x.mvmn.permock.dsl.dsl.Rule
 class DslParsingTest {
 	@Inject
 	ParseHelper<Rule> parseHelper
-	
+
+	@Inject
+	ValidationTestHelper validationTestHelper
+
 	@Test
 	def void loadModel() {
 		val result = parseHelper.parse('''
@@ -26,5 +31,15 @@ class DslParsingTest {
 		Assertions.assertNotNull(result)
 		val errors = result.eResource.errors
 		Assertions.assertTrue(errors.isEmpty, '''Unexpected errors: «errors.join(", ")»''')
+	}
+
+	@Test
+	def void checkComparison() {
+		val result = parseHelper.parse('''
+			if 1 = true
+		''')
+		Assertions.assertNotNull(result)
+		validationTestHelper.assertError(result.eResource, DslPackage.eINSTANCE.expression, null,
+			"Cannot apply = to Long and Boolean")
 	}
 }

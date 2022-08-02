@@ -183,16 +183,24 @@ public class RuleParsingServiceImpl implements RuleParsingService {
 	}
 
 	private MockRuleOperand map(Constant constant) {
+		MockRulePropertyReference propRef = null;
+		if (constant.getSubPropery() != null) {
+			propRef = map(constant.getSubPropery());
+		}
+
 		if (constant.getBoolVal() != null) {
-			return MockRuleConstant.builder().type(MockRuleConstant.Type.BOOL).boolVal(constant.getBoolVal()).build();
+			return MockRuleConstant.builder().type(MockRuleConstant.Type.BOOL).boolVal(constant.getBoolVal())
+					.subProp(propRef).build();
 		} else if (constant.getIntVal() != null) {
-			return MockRuleConstant.builder().type(MockRuleConstant.Type.INT).intVal(constant.getIntVal()).build();
+			return MockRuleConstant.builder().type(MockRuleConstant.Type.INT).intVal(constant.getIntVal())
+					.subProp(propRef).build();
 
 		} else if (constant.getFloatVal() != null) {
 			return MockRuleConstant.builder().type(MockRuleConstant.Type.FLOAT).floatVal(constant.getFloatVal())
-					.build();
+					.subProp(propRef).build();
 		} else {
-			return MockRuleConstant.builder().type(MockRuleConstant.Type.STR).strVal(constant.getStrVal()).build();
+			return MockRuleConstant.builder().type(MockRuleConstant.Type.STR).strVal(constant.getStrVal())
+					.subProp(propRef).build();
 		}
 	}
 

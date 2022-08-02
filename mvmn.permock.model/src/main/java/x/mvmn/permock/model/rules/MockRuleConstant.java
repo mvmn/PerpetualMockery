@@ -35,6 +35,7 @@ public class MockRuleConstant extends MockRuleOperand {
 	private Long intVal;
 	private Double floatVal;
 	private String strVal;
+	protected MockRulePropertyReference subProp;
 
 	@Override
 	@JsonIgnore
@@ -50,17 +51,25 @@ public class MockRuleConstant extends MockRuleOperand {
 
 	@Override
 	public String toString() {
+		String result;
 		switch (type) {
 		case BOOL:
-			return boolVal.toString().toLowerCase();
+			result = boolVal.toString().toLowerCase();
+			break;
 		case FLOAT:
-			return floatVal.toString();
+			result = floatVal.toString();
+			break;
 		case INT:
-			return intVal.toString();
+			result = intVal.toString();
+			break;
 		case STR:
 		default:
-			return "'" + strVal + "'"; // TODO: escape string
+			result = "'" + strVal + "'"; // TODO: escape string
 		}
+		if (subProp != null) {
+			result += subProp;
+		}
+		return result;
 	}
 
 	@JsonIgnore

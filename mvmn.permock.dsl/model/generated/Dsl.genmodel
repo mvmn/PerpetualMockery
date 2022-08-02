@@ -94,6 +94,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//Constant/intVal"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//Constant/floatVal"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//Constant/boolVal"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Dsl.ecore#//Constant/subPropery"/>
     </genClasses>
     <genClasses ecoreClass="Dsl.ecore#//Entity">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//Entity/name"/>

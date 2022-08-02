@@ -30,7 +30,7 @@ public class MockRuleFunctionCall extends MockRulePropertyReference {
 	}
 
 	public String toString() {
-		return "." + name + "(" + args.stream().skip(1).map(MockRuleOperand::toString).collect(Collectors.joining(", "))
-				+ ")" + (this.subProp != null ? this.subProp.toString() : "");
+		return "." + name + "(" + args.stream().map(MockRuleOperand::toString).collect(Collectors.joining(", ")) + ")"
+				+ (this.subProp != null ? this.subProp.toString() : "");
 	}
 }

@@ -38,7 +38,7 @@ public class DslSemanticHighlightingCalculator extends DefaultSemanticHighlighti
 		public static String RESPONSE_CONTENT_VALUE_ID = "responseContentValue";
 		public static String BOOLEAN_ID = "boolean";
 		public static String LOGICAL_CONDITION_ID = "logicalCondition";
-		public static String FUNCATION_NAME_ID = "functionName";
+		public static String FUNCTION_NAME_ID = "functionName";
 		public static String FUNCTION_KEYWORDS_ID = "functionKeyword";
 		public static String ENTITY_NAME_ID = "entityName";
 	}
@@ -170,7 +170,7 @@ public class DslSemanticHighlightingCalculator extends DefaultSemanticHighlighti
 					if (grammarAccess.getFunctionCallAccess().getNameAssignment_0().getFeature()
 							.equals(assignment.getFeature())) {
 						acceptor.addPosition(firstChild.getOffset(), firstChild.getLength(),
-								DslHighlightingStyles.FUNCATION_NAME_ID);
+								DslHighlightingStyles.FUNCTION_NAME_ID);
 					}
 				}
 			}

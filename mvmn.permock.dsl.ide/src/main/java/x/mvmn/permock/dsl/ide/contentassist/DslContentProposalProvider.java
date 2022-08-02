@@ -22,6 +22,7 @@ import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalProvider;
 
 import com.google.inject.Inject;
 
+import x.mvmn.permock.dsl.dsl.Constant;
 import x.mvmn.permock.dsl.dsl.FunctionCall;
 import x.mvmn.permock.dsl.dsl.ListElementReference;
 import x.mvmn.permock.dsl.dsl.ListFunction;
@@ -77,7 +78,8 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 		} else if (ruleCall.getRule().getName().equals(grammarAccess.getPropertyRefRule().getName())) {
 			EObject currentModel = context.getCurrentModel();
 			if (currentModel instanceof PropertyRef || currentModel instanceof Reference
-					|| currentModel instanceof FunctionCall || currentModel instanceof ListElementReference) {
+					|| currentModel instanceof FunctionCall || currentModel instanceof ListElementReference
+					|| currentModel instanceof Constant) {
 				Property currentModelType = xtextModelHelper.resolveType(currentModel);
 				if (currentModelType != null) {
 					createProposals(modelHelper.properties(currentModelType), prefix, context, acceptor);

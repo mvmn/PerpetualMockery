@@ -22,10 +22,10 @@ Condition:
 	OrCondition;
 
 OrCondition returns Condition:
-	AndCondition ({OrCondition.left=current} 'or' right=AndCondition)?;
+	AndCondition ({OrCondition.left=current} 'or' right=AndCondition)*;
 
 AndCondition returns Condition:
-	OptionalNegationCondition ({AndCondition.left=current} 'and' right=OptionalNegationCondition)?;
+	OptionalNegationCondition ({AndCondition.left=current} 'and' right=OptionalNegationCondition)*;
 
 OptionalNegationCondition returns Condition:
 	BracketedCondition | {Negation} 'not' negated=BracketedCondition;
@@ -68,7 +68,7 @@ enum Operator:
 	EQ='=' | NEQ='!=' | GT='>' | GTEQ='>=' | LT='<' | LTEQ='<=' | REGEX='~=';
 
 Constant:
-	strVal=STRING | intVal=INTEGER | floatVal=FLOAT | boolVal=BOOLEAN;
+	(strVal=STRING | intVal=INTEGER | floatVal=FLOAT | boolVal=BOOLEAN) (subPropery=PropertyRef)?;
 
 enum ListOperation:
 	FILTER='where' | ALL='all' | ANY='any';
