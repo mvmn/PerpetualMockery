@@ -39,7 +39,7 @@ public class DslSemanticHighlightingCalculator extends DefaultSemanticHighlighti
 		public static String BOOLEAN_ID = "boolean";
 		public static String LOGICAL_CONDITION_ID = "logicalCondition";
 		public static String FUNCATION_NAME_ID = "functionName";
-		public static String FUNCATION_KEYWORDS_ID = "functionKeyword";
+		public static String FUNCTION_KEYWORDS_ID = "functionKeyword";
 		public static String ENTITY_NAME_ID = "entityName";
 	}
 
@@ -176,7 +176,7 @@ public class DslSemanticHighlightingCalculator extends DefaultSemanticHighlighti
 			}
 			for (ILeafNode n : node.getLeafNodes()) {
 				if (n.getGrammarElement() != null && functionCallKeywordSet.contains(n.getGrammarElement())) {
-					acceptor.addPosition(n.getOffset(), n.getLength(), DslHighlightingStyles.FUNCATION_KEYWORDS_ID);
+					acceptor.addPosition(n.getOffset(), n.getLength(), DslHighlightingStyles.FUNCTION_KEYWORDS_ID);
 				}
 			}
 		} else if (object instanceof Reference) {
