@@ -5,6 +5,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Service;
 
+import x.mvmn.permock.service.HttpProxyService;
+
 @Service
 public class HttpProxyServiceImpl implements HttpProxyService {
 

@@ -3,7 +3,6 @@
  */
 package x.mvmn.permock.dsl.validation;
 
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.xtext.validation.Check;
 
@@ -20,7 +19,6 @@ import x.mvmn.permock.dsl.dsl.ListFunction;
 import x.mvmn.permock.dsl.dsl.Operand;
 import x.mvmn.permock.dsl.dsl.Operator;
 import x.mvmn.permock.dsl.dsl.PropertyAccess;
-import x.mvmn.permock.dsl.dsl.PropertyRef;
 import x.mvmn.permock.dsl.dsl.Reference;
 import x.mvmn.permock.dsl.model.ModelHelper;
 import x.mvmn.permock.dsl.model.ModelHelper.FunctionDescriptor;
@@ -125,7 +123,7 @@ public class DslValidator extends AbstractDslValidator {
 					FunctionDescriptor function = xtextModelHelper
 							.getFunctionDescriptor((FunctionCall) operand.eContainer());
 					if (function != null) {
-						Property operandType = xtextModelHelper.resolveType(getDeepestNode(operand));
+						Property operandType = xtextModelHelper.resolveType(xtextModelHelper.getDeepestNode(operand));
 						if (operandType != null) {
 							Property paramType = function.getArgs().get(index + 1);
 							if (paramType.isCollection() != operandType.isCollection()
@@ -143,7 +141,7 @@ public class DslValidator extends AbstractDslValidator {
 					error("Incorrect function parameter", structuralFeature);
 				}
 			} else if (operand.eContainer() instanceof ListFunction) {
-				Property operandType = xtextModelHelper.resolveType(getDeepestNode(operand));
+				Property operandType = xtextModelHelper.resolveType(xtextModelHelper.getDeepestNode(operand));
 				if (operandType != null) {
 					if (operandType.isCollection()) {
 						error("Mapping to list not supported (not supporting list of lists yet)", structuralFeature);
@@ -237,56 +235,10 @@ public class DslValidator extends AbstractDslValidator {
 	}
 
 	private Property calculateType(ListElementReference listElementRef) {
-		return xtextModelHelper.resolveType(getDeepestNode(listElementRef));
+		return xtextModelHelper.resolveType(xtextModelHelper.getDeepestNode(listElementRef));
 	}
 
 	private Property calculateType(Reference ref) {
-		return xtextModelHelper.resolveType(getDeepestNode(ref));
-	}
-
-	private EObject getDeepestNode(ListElementReference listElementRef) {
-		if (listElementRef.getProp() != null) {
-			return getDeepestNode(listElementRef.getProp());
-		}
-		return listElementRef;
-	}
-
-	private EObject getDeepestNode(Operand operand) {
-		if (operand.getRef() != null) {
-			return getDeepestNode(operand.getRef());
-		} else if (operand.getListElementRef() != null) {
-			return getDeepestNode(operand.getListElementRef());
-		} else {
-			return getDeepestNode(operand.getConst());
-		}
-	}
-
-	private EObject getDeepestNode(Reference ref) {
-		if (ref.getProp() != null) {
-			return getDeepestNode(ref.getProp());
-		}
-		return ref;
-	}
-
-	private EObject getDeepestNode(Constant constant) {
-		if (constant.getSubPropery() != null) {
-			return getDeepestNode(constant.getSubPropery());
-		}
-		return constant;
-	}
-
-	private EObject getDeepestNode(PropertyRef prop) {
-		if (prop.getSubPropery() != null) {
-			return getDeepestNode(prop.getSubPropery());
-		} else if (prop.getCollectionAccess() != null) {
-			return prop.getCollectionAccess();
-		} else if (prop.getListFunc() != null) {
-			return prop.getListFunc();
-		} else if (prop.getCollectionAccess() != null) {
-			return prop.getCollectionAccess();
-		} else if (prop.getFunctionCall() != null) {
-			return prop.getFunctionCall();
-		}
-		return prop;
+		return xtextModelHelper.resolveType(xtextModelHelper.getDeepestNode(ref));
 	}
 }

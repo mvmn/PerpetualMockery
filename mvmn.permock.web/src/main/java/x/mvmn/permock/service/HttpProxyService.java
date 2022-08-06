@@ -1,4 +1,4 @@
-package x.mvmn.permock.service.impl;
+package x.mvmn.permock.service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

@@ -34,11 +34,11 @@ public class XtextModelHelper {
 		if (currentModel instanceof Operand) {
 			Operand op = (Operand) currentModel;
 			if (op.getConst() != null) {
-				return resolveType(op.getConst());
+				return resolveType(getDeepestNode(op.getConst()));
 			} else if (op.getRef() != null) {
-				return resolveType(op.getRef());
+				return resolveType(getDeepestNode(op.getRef()));
 			} else if (op.getListElementRef() != null) {
-				return resolveType(op.getListElementRef());
+				return resolveType(getDeepestNode(op.getListElementRef()));
 			}
 		} else if (currentModel instanceof Reference) {
 			return getReferenceType((Reference) currentModel);
@@ -179,5 +179,51 @@ public class XtextModelHelper {
 			}
 		}
 		return null;
+	}
+
+	public EObject getDeepestNode(ListElementReference listElementRef) {
+		if (listElementRef.getProp() != null) {
+			return getDeepestNode(listElementRef.getProp());
+		}
+		return listElementRef;
+	}
+
+	public EObject getDeepestNode(Operand operand) {
+		if (operand.getRef() != null) {
+			return getDeepestNode(operand.getRef());
+		} else if (operand.getListElementRef() != null) {
+			return getDeepestNode(operand.getListElementRef());
+		} else {
+			return getDeepestNode(operand.getConst());
+		}
+	}
+
+	public EObject getDeepestNode(Reference ref) {
+		if (ref.getProp() != null) {
+			return getDeepestNode(ref.getProp());
+		}
+		return ref;
+	}
+
+	public EObject getDeepestNode(Constant constant) {
+		if (constant.getSubPropery() != null) {
+			return getDeepestNode(constant.getSubPropery());
+		}
+		return constant;
+	}
+
+	public EObject getDeepestNode(PropertyRef prop) {
+		if (prop.getSubPropery() != null) {
+			return getDeepestNode(prop.getSubPropery());
+		} else if (prop.getCollectionAccess() != null) {
+			return prop.getCollectionAccess();
+		} else if (prop.getListFunc() != null) {
+			return prop.getListFunc();
+		} else if (prop.getCollectionAccess() != null) {
+			return prop.getCollectionAccess();
+		} else if (prop.getFunctionCall() != null) {
+			return prop.getFunctionCall();
+		}
+		return prop;
 	}
 }

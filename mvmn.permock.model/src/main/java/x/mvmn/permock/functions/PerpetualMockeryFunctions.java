@@ -131,7 +131,6 @@ public class PerpetualMockeryFunctions {
 		if (val == null || val.isEmpty()) {
 			return null;
 		}
-		return val.stream().map(v -> v != null ? v : "null").map(Object::toString)
-				.collect(Collectors.joining(separator));
+		return val.stream().map(v -> v != null ? v.toString() : "").collect(Collectors.joining(separator));
 	}
 }

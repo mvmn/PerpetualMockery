@@ -42,6 +42,7 @@ import x.mvmn.permock.model.rules.MockResponseConfig;
 import x.mvmn.permock.model.rules.MockRule;
 import x.mvmn.permock.persistence.entity.RuleEntity;
 import x.mvmn.permock.persistence.repository.RuleRepository;
+import x.mvmn.permock.service.HttpProxyService;
 import x.mvmn.permock.service.RuleConditionEvaluationService;
 
 @Service
