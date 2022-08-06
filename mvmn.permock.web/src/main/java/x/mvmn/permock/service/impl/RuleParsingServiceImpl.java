@@ -78,7 +78,9 @@ public class RuleParsingServiceImpl implements RuleParsingService {
 		result.setProxy(false);
 		result.setResponseStatus(200);
 		if (response != null) {
-			result.setResposeBody(response.getContent());
+			if (response.getContent() != null) {
+				result.setResposeBody(map(response.getContent()));
+			}
 			if (response.getHttpStatus() != null) {
 				result.setResponseStatus(response.getHttpStatus().intValue());
 			}

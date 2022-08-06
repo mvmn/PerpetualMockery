@@ -25,7 +25,7 @@ public class MockResponseConfig {
 	private boolean proxy;
 	private String proxyUrl;
 	private Integer responseStatus;
-	private String resposeBody;
+	private MockRuleOperand resposeBody;
 	private List<MockResponseConfigHeader> responseHeaders;
 
 	@Override
@@ -46,7 +46,7 @@ public class MockResponseConfig {
 	}
 
 	private String bodyToString() {
-		return resposeBody != null ? "content '" + resposeBody + "'" : ""; // TODO: Escape string
+		return resposeBody != null ? "content " + resposeBody + " " : "";
 	}
 
 	private String statusToString() {

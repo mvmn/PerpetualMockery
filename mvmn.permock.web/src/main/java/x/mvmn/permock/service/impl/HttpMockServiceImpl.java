@@ -99,15 +99,15 @@ public class HttpMockServiceImpl extends AbstractHandler {
 		HttpRequestModel requestModel = mapToRequestModel(request);
 		MockRule matchingRule = findMatchingRule(requestModel);
 		if (matchingRule != null) {
-			sendResponse(matchingRule.getResponseConfig(), request, response);
+			sendResponse(matchingRule.getResponseConfig(), requestModel, request, response);
 		} else {
 			response.setStatus(404);
 		}
 		baseRequest.setHandled(true);
 	}
 
-	private void sendResponse(MockResponseConfig responseConfig, HttpServletRequest request,
-			HttpServletResponse response) {
+	private void sendResponse(MockResponseConfig responseConfig, HttpRequestModel requestModel,
+			HttpServletRequest request, HttpServletResponse response) {
 		if (responseConfig.isProxy()) {
 			proxyService.proxyRequest(responseConfig.getProxyUrl(), request, response);
 		} else {
@@ -118,10 +118,13 @@ public class HttpMockServiceImpl extends AbstractHandler {
 						.forEach(header -> response.setHeader(header.getName(), header.getValue()));
 			}
 			if (responseConfig.getResposeBody() != null) {
-				try (OutputStream os = response.getOutputStream()) {
-					os.write(responseConfig.getResposeBody().getBytes(StandardCharsets.UTF_8));
-				} catch (Exception e) {
-					e.printStackTrace();
+				String body = evaluationService.evaluate(responseConfig.getResposeBody(), requestModel);
+				if (body != null) {
+					try (OutputStream os = response.getOutputStream()) {
+						os.write(body.getBytes(StandardCharsets.UTF_8));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		}

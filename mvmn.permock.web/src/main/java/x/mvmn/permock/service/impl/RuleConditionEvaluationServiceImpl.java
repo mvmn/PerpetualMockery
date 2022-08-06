@@ -97,6 +97,12 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 	}
 
 	@Override
+	public String evaluate(MockRuleOperand operand, HttpRequestModel requestModel) {
+		EvaluationResult evalResult = evaluate(operand, EvaluationContext.builder().requestModel(requestModel).build());
+		return evalResult.isNull() ? null : evalResult.getValue().toString();
+	}
+
+	@Override
 	public boolean evaluate(MockRuleCondition conditions, HttpRequestModel requestModel) {
 		long startTime = System.currentTimeMillis();
 		Object result = evaluate(conditions, EvaluationContext.builder().requestModel(requestModel).build());

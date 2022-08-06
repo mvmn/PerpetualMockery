@@ -10,7 +10,7 @@ ProxyConf:
 	'url' proxyUrl=STRING;
 
 ResponseConf:
-	('status' httpStatus=INTEGER)? & ('content' content=STRING)? & ('headers' headers=Headers?)?;
+	('status' httpStatus=INTEGER)? & ('content' content=Operand)? & ('headers' headers=Headers?)?;
 
 Headers:
 	headers+=Header (',' headers+=Header)*;

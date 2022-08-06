@@ -131,7 +131,7 @@ public class DslValidator extends AbstractDslValidator {
 						} else if (operand.getListElementRef() != null) {
 							operandType = xtextModelHelper.resolveType(getDeepestNode(operand.getListElementRef()));
 						} else {
-							operandType = xtextModelHelper.resolveType(operand.getConst());
+							operandType = xtextModelHelper.resolveType(getDeepestNode(operand.getConst()));
 						}
 						if (operandType != null) {
 							Property paramType = function.getArgs().get(index + 1);
@@ -255,6 +255,13 @@ public class DslValidator extends AbstractDslValidator {
 			return getDeepestNode(ref.getProp());
 		}
 		return ref;
+	}
+
+	private EObject getDeepestNode(Constant constant) {
+		if (constant.getSubPropery() != null) {
+			return getDeepestNode(constant.getSubPropery());
+		}
+		return constant;
 	}
 
 	private EObject getDeepestNode(PropertyRef prop) {
