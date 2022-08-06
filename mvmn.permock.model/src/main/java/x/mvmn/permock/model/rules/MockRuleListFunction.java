@@ -18,12 +18,14 @@ import lombok.NoArgsConstructor;
 public class MockRuleListFunction extends MockRulePropertyReference {
 
 	public static enum Type {
-		WHERE, ALL, ANY
+		WHERE, ALL, ANY, MAP
 	}
 
 	private Type type;
 	private String listElementAlias;
 	private MockRuleCondition condition;
+	private MockRuleOperand mappingOperand;
+	private String elementType;
 
 	@Override
 	@JsonIgnore
@@ -38,8 +40,14 @@ public class MockRuleListFunction extends MockRulePropertyReference {
 
 	@Override
 	public String toString() {
-		String result = "{\n\t" + type.toString().toLowerCase() + " " + listElementAlias + ":\n\t\t"
-				+ condition.toString() + "\n\t}";
+		String result = "{\n\t" + type.toString().toLowerCase() + " " + listElementAlias + ":\n\t\t";
+
+		if (type == Type.MAP) {
+			result += mappingOperand.toString();
+		} else {
+			result += condition.toString();
+		}
+		result += "\n\t}";
 
 		if (subProp != null) {
 			result += subProp;

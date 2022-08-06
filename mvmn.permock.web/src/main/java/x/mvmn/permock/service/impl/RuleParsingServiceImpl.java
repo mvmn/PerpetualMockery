@@ -24,6 +24,7 @@ import x.mvmn.permock.dsl.dsl.ProxyConf;
 import x.mvmn.permock.dsl.dsl.Reference;
 import x.mvmn.permock.dsl.dsl.ResponseConf;
 import x.mvmn.permock.dsl.dsl.Rule;
+import x.mvmn.permock.dsl.model.XtextModelHelper;
 import x.mvmn.permock.model.rules.MockResponseConfig;
 import x.mvmn.permock.model.rules.MockResponseConfig.MockResponseConfigHeader;
 import x.mvmn.permock.model.rules.MockRule;
@@ -50,6 +51,9 @@ public class RuleParsingServiceImpl implements RuleParsingService {
 
 	@Autowired
 	private XtextService xtextService;
+
+	@Autowired
+	private XtextModelHelper xtextModelHelper;
 
 	@Override
 	public MockRule parse(String text) {
@@ -160,8 +164,16 @@ public class RuleParsingServiceImpl implements RuleParsingService {
 					.args(params.stream().map(this::map).collect(Collectors.toList())).build();
 		} else {
 			ListFunction listFunct = prop.getListFunc();
-			result = MockRuleListFunction.builder().type(map(listFunct.getOp()))
-					.listElementAlias(listFunct.getAlias().getName()).condition(map(listFunct.getCondition())).build();
+			if (listFunct.getCondition() != null && listFunct.getOp() != null) {
+				result = MockRuleListFunction.builder().type(map(listFunct.getOp()))
+						.listElementAlias(listFunct.getAlias().getName()).condition(map(listFunct.getCondition()))
+						.build();
+			} else {
+				result = MockRuleListFunction.builder().type(MockRuleListFunction.Type.MAP)
+						.listElementAlias(listFunct.getAlias().getName())
+						.elementType(xtextModelHelper.resolveType(listFunct.getOperand()).getType().getCanonicalName())
+						.mappingOperand(map(listFunct.getOperand())).build();
+			}
 		}
 
 		if (prop.getSubPropery() != null) {
@@ -196,7 +208,6 @@ public class RuleParsingServiceImpl implements RuleParsingService {
 		} else if (constant.getIntVal() != null) {
 			return MockRuleConstant.builder().type(MockRuleConstant.Type.INT).intVal(constant.getIntVal())
 					.subProp(propRef).build();
-
 		} else if (constant.getFloatVal() != null) {
 			return MockRuleConstant.builder().type(MockRuleConstant.Type.FLOAT).floatVal(constant.getFloatVal())
 					.subProp(propRef).build();

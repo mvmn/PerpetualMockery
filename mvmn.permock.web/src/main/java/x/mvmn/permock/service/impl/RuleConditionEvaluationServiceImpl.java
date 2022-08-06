@@ -320,6 +320,14 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 				}
 				expectedType = new Property(listFunct.getType().name().toLowerCase(), Boolean.class, false);
 				break;
+			case MAP:
+				try {
+					expectedType = Property.of("list", Class.forName(listFunct.getElementType()), true);
+				} catch (ClassNotFoundException e) {
+					System.err.println("Failed to get mapped list element type for name " + listFunct.getElementType());
+					expectedType = Property.of("list", Object.class, true);
+				}
+				break;
 			default:
 			case WHERE:
 				if (parentListNullOrEmpty) {
@@ -334,7 +342,7 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 				Property listElementType = new Property(listFunct.getListElementAlias(), parentValue.getB().getType(),
 						BeanUtil.isCollection(parentValue.getB().getType()));
 
-				List<Object> filteredList = new ArrayList<>(parentList.size());
+				List<Object> resultingList = new ArrayList<>(parentList.size());
 
 				switch (listFunct.getType()) {
 				case ALL:
@@ -347,7 +355,8 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 					value = false;
 					break;
 				case WHERE:
-					value = filteredList;
+				case MAP:
+					value = resultingList;
 					break;
 				default:
 				}
@@ -357,32 +366,38 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 					EvaluationContext subContext = EvaluationContext.builder().parent(context)
 							.listElementAlias(listFunct.getListElementAlias()).listElementType(listElementType)
 							.listElementValue(element).build();
-					boolean evalResult = evaluate(listFunct.getCondition(), subContext);
 
-					if (debug) {
-						System.err.println("Evaluated to " + evalResult + " list element " + element + " condition "
-								+ listFunct.getCondition() + " in list function " + listFunct.getListElementAlias()
-								+ " " + listFunct.getType());
-					}
+					if (listFunct.getType() == MockRuleListFunction.Type.MAP) {
+						resultingList.add(evaluate(listFunct.getMappingOperand(), subContext).getValue());
+					} else {
+						boolean evalResult = evaluate(listFunct.getCondition(), subContext);
 
-					switch (listFunct.getType()) {
-					case ALL:
-						if (!evalResult) {
-							value = false;
-							break loop;
+						if (debug) {
+							System.err.println("Evaluated to " + evalResult + " list element " + element + " condition "
+									+ listFunct.getCondition() + " in list function " + listFunct.getListElementAlias()
+									+ " " + listFunct.getType());
 						}
-						break;
-					case ANY:
-						if (evalResult) {
-							value = true;
-							break loop;
+
+						switch (listFunct.getType()) {
+						case ALL:
+							if (!evalResult) {
+								value = false;
+								break loop;
+							}
+							break;
+						case ANY:
+							if (evalResult) {
+								value = true;
+								break loop;
+							}
+							break;
+						default:
+						case WHERE:
+							if (evalResult) {
+								resultingList.add(element);
+							}
+							break;
 						}
-						break;
-					case WHERE:
-						if (evalResult) {
-							filteredList.add(element);
-						}
-						break;
 					}
 				}
 			}

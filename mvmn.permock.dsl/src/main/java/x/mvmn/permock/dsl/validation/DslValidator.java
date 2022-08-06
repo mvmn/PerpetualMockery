@@ -80,9 +80,9 @@ public class DslValidator extends AbstractDslValidator {
 	}
 
 	@Check
-	public void check(PropertyAccess entity) {
+	public void check(PropertyAccess val) {
 		try {
-			if (xtextModelHelper.resolveType(entity) == null) {
+			if (xtextModelHelper.resolveType(val) == null) {
 				error("Cannot resolve", DslPackage.Literals.PROPERTY_ACCESS__NAME);
 			}
 		} catch (Exception e) {
@@ -125,14 +125,7 @@ public class DslValidator extends AbstractDslValidator {
 					FunctionDescriptor function = xtextModelHelper
 							.getFunctionDescriptor((FunctionCall) operand.eContainer());
 					if (function != null) {
-						Property operandType;
-						if (operand.getRef() != null) {
-							operandType = xtextModelHelper.resolveType(getDeepestNode(operand.getRef()));
-						} else if (operand.getListElementRef() != null) {
-							operandType = xtextModelHelper.resolveType(getDeepestNode(operand.getListElementRef()));
-						} else {
-							operandType = xtextModelHelper.resolveType(getDeepestNode(operand.getConst()));
-						}
+						Property operandType = xtextModelHelper.resolveType(getDeepestNode(operand));
 						if (operandType != null) {
 							Property paramType = function.getArgs().get(index + 1);
 							if (paramType.isCollection() != operandType.isCollection()
@@ -149,6 +142,13 @@ public class DslValidator extends AbstractDslValidator {
 				} catch (IndexOutOfBoundsException iobe) {
 					error("Incorrect function parameter", structuralFeature);
 				}
+			} else if (operand.eContainer() instanceof ListFunction) {
+				Property operandType = xtextModelHelper.resolveType(getDeepestNode(operand));
+				if (operandType != null) {
+					if (operandType.isCollection()) {
+						error("Mapping to list not supported (not supporting list of lists yet)", structuralFeature);
+					}
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -156,13 +156,13 @@ public class DslValidator extends AbstractDslValidator {
 	}
 
 	@Check
-	public void check(CollectionAccess entity) {
+	public void check(CollectionAccess val) {
 		try {
-			Property type = xtextModelHelper.resolveType(entity.eContainer().eContainer());
-			if (entity.getIndex() != null && (type == null || !type.isCollection())) {
+			Property type = xtextModelHelper.resolveType(val.eContainer().eContainer());
+			if (val.getIndex() != null && (type == null || !type.isCollection())) {
 				error("Index access only allowed for lists", DslPackage.Literals.COLLECTION_ACCESS__INDEX);
 			}
-			if (entity.getKey() != null && (type == null || !modelHelper.isDictionary(type))) {
+			if (val.getKey() != null && (type == null || !modelHelper.isDictionary(type))) {
 				error("Key access only allowed for dictionaries", DslPackage.Literals.COLLECTION_ACCESS__INDEX);
 			}
 		} catch (Exception e) {
@@ -171,14 +171,15 @@ public class DslValidator extends AbstractDslValidator {
 	}
 
 	@Check
-	public void check(ListFunction entity) {
+	public void check(ListFunction val) {
 		try {
-			Property type = xtextModelHelper.resolveType(entity.eContainer().eContainer());
+			Property type = xtextModelHelper.resolveType(val.eContainer().eContainer());
 			if (type == null || !type.isCollection()) {
-				error("List functions only allowed for lists", entity, DslPackage.Literals.LIST_FUNCTION__ALIAS);
-				error("List functions only allowed for lists", entity, DslPackage.Literals.LIST_FUNCTION__SEPARATOR);
-				error("List functions only allowed for lists", entity, DslPackage.Literals.LIST_FUNCTION__OP);
-				error("List functions only allowed for lists", entity, DslPackage.Literals.LIST_FUNCTION__CONDITION);
+				error("List functions only allowed for lists", val, DslPackage.Literals.LIST_FUNCTION__ALIAS);
+				error("List functions only allowed for lists", val, DslPackage.Literals.LIST_FUNCTION__OP);
+				error("List functions only allowed for lists", val, DslPackage.Literals.LIST_FUNCTION__MAP_KEYWORD);
+				error("List functions only allowed for lists", val, DslPackage.Literals.LIST_FUNCTION__SEPARATOR);
+				error("List functions only allowed for lists", val, DslPackage.Literals.LIST_FUNCTION__CONDITION);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -248,6 +249,16 @@ public class DslValidator extends AbstractDslValidator {
 			return getDeepestNode(listElementRef.getProp());
 		}
 		return listElementRef;
+	}
+
+	private EObject getDeepestNode(Operand operand) {
+		if (operand.getRef() != null) {
+			return getDeepestNode(operand.getRef());
+		} else if (operand.getListElementRef() != null) {
+			return getDeepestNode(operand.getListElementRef());
+		} else {
+			return getDeepestNode(operand.getConst());
+		}
 	}
 
 	private EObject getDeepestNode(Reference ref) {

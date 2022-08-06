@@ -72,8 +72,9 @@ public class DslSemanticHighlightingCalculator extends DefaultSemanticHighlighti
 
 		listFunctionKeywordSet = new HashSet<>(
 				Arrays.asList(grammarAccess.getListFunctionAccess().getLeftCurlyBracketKeyword_0(),
-						grammarAccess.getListFunctionAccess().getRightCurlyBracketKeyword_5(),
-						grammarAccess.getListFunctionAccess().getSeparatorColonKeyword_3_0()));
+						grammarAccess.getListFunctionAccess().getRightCurlyBracketKeyword_2(),
+						grammarAccess.getListFunctionAccess().getSeparatorColonKeyword_1_0_2_0(),
+						grammarAccess.getListFunctionAccess().getSeparatorColonKeyword_1_1_2_0()));
 
 		logicalConditionSet = new HashSet<>(Arrays.asList(grammarAccess.getOrConditionAccess().getOrKeyword_1_1(),
 				grammarAccess.getAndConditionAccess().getAndKeyword_1_1(),
@@ -140,6 +141,10 @@ public class DslSemanticHighlightingCalculator extends DefaultSemanticHighlighti
 		} else if (object instanceof ListFunction) {
 			for (ILeafNode n : node.getLeafNodes()) {
 				if (n.getGrammarElement() != null && listFunctionKeywordSet.contains(n.getGrammarElement())) {
+					acceptor.addPosition(n.getOffset(), n.getLength(), DslHighlightingStyles.KEYWORD_ID);
+				}
+				if (n.getGrammarElement() != null && grammarAccess.getListFunctionAccess()
+						.getMapKeywordMapKeyword_1_1_0_0().equals(n.getGrammarElement())) {
 					acceptor.addPosition(n.getOffset(), n.getLength(), DslHighlightingStyles.KEYWORD_ID);
 				}
 			}

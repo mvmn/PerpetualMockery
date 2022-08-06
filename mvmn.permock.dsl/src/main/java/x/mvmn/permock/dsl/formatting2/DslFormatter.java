@@ -131,7 +131,12 @@ public class DslFormatter extends AbstractJavaFormatter {
 		doc.surround(textRegionExtensions.regionFor(listFunc).feature(DslPackage.Literals.LIST_FUNCTION__OP),
 				i -> i.indent());
 		doc.prepend(textRegionExtensions.regionFor(listFunc).keyword(":"), i -> i.noSpace());
-		doc.format(listFunc.getCondition());
+		if (listFunc.getCondition() != null) {
+			doc.format(listFunc.getCondition());
+		}
+		if (listFunc.getOperand() != null) {
+			doc.format(listFunc.getOperand());
+		}
 		doc.interior(doc.append(textRegionExtensions.regionFor(listFunc).keyword("{"), i -> i.oneSpace()),
 				doc.prepend(textRegionExtensions.regionFor(listFunc).keyword("}"), i -> i.newLine()), i -> i.indent());
 	}

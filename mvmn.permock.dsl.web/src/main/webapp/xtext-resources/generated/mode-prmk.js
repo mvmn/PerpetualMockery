@@ -1,6 +1,6 @@
 define(["ace/lib/oop", "ace/mode/text", "ace/mode/text_highlight_rules"], function(oop, mText, mTextHighlightRules) {
 	var HighlightRules = function() {
-		var keywords = "all|and|any|content|headers|if|not|or|proxy|respond|status|url|where|with";
+		var keywords = "all|and|any|content|headers|if|map|not|or|proxy|respond|status|url|where|with";
 		this.$rules = {
 			"start": [
 				{token: "lparen", regex: "[\\[({]"},

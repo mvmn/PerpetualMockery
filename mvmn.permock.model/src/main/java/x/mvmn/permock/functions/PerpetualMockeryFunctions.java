@@ -5,6 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PerpetualMockeryFunctions {
 
@@ -88,6 +89,18 @@ public class PerpetualMockeryFunctions {
 		return val != null ? Double.valueOf(Math.floor(val)).longValue() : null;
 	}
 
+	public String toStringFromNum(Double val) {
+		return val != null ? val.toString() : null;
+	}
+
+	public String toStringFromInt(Long val) {
+		return val != null ? val.toString() : null;
+	}
+
+	public String toStringFromBool(Boolean val) {
+		return val != null ? val.toString() : null;
+	}
+
 	public Long size(List<?> val) {
 		return val != null ? val.size() : 0L;
 	}
@@ -112,5 +125,13 @@ public class PerpetualMockeryFunctions {
 			return null;
 		}
 		return val.get(val.size() - 1);
+	}
+
+	public String join(List<?> val, String separator) {
+		if (val == null || val.isEmpty()) {
+			return null;
+		}
+		return val.stream().map(v -> v != null ? v : "null").map(Object::toString)
+				.collect(Collectors.joining(separator));
 	}
 }

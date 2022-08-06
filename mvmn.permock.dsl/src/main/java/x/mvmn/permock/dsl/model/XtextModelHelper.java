@@ -7,29 +7,40 @@ import org.eclipse.xtext.EcoreUtil2;
 
 import com.google.inject.Inject;
 
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import x.mvmn.permock.dsl.dsl.CollectionAccess;
 import x.mvmn.permock.dsl.dsl.Constant;
 import x.mvmn.permock.dsl.dsl.FunctionCall;
 import x.mvmn.permock.dsl.dsl.ListElementReference;
 import x.mvmn.permock.dsl.dsl.ListFunction;
+import x.mvmn.permock.dsl.dsl.ListOperation;
+import x.mvmn.permock.dsl.dsl.Operand;
 import x.mvmn.permock.dsl.dsl.PropertyAccess;
 import x.mvmn.permock.dsl.dsl.PropertyRef;
 import x.mvmn.permock.dsl.dsl.Reference;
 import x.mvmn.permock.dsl.model.ModelHelper.FunctionDescriptor;
-import x.mvmn.permock.dsl.services.DslGrammarAccess;
 import x.mvmn.permock.util.BeanUtil;
 import x.mvmn.permock.util.Property;
 
+@Setter
+@Accessors(chain = true)
 public class XtextModelHelper {
 
 	@Inject
 	private ModelHelper modelHelper;
 
-	@Inject
-	private DslGrammarAccess grammarAccess;
-
 	public Property resolveType(EObject currentModel) {
-		if (currentModel instanceof Reference) {
+		if (currentModel instanceof Operand) {
+			Operand op = (Operand) currentModel;
+			if (op.getConst() != null) {
+				return resolveType(op.getConst());
+			} else if (op.getRef() != null) {
+				return resolveType(op.getRef());
+			} else if (op.getListElementRef() != null) {
+				return resolveType(op.getListElementRef());
+			}
+		} else if (currentModel instanceof Reference) {
 			return getReferenceType((Reference) currentModel);
 		} else if (currentModel instanceof PropertyAccess) {
 			return getPropertyType((PropertyAccess) currentModel);
@@ -54,8 +65,10 @@ public class XtextModelHelper {
 			return resolveListElementRefType(listElRef, alias);
 		} else if (currentModel instanceof ListFunction) {
 			ListFunction listFunction = (ListFunction) currentModel;
-			if (grammarAccess.getListOperationAccess().getFILTEREnumLiteralDeclaration_0().getLiteral().getValue()
-					.equals(listFunction.getOp().getLiteral())) {
+			if (listFunction.getOperand() != null) {
+				Property elementType = resolveType(listFunction.getOperand());
+				return Property.of("list", elementType.getType(), true);
+			} else if (listFunction.getOp() == ListOperation.FILTER) {
 				return resolveType(currentModel.eContainer().eContainer());
 			} else { // ALL, ANY - boolean result
 				return Property.of("list", Boolean.class, false);

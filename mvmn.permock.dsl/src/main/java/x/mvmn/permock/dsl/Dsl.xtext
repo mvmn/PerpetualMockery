@@ -40,7 +40,11 @@ Operand:
 	ref=Reference | const=Constant | listElementRef=ListElementReference;
 
 ListFunction:
-	'{' op=ListOperation alias=ListElementAlias separator=':' condition=Condition '}';
+	'{' (op=ListOperation alias=ListElementAlias separator=':' condition=Condition | mapKeyword='map'
+	alias=ListElementAlias separator=':' operand=Operand) '}';
+
+enum ListOperation:
+	FILTER='where' | ALL='all' | ANY='any';
 
 ListElementAlias:
 	name=ID;
@@ -69,9 +73,6 @@ enum Operator:
 
 Constant:
 	(strVal=STRING | intVal=INTEGER | floatVal=FLOAT | boolVal=BOOLEAN) (subPropery=PropertyRef)?;
-
-enum ListOperation:
-	FILTER='where' | ALL='all' | ANY='any';
 
 Entity:
 	name=ID;

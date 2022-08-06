@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import x.mvmn.permock.dsl.model.ModelHelper;
+import x.mvmn.permock.dsl.model.XtextModelHelper;
 import x.mvmn.permock.functions.PerpetualMockeryFunctions;
 
 @Configuration
@@ -21,6 +22,11 @@ public class GeneralConfig {
 	@Bean
 	public ModelHelper modelHelper() {
 		return new ModelHelper();
+	}
+
+	@Bean
+	public XtextModelHelper xtextModelHelper(ModelHelper modelHelper) {
+		return new XtextModelHelper().setModelHelper(modelHelper);
 	}
 
 	@Bean
