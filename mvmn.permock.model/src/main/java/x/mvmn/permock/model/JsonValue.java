@@ -18,7 +18,7 @@ public class JsonValue {
 	private JsonNode jsonNode;
 
 	public String getAsString() {
-		return jsonNode != null && jsonNode.isValueNode() ? jsonNode.asText() : null;
+		return jsonNode != null ? jsonNode.asText() : null;
 	}
 
 	public List<JsonValue> getAsArray() {

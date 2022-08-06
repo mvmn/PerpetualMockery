@@ -78,7 +78,7 @@ public class PerpetualMockeryFunctions {
 		}
 		int index = str.indexOf(val);
 		if (index >= 0) {
-			return str.substring(index);
+			return str.substring(index + 1);
 		} else {
 			return "";
 		}
@@ -90,7 +90,7 @@ public class PerpetualMockeryFunctions {
 		}
 		int index = str.lastIndexOf(val);
 		if (index >= 0) {
-			return str.substring(index);
+			return str.substring(index + 1);
 		} else {
 			return "";
 		}
