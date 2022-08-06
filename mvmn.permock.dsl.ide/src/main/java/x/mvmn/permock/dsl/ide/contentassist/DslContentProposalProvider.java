@@ -66,7 +66,8 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 						grammarAccess.getCollectionAccessAccess().getLeftSquareBracketKeyword_0(),
 						grammarAccess.getListOperationAccess().getALLAllKeyword_1_0(),
 						grammarAccess.getListOperationAccess().getANYAnyKeyword_2_0(),
-						grammarAccess.getListOperationAccess().getFILTERWhereKeyword_0_0()));
+						grammarAccess.getListOperationAccess().getFILTERWhereKeyword_0_0(),
+						grammarAccess.getListFunctionAccess().getMapKeywordMapKeyword_1_1_0_0()));
 	}
 
 	@Override

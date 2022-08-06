@@ -107,6 +107,9 @@ public class DslFormatter extends AbstractJavaFormatter {
 		if (responseConf.getHeaders() != null) {
 			doc.format(responseConf.getHeaders());
 		}
+		if (responseConf.getContent() != null) {
+			doc.format(responseConf.getContent());
+		}
 	}
 
 	protected void format(Headers headers, IFormattableDocument doc) {
