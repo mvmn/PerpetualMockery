@@ -67,7 +67,7 @@ public class XtextModelHelper {
 			ListFunction listFunction = (ListFunction) currentModel;
 			if (listFunction.getOperand() != null) {
 				Property elementType = resolveType(listFunction.getOperand());
-				return Property.of("list", elementType.getType(), true);
+				return elementType != null ? Property.of("list", elementType.getType(), true) : null;
 			} else if (listFunction.getOp() == ListOperation.FILTER) {
 				return resolveType(currentModel.eContainer().eContainer());
 			} else { // ALL, ANY - boolean result

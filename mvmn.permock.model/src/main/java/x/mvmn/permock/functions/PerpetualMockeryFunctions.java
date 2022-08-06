@@ -7,7 +7,14 @@ import java.lang.annotation.Target;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.burt.jmespath.jackson.JacksonRuntime;
+import x.mvmn.permock.model.JsonValue;
+
 public class PerpetualMockeryFunctions {
+
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.PARAMETER)
@@ -63,6 +70,54 @@ public class PerpetualMockeryFunctions {
 		}
 
 		return result;
+	}
+
+	public String substringAfter(String str, String val) {
+		if (str == null || val == null) {
+			return "";
+		}
+		int index = str.indexOf(val);
+		if (index >= 0) {
+			return str.substring(index);
+		} else {
+			return "";
+		}
+	}
+
+	public String substringAfterLast(String str, String val) {
+		if (str == null || val == null) {
+			return "";
+		}
+		int index = str.lastIndexOf(val);
+		if (index >= 0) {
+			return str.substring(index);
+		} else {
+			return "";
+		}
+	}
+
+	public String substringBefore(String str, String val) {
+		if (str == null || val == null) {
+			return "";
+		}
+		int index = str.indexOf(val);
+		if (index >= 0) {
+			return str.substring(0, index);
+		} else {
+			return "";
+		}
+	}
+
+	public String substringBeforeLast(String str, String val) {
+		if (str == null || val == null) {
+			return "";
+		}
+		int index = str.lastIndexOf(val);
+		if (index >= 0) {
+			return str.substring(0, index);
+		} else {
+			return "";
+		}
 	}
 
 	public Boolean isEmpty(String string) {
@@ -132,5 +187,17 @@ public class PerpetualMockeryFunctions {
 			return null;
 		}
 		return val.stream().map(v -> v != null ? v.toString() : "").collect(Collectors.joining(separator));
+	}
+
+	public JsonValue parseJson(String str) {
+		try {
+			return JsonValue.of(objectMapper.readTree(str));
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	public JsonValue jmesPath(JsonValue val, String str) {
+		return JsonValue.of(new JacksonRuntime().compile(str).search(val.jsonNode()));
 	}
 }
