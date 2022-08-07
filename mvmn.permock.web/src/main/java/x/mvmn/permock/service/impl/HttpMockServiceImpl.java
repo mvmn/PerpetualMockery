@@ -148,17 +148,23 @@ public class HttpMockServiceImpl extends AbstractHandler {
 		String path = request.getRequestURI();
 		String queryString = request.getQueryString();
 		List<RequestParameter> requestParams = new ArrayList<>();
-		request.getParameterMap().entrySet().stream()
-				.map(param -> new RequestParameter(param.getKey(), request.getParameter(param.getKey()),
-						param.getValue() != null ? Arrays.asList(param.getValue()) : Collections.emptyList()))
-				.forEach(requestParams::add);
+		if (request.getParameterMap() != null) {
+			request.getParameterMap().entrySet().stream()
+					.map(param -> new RequestParameter(param.getKey(), request.getParameter(param.getKey()),
+							param.getValue() != null ? Arrays.asList(param.getValue()) : Collections.emptyList()))
+					.forEach(requestParams::add);
+		}
 
 		List<HttpHeader> headers = new ArrayList<>();
-		Collections.list(request.getHeaderNames()).stream().map(headerName -> this.mapHeader(headerName, request))
-				.forEach(headers::add);
+		if (request.getHeaderNames() != null) {
+			Collections.list(request.getHeaderNames()).stream().map(headerName -> this.mapHeader(headerName, request))
+					.forEach(headers::add);
+		}
 
 		List<Cookie> cookies = new ArrayList<>();
-		Stream.of(request.getCookies()).map(this::mapCookie).forEach(cookies::add);
+		if (request.getCookies() != null) {
+			Stream.of(request.getCookies()).map(this::mapCookie).forEach(cookies::add);
+		}
 
 		byte[] body = null;
 		try (InputStream in = request.getInputStream()) {
