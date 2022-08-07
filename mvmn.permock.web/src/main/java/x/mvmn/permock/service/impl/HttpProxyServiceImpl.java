@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 
 import x.mvmn.permock.model.HttpRequestModel;
 import x.mvmn.permock.service.HttpProxyService;
-import x.mvmn.permock.util.StringUtil;
 
 @Service
 public class HttpProxyServiceImpl implements HttpProxyService {
@@ -57,11 +56,9 @@ public class HttpProxyServiceImpl implements HttpProxyService {
 	@Override
 	public void proxyRequest(String url, HttpServletRequest request, HttpServletResponse response,
 			HttpRequestModel mappedRequest) {
-		System.out.println("Proxying " + request.getMethod() + " " + url + request.getRequestURI() + "?"
-				+ StringUtil.blankForNull(request.getQueryString()));
+		System.out.println("Proxying " + request.getMethod() + " " + url);
 
-		BasicClassicHttpRequest proxRequest = new BasicClassicHttpRequest(request.getMethod(),
-				url + request.getRequestURI());
+		BasicClassicHttpRequest proxRequest = new BasicClassicHttpRequest(request.getMethod(), url);
 		Collections.list(request.getHeaderNames()).stream()
 				.filter(headerName -> !skipHeaders.contains(headerName.toLowerCase()))
 				.forEach(headerName -> Collections.list(request.getHeaders(headerName)).stream()

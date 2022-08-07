@@ -1,5 +1,6 @@
 package x.mvmn.permock.service.impl;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -20,6 +21,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
@@ -114,19 +116,35 @@ public class HttpMockServiceImpl extends AbstractHandler {
 	private void sendResponse(MockResponseConfig responseConfig, HttpRequestModel requestModel,
 			HttpServletRequest request, HttpServletResponse response) {
 		if (responseConfig.isProxy()) {
-			proxyService.proxyRequest(responseConfig.getProxyUrl(), request, response, requestModel);
+			String proxyUrl = evaluationService.evaluate(responseConfig.getProxyUrl(), requestModel);
+			proxyService.proxyRequest(proxyUrl, request, response, requestModel);
 		} else {
-			response.setStatus(
-					responseConfig.getResponseStatus() != null ? responseConfig.getResponseStatus().intValue() : 200);
+			int responseStatus = 200;
+			if (responseConfig.getResponseStatus() != null) {
+				String responseStatusStr = evaluationService.evaluate(responseConfig.getResponseStatus(), requestModel);
+				if (responseStatusStr != null) {
+					try {
+						responseStatus = Integer.parseInt(responseStatusStr);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+
+			response.setStatus(responseStatus);
 			if (responseConfig.getResponseHeaders() != null && !responseConfig.getResponseHeaders().isEmpty()) {
 				responseConfig.getResponseHeaders()
 						.forEach(header -> response.setHeader(header.getName(), header.getValue()));
 			}
-			if (responseConfig.getResposeBody() != null) {
-				String body = evaluationService.evaluate(responseConfig.getResposeBody(), requestModel);
-				if (body != null) {
+			if (responseConfig.getResponse() != null) {
+				String responseData = evaluationService.evaluate(responseConfig.getResponse(), requestModel);
+				if (responseData != null) {
 					try (OutputStream os = response.getOutputStream()) {
-						os.write(body.getBytes(StandardCharsets.UTF_8));
+						if (responseConfig.isRespondWithFile()) {
+							FileUtils.copyFile(new File(responseData), os);
+						} else {
+							os.write(responseData.getBytes(StandardCharsets.UTF_8));
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -228,6 +246,7 @@ public class HttpMockServiceImpl extends AbstractHandler {
 					parsedRule.setId(r.getId());
 					return parsedRule;
 				} catch (Exception e) {
+					System.err.println("Error parsing rule " + r.getId());
 					e.printStackTrace();
 					return null;
 				}

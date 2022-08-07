@@ -7,10 +7,11 @@ Rule:
 	'if' conditions=Condition ('proxy' proxy=ProxyConf | 'respond' 'with' response=ResponseConf)?;
 
 ProxyConf:
-	'url' proxyUrl=STRING;
+	'url' proxyUrl=Operand;
 
 ResponseConf:
-	('status' httpStatus=INTEGER)? & ('content' content=Operand)? & ('headers' headers=Headers?)?;
+	('status' httpStatus=Operand)? & ('content' (content=Operand | 'file' file=Operand))? & ('headers' headers=Headers?)
+	?;
 
 Headers:
 	headers+=Header (',' headers+=Header)*;

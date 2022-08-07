@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.node.NullNode;
 import io.burt.jmespath.jackson.JacksonRuntime;
 import x.mvmn.permock.model.JsonNode;
 import x.mvmn.permock.model.XmlNode;
+import x.mvmn.permock.util.StringUtil;
 
 public class PerpetualMockeryFunctions {
 
@@ -36,28 +37,32 @@ public class PerpetualMockeryFunctions {
 		public String value() default "param";
 	}
 
-	private String blankForNull(String val) {
-		return val != null ? val : "";
-	}
-
 	public String append(String val, String param) {
-		return blankForNull(val) + blankForNull(param);
+		return StringUtil.blankForNull(val) + StringUtil.blankForNull(param);
 	}
 
 	public String prepend(String val, String param) {
-		return blankForNull(param) + blankForNull(val);
+		return StringUtil.blankForNull(param) + StringUtil.blankForNull(val);
+	}
+
+	public String appendIfNotEmpty(String val, String param) {
+		return val != null && !val.isEmpty() ? val + StringUtil.blankForNull(param) : val;
+	}
+
+	public String prependIfNotEmpty(String val, String param) {
+		return val != null && !val.isEmpty() ? StringUtil.blankForNull(param) + val : val;
 	}
 
 	public Boolean startsWith(String val, String param) {
-		return blankForNull(val).startsWith(blankForNull(param));
+		return StringUtil.blankForNull(val).startsWith(StringUtil.blankForNull(param));
 	}
 
 	public Boolean endsWith(String val, String param) {
-		return blankForNull(val).endsWith(blankForNull(param));
+		return StringUtil.blankForNull(val).endsWith(StringUtil.blankForNull(param));
 	}
 
 	public Boolean contains(String val, String param) {
-		return blankForNull(val).contains(blankForNull(param));
+		return StringUtil.blankForNull(val).contains(StringUtil.blankForNull(param));
 	}
 
 	public String substring(String val, @FunctionParam("start") Long start) {
@@ -196,11 +201,21 @@ public class PerpetualMockeryFunctions {
 		return val.get(val.size() - 1);
 	}
 
-	public String join(List<?> val, String separator) {
+	public String join(List<?> val, @FunctionParam("separator") String separator) {
 		if (val == null || val.isEmpty()) {
 			return null;
 		}
 		return val.stream().map(v -> v != null ? v.toString() : "").collect(Collectors.joining(separator));
+	}
+
+	public String joinSurrounding(List<?> val, @FunctionParam("separator") String separator,
+			@FunctionParam("prefix") String prefix, @FunctionParam("suffix") String suffix) {
+		if (val == null || val.isEmpty()) {
+			return null;
+		}
+		return StringUtil.blankForNull(prefix)
+				+ val.stream().map(v -> v != null ? v.toString() : "").collect(Collectors.joining(separator))
+				+ StringUtil.blankForNull(suffix);
 	}
 
 	public JsonNode parseJson(String str) {
@@ -342,5 +357,51 @@ public class PerpetualMockeryFunctions {
 		}
 
 		return result;
+	}
+
+	public Long addInt(Long val, Long val2) {
+		return zeroForNull(val) + zeroForNull(val2);
+	}
+
+	public Long subInt(Long val, Long val2) {
+		return zeroForNull(val) - zeroForNull(val2);
+	}
+
+	public Long mulInt(Long val, Long val2) {
+		return zeroForNull(val) * zeroForNull(val2);
+	}
+
+	public Long divInt(Long val, Long val2) {
+		if (val2 == null || val2 == 0) {
+			return null;
+		}
+		return zeroForNull(val) / val2;
+	}
+
+	private long zeroForNull(Long val) {
+		return val != null ? val.longValue() : 0L;
+	}
+
+	public Double addFloat(Double val, Double val2) {
+		return zeroForNull(val) + zeroForNull(val2);
+	}
+
+	public Double subFloat(Double val, Double val2) {
+		return zeroForNull(val) - zeroForNull(val2);
+	}
+
+	public Double mulFloat(Double val, Double val2) {
+		return zeroForNull(val) * zeroForNull(val2);
+	}
+
+	public Double divFloat(Double val, Double val2) {
+		if (val2 == null || val2 < 0.00000000000001) {
+			return null;
+		}
+		return zeroForNull(val) / val2;
+	}
+
+	private double zeroForNull(Double val) {
+		return val != null ? val.doubleValue() : 0.0d;
 	}
 }

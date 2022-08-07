@@ -74,19 +74,23 @@ public class RuleParsingServiceImpl implements RuleParsingService {
 	}
 
 	private MockResponseConfig map(ProxyConf proxy) {
-		return MockResponseConfig.builder().proxy(true).proxyUrl(proxy.getProxyUrl()).build();
+		return MockResponseConfig.builder().proxy(true).proxyUrl(map(proxy.getProxyUrl())).build();
 	}
 
 	private MockResponseConfig map(ResponseConf response) {
 		MockResponseConfig result = new MockResponseConfig();
 		result.setProxy(false);
-		result.setResponseStatus(200);
 		if (response != null) {
 			if (response.getContent() != null) {
-				result.setResposeBody(map(response.getContent()));
+				result.setRespondWithFile(response.getFile() != null);
+				if (response.getFile() != null) {
+					result.setResponse(map(response.getFile()));
+				} else {
+					result.setResponse(map(response.getContent()));
+				}
 			}
 			if (response.getHttpStatus() != null) {
-				result.setResponseStatus(response.getHttpStatus().intValue());
+				result.setResponseStatus(map(response.getHttpStatus()));
 			}
 			if (response.getHeaders() != null && response.getHeaders().getHeaders() != null) {
 				List<MockResponseConfigHeader> headers = response.getHeaders().getHeaders().stream()

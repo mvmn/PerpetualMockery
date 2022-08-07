@@ -23,9 +23,10 @@ public class MockResponseConfig {
 	}
 
 	private boolean proxy;
-	private String proxyUrl;
-	private Integer responseStatus;
-	private MockRuleOperand resposeBody;
+	private MockRuleOperand proxyUrl;
+	private MockRuleOperand responseStatus;
+	private MockRuleOperand response;
+	private boolean respondWithFile;
 	private List<MockResponseConfigHeader> responseHeaders;
 
 	@Override
@@ -46,10 +47,10 @@ public class MockResponseConfig {
 	}
 
 	private String bodyToString() {
-		return resposeBody != null ? "content " + resposeBody + " " : "";
+		return response != null ? "content " + (respondWithFile ? "file" : "") + response + " " : "";
 	}
 
 	private String statusToString() {
-		return responseStatus != null ? "status " + responseStatus.intValue() : "";
+		return responseStatus != null ? "status " + responseStatus : "";
 	}
 }
