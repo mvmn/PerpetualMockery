@@ -124,7 +124,7 @@ public class HttpMockServiceImpl extends AbstractHandler {
 				String responseStatusStr = evaluationService.evaluate(responseConfig.getResponseStatus(), requestModel);
 				if (responseStatusStr != null) {
 					try {
-						responseStatus = Integer.parseInt(responseStatusStr);
+						responseStatus = Integer.parseInt(responseStatusStr.trim().replaceAll("[^0-9]+", ""));
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -133,8 +133,8 @@ public class HttpMockServiceImpl extends AbstractHandler {
 
 			response.setStatus(responseStatus);
 			if (responseConfig.getResponseHeaders() != null && !responseConfig.getResponseHeaders().isEmpty()) {
-				responseConfig.getResponseHeaders()
-						.forEach(header -> response.setHeader(header.getName(), header.getValue()));
+				responseConfig.getResponseHeaders().forEach(header -> response.setHeader(header.getName(),
+						evaluationService.evaluate(header.getValue(), requestModel)));
 			}
 			if (responseConfig.getResponse() != null) {
 				String responseData = evaluationService.evaluate(responseConfig.getResponse(), requestModel);

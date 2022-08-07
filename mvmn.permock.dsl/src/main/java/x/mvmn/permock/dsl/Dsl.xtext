@@ -17,7 +17,7 @@ Headers:
 	headers+=Header (',' headers+=Header)*;
 
 Header:
-	headerName=STRING ':' headerValue=STRING;
+	headerName=STRING ':' headerValue=Operand;
 
 Condition:
 	OrCondition;

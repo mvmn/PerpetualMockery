@@ -19,7 +19,7 @@ public class MockResponseConfig {
 	@NoArgsConstructor
 	public static class MockResponseConfigHeader {
 		private String name;
-		private String value;
+		private MockRuleOperand value;
 	}
 
 	private boolean proxy;

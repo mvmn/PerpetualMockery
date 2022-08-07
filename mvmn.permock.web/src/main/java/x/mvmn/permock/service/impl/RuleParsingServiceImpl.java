@@ -93,8 +93,8 @@ public class RuleParsingServiceImpl implements RuleParsingService {
 				result.setResponseStatus(map(response.getHttpStatus()));
 			}
 			if (response.getHeaders() != null && response.getHeaders().getHeaders() != null) {
-				List<MockResponseConfigHeader> headers = response.getHeaders().getHeaders().stream()
-						.map(header -> new MockResponseConfigHeader(header.getHeaderName(), header.getHeaderValue()))
+				List<MockResponseConfigHeader> headers = response.getHeaders().getHeaders().stream().map(
+						header -> new MockResponseConfigHeader(header.getHeaderName(), map(header.getHeaderValue())))
 						.collect(Collectors.toList());
 				result.setResponseHeaders(headers);
 			}
