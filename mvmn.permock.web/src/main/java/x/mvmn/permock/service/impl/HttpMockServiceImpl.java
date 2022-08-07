@@ -141,7 +141,13 @@ public class HttpMockServiceImpl extends AbstractHandler {
 				if (responseData != null) {
 					try (OutputStream os = response.getOutputStream()) {
 						if (responseConfig.isRespondWithFile()) {
-							FileUtils.copyFile(new File(responseData), os);
+							File file = new File(responseData);
+							if (file.exists()) {
+								FileUtils.copyFile(file, os);
+							} else {
+								response.setStatus(404);
+								os.write(("File not found " + responseData).getBytes(StandardCharsets.UTF_8));
+							}
 						} else {
 							os.write(responseData.getBytes(StandardCharsets.UTF_8));
 						}
