@@ -19,6 +19,8 @@
 		<lombok.version>1.18.16</lombok.version>
 		<org.mapstruct.version>1.5.2.Final</org.mapstruct.version>
 		<jmespath.version>0.5.1</jmespath.version>
+		<logback.version>1.2.3</logback.version>
+		<jackson.version>2.11.3</jackson.version>
 	</properties>
 
 	<dependencies>
@@ -31,12 +33,17 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-annotations</artifactId>
-			<version>2.11.3</version>
+			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.burt</groupId>
 			<artifactId>jmespath-jackson</artifactId>
 			<version>${jmespath.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${logback.version}</version>
 		</dependency>
 	</dependencies>
 

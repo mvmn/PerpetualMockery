@@ -15,6 +15,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -29,6 +31,7 @@ import x.mvmn.permock.util.StringUtil;
 
 public class PerpetualMockeryFunctions {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(PerpetualMockeryFunctions.class);
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Retention(RetentionPolicy.RUNTIME)
@@ -43,6 +46,7 @@ public class PerpetualMockeryFunctions {
 			return StringUtil.blankForNull(val).replaceAll(StringUtil.blankForNull(regex),
 					StringUtil.blankForNull(param));
 		} catch (Exception e) {
+			LOGGER.warn("Regex error", e);
 			return "Regex error: " + e.getMessage();
 		}
 	}
@@ -53,6 +57,7 @@ public class PerpetualMockeryFunctions {
 			return StringUtil.blankForNull(val).replaceFirst(StringUtil.blankForNull(regex),
 					StringUtil.blankForNull(param));
 		} catch (Exception e) {
+			LOGGER.warn("Regex error", e);
 			return "Regex error: " + e.getMessage();
 		}
 	}
@@ -270,13 +275,13 @@ public class PerpetualMockeryFunctions {
 				dbf.setXIncludeAware(false);
 				dbf.setExpandEntityReferences(false);
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.warn("XML parser setup error", e);
 			}
 			Document document = dbf.newDocumentBuilder()
 					.parse(new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8)));
 			return new XmlNode(document.getFirstChild());
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.warn("XML parsing error", e);
 			return null;
 		}
 	}
@@ -287,7 +292,7 @@ public class PerpetualMockeryFunctions {
 					XPathConstants.NODE);
 			return result != null ? new XmlNode(result) : null;
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.warn("Xpath error", e);
 			return null;
 		}
 	}
@@ -296,7 +301,7 @@ public class PerpetualMockeryFunctions {
 		try {
 			return XPathFactory.newInstance().newXPath().compile(str).evaluate(val.node());
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.warn("Xpath error", e);
 			return null;
 		}
 	}
@@ -307,7 +312,7 @@ public class PerpetualMockeryFunctions {
 					XPathConstants.NODESET);
 			return XmlNode.ofList(nodes);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.warn("Xpath error", e);
 			return Collections.emptyList();
 		}
 	}
@@ -318,7 +323,7 @@ public class PerpetualMockeryFunctions {
 					XPathConstants.BOOLEAN);
 			return result;
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.warn("Xpath error", e);
 			return null;
 		}
 	}
@@ -329,7 +334,7 @@ public class PerpetualMockeryFunctions {
 					XPathConstants.NUMBER);
 			return result != null ? result.doubleValue() : null;
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.warn("Xpath error", e);
 			return null;
 		}
 	}
@@ -340,7 +345,7 @@ public class PerpetualMockeryFunctions {
 					XPathConstants.NUMBER);
 			return result != null ? result.longValue() : null;
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.warn("Xpath error", e);
 			return null;
 		}
 	}
