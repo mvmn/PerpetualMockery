@@ -47,6 +47,21 @@ public class PerpetualMockeryFunctions {
 		}
 	}
 
+	public String replaceFirst(String val, @FunctionParam("value") String regex,
+			@FunctionParam("replacement") String param) {
+		try {
+			return StringUtil.blankForNull(val).replaceFirst(StringUtil.blankForNull(regex),
+					StringUtil.blankForNull(param));
+		} catch (Exception e) {
+			return "Regex error: " + e.getMessage();
+		}
+	}
+
+	public String replaceStr(String val, @FunctionParam("value") String regex,
+			@FunctionParam("replacement") String param) {
+		return StringUtil.blankForNull(val).replace(StringUtil.blankForNull(regex), StringUtil.blankForNull(param));
+	}
+
 	public String append(String val, String param) {
 		return StringUtil.blankForNull(val) + StringUtil.blankForNull(param);
 	}
