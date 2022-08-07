@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
 
 import io.burt.jmespath.jackson.JacksonRuntime;
+import io.burt.jmespath.parser.ParseException;
 import x.mvmn.permock.model.JsonNode;
 import x.mvmn.permock.model.XmlNode;
 import x.mvmn.permock.util.StringUtil;
@@ -258,8 +259,13 @@ public class PerpetualMockeryFunctions {
 	}
 
 	public JsonNode jmesPath(JsonNode val, String str) {
-		return val == null || val.getIsNull() ? JsonNode.of(NullNode.instance)
-				: JsonNode.of(new JacksonRuntime().compile(str).search(val.jsonNode()));
+		try {
+			return val == null || val.getIsNull() ? JsonNode.of(NullNode.instance)
+					: JsonNode.of(new JacksonRuntime().compile(str).search(val.jsonNode()));
+		} catch (ParseException jmesPathParseException) {
+			LOGGER.warn("JMESPath parse exception", jmesPathParseException);
+			return null;
+		}
 	}
 
 	public XmlNode parseXml(String str) {
@@ -408,6 +414,17 @@ public class PerpetualMockeryFunctions {
 		return zeroForNull(val) / val2;
 	}
 
+	public Double divIntByFloat(Long val, Double val2) {
+		if (val2 == null || val2 == 0) {
+			return null;
+		}
+		return zeroForNull(val) / val2;
+	}
+
+	public Double mulIntByFloat(Long val, Double val2) {
+		return zeroForNull(val) * zeroForNull(val2);
+	}
+
 	private long zeroForNull(Long val) {
 		return val != null ? val.longValue() : 0L;
 	}
@@ -425,13 +442,21 @@ public class PerpetualMockeryFunctions {
 	}
 
 	public Double divFloat(Double val, Double val2) {
-		if (val2 == null || val2 < 0.00000000000001) {
+		if (val2 == null) {
 			return null;
 		}
-		return zeroForNull(val) / val2;
+		try {
+			return zeroForNull(val) / val2;
+		} catch (ArithmeticException e) {
+			return null;
+		}
 	}
 
 	private double zeroForNull(Double val) {
 		return val != null ? val.doubleValue() : 0.0d;
+	}
+
+	public Double toFloat(Long val) {
+		return val != null ? val.doubleValue() : null;
 	}
 }

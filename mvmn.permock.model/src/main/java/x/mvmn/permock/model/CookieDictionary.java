@@ -17,6 +17,9 @@ public class CookieDictionary implements Dictionary<String, Cookie> {
 	}
 
 	public Cookie get(String key) {
+		if (key == null) {
+			return null;
+		}
 		return map.get(key);
 	}
 

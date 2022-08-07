@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Inject;
 
 import x.mvmn.permock.dsl.dsl.Constant;
-import x.mvmn.permock.dsl.dsl.FunctionCall;
 import x.mvmn.permock.dsl.dsl.ListElementReference;
 import x.mvmn.permock.dsl.dsl.ListFunction;
 import x.mvmn.permock.dsl.dsl.PropertyRef;
@@ -83,8 +82,7 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 		} else if (ruleCall.getRule().getName().equals(grammarAccess.getPropertyRefRule().getName())) {
 			EObject currentModel = context.getCurrentModel();
 			if (currentModel instanceof PropertyRef || currentModel instanceof Reference
-					|| currentModel instanceof FunctionCall || currentModel instanceof ListElementReference
-					|| currentModel instanceof Constant) {
+					|| currentModel instanceof ListElementReference || currentModel instanceof Constant) {
 				Property currentModelType = xtextModelHelper.resolveType(currentModel);
 				if (currentModelType != null) {
 					createProposals(modelHelper.properties(currentModelType), prefix, context, acceptor);
@@ -93,6 +91,20 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 				}
 			} else {
 				LOGGER.error("Not covered in _createProposals(ruleCall): " + currentModel);
+			}
+		} else if (ruleCall.getRule().getName().equals(grammarAccess.getPropertyAccessRule().getName())
+				|| ruleCall.getRule().getName().equals(grammarAccess.getFunctionCallRule().getName())) {
+			EObject currentModel = context.getCurrentModel();
+			if (currentModel instanceof PropertyRef) {
+				PropertyRef propRef = (PropertyRef) currentModel;
+				if (prefix != null && !prefix.isEmpty()) {
+					Property currentModelType = xtextModelHelper.resolveType(propRef.eContainer());
+					if (currentModelType != null) {
+						createProposals(modelHelper.properties(currentModelType), prefix, context, acceptor);
+						createFunctionProposals(modelHelper.getFunctionDescriptors(currentModelType), prefix, context,
+								acceptor);
+					}
+				}
 			}
 		}
 	}
