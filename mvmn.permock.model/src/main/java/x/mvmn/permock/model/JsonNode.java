@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -13,28 +11,28 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JsonValue {
+public class JsonNode {
 
-	private JsonNode jsonNode;
+	private com.fasterxml.jackson.databind.JsonNode jsonNode;
 
 	public String getAsString() {
 		return jsonNode != null ? jsonNode.asText() : null;
 	}
 
-	public List<JsonValue> getAsArray() {
+	public List<JsonNode> getAsArray() {
 		if (jsonNode == null || !jsonNode.isArray()) {
 			return Collections.emptyList();
 		}
-		List<JsonValue> result = new ArrayList<>(jsonNode.size());
-		jsonNode.forEach(child -> result.add(JsonValue.of(child)));
+		List<JsonNode> result = new ArrayList<>(jsonNode.size());
+		jsonNode.forEach(child -> result.add(JsonNode.of(child)));
 		return result;
 	}
 
-	public JsonValueDictionary getAsObject() {
+	public JsonNodeDictionary getAsObject() {
 		if (jsonNode == null || !jsonNode.isObject()) {
 			return null;
 		}
-		return new JsonValueDictionary(jsonNode);
+		return new JsonNodeDictionary(jsonNode);
 	}
 
 	public Boolean getAsBoolean() {
@@ -105,11 +103,11 @@ public class JsonValue {
 		return jsonNode == null || jsonNode.isNull();
 	}
 
-	public static JsonValue of(JsonNode jsonNode) {
-		return new JsonValue(jsonNode);
+	public static JsonNode of(com.fasterxml.jackson.databind.JsonNode jsonNode) {
+		return new JsonNode(jsonNode);
 	}
 
-	public JsonNode jsonNode() {
+	public com.fasterxml.jackson.databind.JsonNode jsonNode() {
 		return jsonNode;
 	}
 }

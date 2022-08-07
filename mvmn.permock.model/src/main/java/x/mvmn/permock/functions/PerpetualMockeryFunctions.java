@@ -1,17 +1,30 @@
 package x.mvmn.permock.functions;
 
+import java.io.ByteArrayInputStream;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
 
 import io.burt.jmespath.jackson.JacksonRuntime;
-import x.mvmn.permock.model.JsonValue;
+import x.mvmn.permock.model.JsonNode;
+import x.mvmn.permock.model.XmlNode;
 
 public class PerpetualMockeryFunctions {
 
@@ -190,16 +203,144 @@ public class PerpetualMockeryFunctions {
 		return val.stream().map(v -> v != null ? v.toString() : "").collect(Collectors.joining(separator));
 	}
 
-	public JsonValue parseJson(String str) {
+	public JsonNode parseJson(String str) {
 		try {
-			return JsonValue.of(objectMapper.readTree(str));
+			return JsonNode.of(objectMapper.readTree(str));
 		} catch (Exception e) {
+			e.printStackTrace();
 			return null;
 		}
 	}
 
-	public JsonValue jmesPath(JsonValue val, String str) {
-		return val == null || val.getIsNull() ? JsonValue.of(NullNode.instance)
-				: JsonValue.of(new JacksonRuntime().compile(str).search(val.jsonNode()));
+	public JsonNode jmesPath(JsonNode val, String str) {
+		return val == null || val.getIsNull() ? JsonNode.of(NullNode.instance)
+				: JsonNode.of(new JacksonRuntime().compile(str).search(val.jsonNode()));
+	}
+
+	public XmlNode parseXml(String str) {
+		try {
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			try {
+				dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+				dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+				dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+				dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+				dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+				dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+				dbf.setXIncludeAware(false);
+				dbf.setExpandEntityReferences(false);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			Document document = dbf.newDocumentBuilder()
+					.parse(new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8)));
+			return new XmlNode(document.getFirstChild());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public XmlNode xPath(XmlNode val, String str) {
+		try {
+			Node result = (Node) XPathFactory.newInstance().newXPath().compile(str).evaluate(val.node(),
+					XPathConstants.NODE);
+			return result != null ? new XmlNode(result) : null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public String xPathForString(XmlNode val, String str) {
+		try {
+			return XPathFactory.newInstance().newXPath().compile(str).evaluate(val.node());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<XmlNode> xPathForList(XmlNode val, String str) {
+		try {
+			NodeList nodes = (NodeList) XPathFactory.newInstance().newXPath().compile(str).evaluate(val.node(),
+					XPathConstants.NODESET);
+			return XmlNode.ofList(nodes);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Collections.emptyList();
+		}
+	}
+
+	public Boolean xPathForBoolean(XmlNode val, String str) {
+		try {
+			Boolean result = (Boolean) XPathFactory.newInstance().newXPath().compile(str).evaluate(val.node(),
+					XPathConstants.BOOLEAN);
+			return result;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public Double xPathForFloat(XmlNode val, String str) {
+		try {
+			Number result = (Number) XPathFactory.newInstance().newXPath().compile(str).evaluate(val.node(),
+					XPathConstants.NUMBER);
+			return result != null ? result.doubleValue() : null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public Long xPathForInteger(XmlNode val, String str) {
+		try {
+			Number result = (Number) XPathFactory.newInstance().newXPath().compile(str).evaluate(val.node(),
+					XPathConstants.NUMBER);
+			return result != null ? result.longValue() : null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public Long parseInt(String val, @FunctionParam("defaultValue") Long defaultVal) {
+		Long result = defaultVal;
+
+		if (val != null) {
+			try {
+				result = Long.parseLong(val.trim());
+			} catch (Exception e) {
+			}
+		}
+
+		return result;
+	}
+
+	public Double parseFloat(String val, @FunctionParam("defaultValue") Double defaultVal) {
+		Double result = defaultVal;
+
+		if (val != null) {
+			try {
+				result = Double.parseDouble(val.trim());
+			} catch (Exception e) {
+			}
+		}
+
+		return result;
+	}
+
+	public Boolean parseBoolean(String val, @FunctionParam("defaultValue") Boolean defaultVal) {
+		Boolean result = defaultVal;
+
+		if (val != null) {
+			try {
+				result = Boolean.valueOf(val.trim());
+			} catch (Exception e) {
+			}
+		}
+
+		return result;
 	}
 }
