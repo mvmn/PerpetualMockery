@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
 
 import io.burt.jmespath.jackson.JacksonRuntime;
+import io.burt.jmespath.parser.ParseException;
 import x.mvmn.permock.model.JsonNode;
 import x.mvmn.permock.model.XmlNode;
 import x.mvmn.permock.util.StringUtil;
@@ -258,8 +259,13 @@ public class PerpetualMockeryFunctions {
 	}
 
 	public JsonNode jmesPath(JsonNode val, String str) {
-		return val == null || val.getIsNull() ? JsonNode.of(NullNode.instance)
-				: JsonNode.of(new JacksonRuntime().compile(str).search(val.jsonNode()));
+		try {
+			return val == null || val.getIsNull() ? JsonNode.of(NullNode.instance)
+					: JsonNode.of(new JacksonRuntime().compile(str).search(val.jsonNode()));
+		} catch (ParseException jmesPathParseException) {
+			LOGGER.warn("JMESPath parse exception", jmesPathParseException);
+			return null;
+		}
 	}
 
 	public XmlNode parseXml(String str) {
