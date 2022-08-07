@@ -19,6 +19,8 @@ import org.eclipse.xtext.ide.editor.contentassist.IIdeContentProposalAcceptor;
 import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalCreator;
 import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalPriorities;
 import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
@@ -35,6 +37,8 @@ import x.mvmn.permock.dsl.services.DslGrammarAccess;
 import x.mvmn.permock.util.Property;
 
 public class DslContentProposalProvider extends IdeContentProposalProvider {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(DslContentProposalProvider.class);
 
 	@Inject
 	private IdeContentProposalCreator proposalCreator;
@@ -88,7 +92,7 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 							acceptor);
 				}
 			} else {
-				System.err.println("Uncovered " + currentModel);
+				LOGGER.error("Not covered in _createProposals(ruleCall): " + currentModel);
 			}
 		}
 	}

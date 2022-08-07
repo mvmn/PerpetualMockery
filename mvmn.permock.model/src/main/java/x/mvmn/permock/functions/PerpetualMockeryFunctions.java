@@ -252,7 +252,7 @@ public class PerpetualMockeryFunctions {
 		try {
 			return JsonNode.of(objectMapper.readTree(str));
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.warn("JSON parsing error", e);
 			return null;
 		}
 	}

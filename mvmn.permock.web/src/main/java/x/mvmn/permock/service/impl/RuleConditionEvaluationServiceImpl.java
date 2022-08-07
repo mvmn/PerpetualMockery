@@ -8,8 +8,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
@@ -43,14 +44,13 @@ import x.mvmn.permock.util.Property;
 @Service
 public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluationService {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(RuleConditionEvaluationServiceImpl.class);
+
 	@Autowired
 	private ModelHelper modelHelper;
 
 	@Autowired
 	private PerpetualMockeryFunctions functions;
-
-	@Value("${mock.eval.debug:false}")
-	private boolean debug;
 
 	@Data
 	@AllArgsConstructor
@@ -106,8 +106,8 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 	public boolean evaluate(MockRuleCondition conditions, HttpRequestModel requestModel) {
 		long startTime = System.currentTimeMillis();
 		Object result = evaluate(conditions, EvaluationContext.builder().requestModel(requestModel).build());
-		if (debug) {
-			System.out.println("Evaluated to " + result + " conditions:\n" + conditions + " - took "
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Evaluated to " + result + " conditions:\n" + conditions + " - took "
 					+ (System.currentTimeMillis() - startTime) + " millisec.");
 		}
 		return result instanceof Boolean && ((Boolean) result).booleanValue();
@@ -117,8 +117,8 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 		if (condition.isBinaryLogicalCondition()) {
 			MockRuleBiLogicalCondition biCondition = (MockRuleBiLogicalCondition) condition;
 			boolean left = evaluate(biCondition.getLeft(), context);
-			if (debug) {
-				System.err.println("Evaluated to " + left + " left operand of " + biCondition.getType() + ":\n"
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Evaluated to " + left + " left operand of " + biCondition.getType() + ":\n"
 						+ biCondition.getLeft());
 			}
 
@@ -135,8 +135,8 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 				}
 			}
 			boolean right = evaluate(biCondition.getRight(), context);
-			if (debug) {
-				System.err.println("Evaluated to " + right + " right operand of " + biCondition.getType() + ":\n"
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Evaluated to " + right + " right operand of " + biCondition.getType() + ":\n"
 						+ biCondition.getRight());
 			}
 			return right;
@@ -144,9 +144,9 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 			MockRuleUnaryCondition uc = (MockRuleUnaryCondition) condition;
 			boolean result = evaluate(uc.getWrappedCondition(), context);
 
-			if (debug) {
-				System.err.println("Evaluated to " + result + " operand of " + (uc.isNegate() ? "not " : "")
-						+ " condition:\n" + uc.getWrappedCondition());
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Evaluated to " + result + " operand of " + (uc.isNegate() ? "not " : "") + " condition:\n"
+						+ uc.getWrappedCondition());
 			}
 			if (uc.isNegate()) {
 				return !result;
@@ -156,8 +156,8 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 		} else if (condition.isExpression()) {
 			boolean result = evaluateExpression((MockRuleExpression) condition, context);
 
-			if (debug) {
-				System.err.println("Evaluated to " + result + " expression " + condition);
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Evaluated to " + result + " expression " + condition);
 			}
 
 			return result;
@@ -169,14 +169,14 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 	private boolean evaluateExpression(MockRuleExpression expression, EvaluationContext context) {
 		EvaluationResult left = evaluate(expression.getLeft(), context);
 		if (left == null || left.isNull() || !left.getType().isPrimitive()) {
-			System.err.println("Left side of evaluation is null or not a primitive: " + left + ". " + expression);
+			LOGGER.debug("Left side of evaluation is null or not a primitive: " + left + ". " + expression);
 			return false;
 		}
 
 		EvaluationResult right = evaluate(expression.getRight(), context);
 
-		if (debug) {
-			System.err.println("Evaluating expression " + left + " " + expression.getType().name() + " " + right);
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Evaluating expression " + left + " " + expression.getType().name() + " " + right);
 		}
 
 		switch (expression.getType()) {
@@ -198,7 +198,7 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 		case LT:
 		case LTEQ:
 			if (!left.getType().isNumber() || right.isNull()) {
-				System.err.println("Left side of evaluation is not a number or right side is null: left = " + left
+				LOGGER.warn("Left side of evaluation is not a number or right side is null: left = " + left
 						+ ". expression = " + expression);
 				return false;
 			}
@@ -251,8 +251,8 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 			if (listElemRef.getPropRef() != null) {
 				return evaluatePropertyRef(listElement, listElemRef.getPropRef(), context);
 			} else {
-				if (debug) {
-					System.err.println("Evaluated list element ref " + alias + " to " + listElement);
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Evaluated list element ref " + alias + " to " + listElement);
 				}
 				return EvaluationResult.builder().type(listElement.getB()).value(listElement.getA()).build();
 			}
@@ -269,8 +269,8 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 				if (ref.getPropRef() != null) {
 					return evaluatePropertyRef(new Tuple2<>(entityValue, entityType), ref.getPropRef(), context);
 				} else {
-					if (debug) {
-						System.err.println("Evaluated entity " + entityName + " to " + entityValue);
+					if (LOGGER.isDebugEnabled()) {
+						LOGGER.debug("Evaluated entity " + entityName + " to " + entityValue);
 					}
 					return EvaluationResult.builder().type(entityType).value(entityValue).build();
 				}
@@ -324,7 +324,7 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 				try {
 					expectedType = Property.of("list", Class.forName(listFunct.getElementType()), true);
 				} catch (ClassNotFoundException e) {
-					System.err.println("Failed to get mapped list element type for name " + listFunct.getElementType());
+					LOGGER.error("Failed to get mapped list element type for name " + listFunct.getElementType());
 					expectedType = Property.of("list", Object.class, true);
 				}
 				break;
@@ -372,8 +372,8 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 					} else {
 						boolean evalResult = evaluate(listFunct.getCondition(), subContext);
 
-						if (debug) {
-							System.err.println("Evaluated to " + evalResult + " list element " + element + " condition "
+						if (LOGGER.isDebugEnabled()) {
+							LOGGER.debug("Evaluated to " + evalResult + " list element " + element + " condition "
 									+ listFunct.getCondition() + " in list function " + listFunct.getListElementAlias()
 									+ " " + listFunct.getType());
 						}
@@ -402,8 +402,8 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 				}
 			}
 
-			if (debug) {
-				System.err.println("Evaluated list function to " + value + " for " + listFunct);
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Evaluated list function to " + value + " for " + listFunct);
 			}
 			if (listFunct.getSubProp() != null) {
 				return evaluatePropertyRef(new Tuple2<>(value, expectedType), listFunct.getSubProp(), context);
@@ -421,9 +421,9 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 				value = parentDictionary.get(dictAccess.getKey());
 			}
 
-			if (debug) {
-				System.err.println("Evaluated dict access to " + value + " for key " + dictAccess.getKey()
-						+ " on dictionary " + parentDictionary);
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Evaluated dict access to " + value + " for key " + dictAccess.getKey() + " on dictionary "
+						+ parentDictionary);
 			}
 			if (dictAccess.getSubProp() != null) {
 				return evaluatePropertyRef(new Tuple2<>(value, elementType), dictAccess.getSubProp(), context);
@@ -442,9 +442,9 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 			}
 			Property type = new Property(parentValue.getB().getName(), parentValue.getB().getType(),
 					BeanUtil.isCollection(parentValue.getB().getType()));
-			if (debug) {
-				System.err.println("Evaluated list access to " + value + " for index " + listAccess.getIndex()
-						+ " on list " + parentList);
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Evaluated list access to " + value + " for index " + listAccess.getIndex() + " on list "
+						+ parentList);
 			}
 			if (listAccess.getSubProp() != null) {
 				return evaluatePropertyRef(new Tuple2<>(value, type), listAccess.getSubProp(), context);
@@ -462,16 +462,16 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 			for (int i = 1; i < args.length; i++) {
 				MockRuleOperand operand = functArgIterator.next();
 				args[i] = normalizeTypes(evaluate(operand, context)).getValue();
-				if (debug) {
-					System.err.println("Evaluated function parameter " + operand + " to " + args[i]);
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Evaluated function parameter " + operand + " to " + args[i]);
 				}
 			}
 			try {
 				Property expectedType = BeanUtil.fromMethod(funct, parentValue.getB());
 				Object result = funct.invoke(functions, args);
 
-				if (debug) {
-					System.err.println(
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug(
 							"Evaluated function " + functCall.getName() + " with " + (functCall.getArgs().size() + 1)
 									+ " args to " + result + ". Args = " + Arrays.toString(args));
 				}
@@ -488,8 +488,8 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 			// Property access. Can be a primitive function or collection function
 			String propertyName = propAccess.getProperty();
 			if (parentValue.getA() == null) {
-				if (debug) {
-					System.err.println("Evaluated null value of property " + propAccess);
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Evaluated null value of property " + propAccess);
 				}
 				return EvaluationResult.builder().value(null)
 						.type(modelHelper.typeOfProperty(parentValue.getB(), propertyName)).build();
@@ -505,8 +505,8 @@ public class RuleConditionEvaluationServiceImpl implements RuleConditionEvaluati
 					if (propAccess.getSubProp() != null) {
 						return evaluatePropertyRef(new Tuple2<>(value, expectedType), propAccess.getSubProp(), context);
 					} else {
-						if (debug) {
-							System.err.println("Evaluated to " + value + " value of property " + propAccess);
+						if (LOGGER.isDebugEnabled()) {
+							LOGGER.debug("Evaluated to " + value + " value of property " + propAccess);
 						}
 						return EvaluationResult.builder().value(value).type(expectedType).build();
 					}

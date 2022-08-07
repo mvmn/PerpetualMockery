@@ -4,6 +4,8 @@ import java.util.function.Predicate;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.EcoreUtil2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
@@ -26,6 +28,8 @@ import x.mvmn.permock.util.Property;
 @Setter
 @Accessors(chain = true)
 public class XtextModelHelper {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(XtextModelHelper.class);
 
 	@Inject
 	private ModelHelper modelHelper;
@@ -90,12 +94,11 @@ public class XtextModelHelper {
 			} else if (constant.getFloatVal() != null) {
 				return Property.of("constant", Double.class, false);
 			} else {
-				System.err.println("Unknown constant type: " + constant);
+				LOGGER.error("Unknown constant type: " + constant);
 			}
+		} else {
+			LOGGER.error("Not covered in resolveType: " + currentModel);
 		}
-		// else {
-//			System.err.println("Not covered " + currentModel);
-//		}
 		return null;
 	}
 

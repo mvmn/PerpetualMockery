@@ -82,12 +82,10 @@ public class RuleParsingServiceImpl implements RuleParsingService {
 		result.setProxy(false);
 		if (response != null) {
 			if (response.getContent() != null) {
-				result.setRespondWithFile(response.getFile() != null);
-				if (response.getFile() != null) {
-					result.setResponse(map(response.getFile()));
-				} else {
-					result.setResponse(map(response.getContent()));
-				}
+				result.setResponse(map(response.getContent()));
+			} else if (response.getFile() != null) {
+				result.setResponse(map(response.getFile()));
+				result.setRespondWithFile(true);
 			}
 			if (response.getHttpStatus() != null) {
 				result.setResponseStatus(map(response.getHttpStatus()));

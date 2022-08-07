@@ -5,6 +5,8 @@ package x.mvmn.permock.dsl.validation;
 
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.xtext.validation.Check;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
@@ -32,6 +34,8 @@ import x.mvmn.permock.util.Property;
  * https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#validation
  */
 public class DslValidator extends AbstractDslValidator {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(DslValidator.class);
 
 	public static final String INVALID_NAME = "invalidName";
 
@@ -61,7 +65,7 @@ public class DslValidator extends AbstractDslValidator {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error("Expression check error", e);
 		}
 	}
 
@@ -73,7 +77,7 @@ public class DslValidator extends AbstractDslValidator {
 				error("Cannot resolve", DslPackage.Literals.ENTITY__NAME);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error("Entity check error", e);
 		}
 	}
 
@@ -84,7 +88,7 @@ public class DslValidator extends AbstractDslValidator {
 				error("Cannot resolve", DslPackage.Literals.PROPERTY_ACCESS__NAME);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error("Property access check error", e);
 		}
 	}
 
@@ -101,7 +105,7 @@ public class DslValidator extends AbstractDslValidator {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error("Function call check error", e);
 		}
 	}
 
@@ -131,11 +135,7 @@ public class DslValidator extends AbstractDslValidator {
 								error("Incorrect function parameter type - expected " + paramType.getTypeName()
 										+ " but got " + operandType.getTypeName(), structuralFeature);
 							}
-						} else {
-//							System.err.println("Failed to resolve operand type " + operand);
 						}
-					} else {
-//						System.err.println("Failed to resolve function " + operand.eContainer());
 					}
 				} catch (IndexOutOfBoundsException iobe) {
 					error("Incorrect function parameter", structuralFeature);
@@ -149,7 +149,7 @@ public class DslValidator extends AbstractDslValidator {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error("Operand check error", e);
 		}
 	}
 
@@ -164,7 +164,7 @@ public class DslValidator extends AbstractDslValidator {
 				error("Key access only allowed for dictionaries", DslPackage.Literals.COLLECTION_ACCESS__INDEX);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error("Collection access check error", e);
 		}
 	}
 
@@ -180,7 +180,7 @@ public class DslValidator extends AbstractDslValidator {
 				error("List functions only allowed for lists", val, DslPackage.Literals.LIST_FUNCTION__CONDITION);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error("List function check error", e);
 		}
 	}
 

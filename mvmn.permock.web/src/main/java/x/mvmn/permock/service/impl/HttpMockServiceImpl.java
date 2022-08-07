@@ -28,6 +28,8 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.util.UrlEncoded;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -52,6 +54,8 @@ import x.mvmn.permock.service.RuleConditionEvaluationService;
 
 @Service
 public class HttpMockServiceImpl extends AbstractHandler {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(HttpMockServiceImpl.class);
 
 	@Value("${mock.port:0}")
 	private int mockPort;
@@ -84,7 +88,7 @@ public class HttpMockServiceImpl extends AbstractHandler {
 		server.start();
 		int port = Stream.of(server.getConnectors()).filter(c -> c instanceof ServerConnector)
 				.map(c -> (ServerConnector) c).mapToInt(ServerConnector::getLocalPort).findAny().orElse(-1);
-		System.out.println("Started mock server on port " + port);
+		LOGGER.info("! Started mock server on port " + port);
 		this.server = server;
 	}
 
@@ -94,7 +98,7 @@ public class HttpMockServiceImpl extends AbstractHandler {
 			try {
 				server.stop();
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.warn("Error when stopping Jetty server", e);
 			}
 		}
 	}
@@ -124,9 +128,12 @@ public class HttpMockServiceImpl extends AbstractHandler {
 				String responseStatusStr = evaluationService.evaluate(responseConfig.getResponseStatus(), requestModel);
 				if (responseStatusStr != null) {
 					try {
-						responseStatus = Integer.parseInt(responseStatusStr.trim().replaceAll("[^0-9]+", ""));
+						responseStatusStr = responseStatusStr.replaceAll("[^0-9]+", "").trim();
+						if (!responseStatusStr.isEmpty()) {
+							responseStatus = Integer.parseInt(responseStatusStr);
+						}
 					} catch (Exception e) {
-						e.printStackTrace();
+						LOGGER.warn("Failed to parse evaluated response status as int", e);
 					}
 				}
 			}
@@ -145,6 +152,7 @@ public class HttpMockServiceImpl extends AbstractHandler {
 							if (file.exists()) {
 								FileUtils.copyFile(file, os);
 							} else {
+								LOGGER.warn("Response file not found " + responseData);
 								response.setStatus(404);
 								os.write(("File not found " + responseData).getBytes(StandardCharsets.UTF_8));
 							}
@@ -152,7 +160,7 @@ public class HttpMockServiceImpl extends AbstractHandler {
 							os.write(responseData.getBytes(StandardCharsets.UTF_8));
 						}
 					} catch (Exception e) {
-						e.printStackTrace();
+						LOGGER.error("Error writing response body", e);
 					}
 				}
 			}
@@ -198,7 +206,7 @@ public class HttpMockServiceImpl extends AbstractHandler {
 		try (InputStream in = request.getInputStream()) {
 			body = IOUtils.toByteArray(in);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error("Failed to read request body", e);
 		}
 
 		HttpHeaderDictionary headersByName = new HttpHeaderDictionary(headers);
@@ -213,7 +221,7 @@ public class HttpMockServiceImpl extends AbstractHandler {
 						.add(new RequestParameter(key, values != null && !values.isEmpty() ? values.get(0) : null,
 								values != null ? values : Collections.emptyList())));
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.error("Failed to parse form url-encoded request body", e);
 			}
 		}
 
@@ -252,8 +260,7 @@ public class HttpMockServiceImpl extends AbstractHandler {
 					parsedRule.setId(r.getId());
 					return parsedRule;
 				} catch (Exception e) {
-					System.err.println("Error parsing rule " + r.getId());
-					e.printStackTrace();
+					LOGGER.error("Error parsing rule " + r.getId(), e);
 					return null;
 				}
 			}).filter(Objects::nonNull).collect(Collectors.toList());

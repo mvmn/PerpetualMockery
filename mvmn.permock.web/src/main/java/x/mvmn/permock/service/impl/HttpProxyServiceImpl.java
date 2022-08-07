@@ -20,6 +20,8 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
 import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,8 @@ import x.mvmn.permock.service.HttpProxyService;
 
 @Service
 public class HttpProxyServiceImpl implements HttpProxyService {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(HttpProxyServiceImpl.class);
 
 	private CloseableHttpClient httpClient;
 
@@ -49,14 +53,14 @@ public class HttpProxyServiceImpl implements HttpProxyService {
 		try {
 			this.httpClient.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.warn("Failed to close HTTPClient", e);
 		}
 	}
 
 	@Override
 	public void proxyRequest(String url, HttpServletRequest request, HttpServletResponse response,
 			HttpRequestModel mappedRequest) {
-		System.out.println("Proxying " + request.getMethod() + " " + url);
+		LOGGER.info("Proxying " + request.getMethod() + " " + url);
 
 		BasicClassicHttpRequest proxRequest = new BasicClassicHttpRequest(request.getMethod(), url);
 		Collections.list(request.getHeaderNames()).stream()
@@ -76,16 +80,16 @@ public class HttpProxyServiceImpl implements HttpProxyService {
 				try (ServletOutputStream out = response.getOutputStream()) {
 					IOUtils.copy(entity.getContent(), out);
 				} catch (IOException e) {
-					e.printStackTrace();
+					LOGGER.error("Failed to copy response body", e);
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error("Proxying error", e);
 			response.setStatus(500);
 			try (ServletOutputStream out = response.getOutputStream()) {
 				out.write(NestedExceptionUtils.buildMessage("Proxying failure", e).getBytes(StandardCharsets.UTF_8));
 			} catch (IOException e1) {
-				e1.printStackTrace();
+				LOGGER.error("Error response body writing error", e1);
 			}
 		}
 	}

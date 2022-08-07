@@ -4,8 +4,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,6 +32,8 @@ import x.mvmn.permock.service.RuleParsingService;
 @RestController
 @RequestMapping("/api/rules")
 public class RulesController {
+	private static final Logger LOGGER = LoggerFactory.getLogger(RulesController.class);
+
 	@Autowired
 	private RuleMapper ruleMapper;
 
@@ -42,9 +45,6 @@ public class RulesController {
 
 	@Autowired
 	private ObjectMapper objectMapper;
-
-	@Value("${mock.parse.debug:false}")
-	private boolean debug;
 
 	@GetMapping
 	public List<RuleViewDto> list() {
@@ -81,12 +81,12 @@ public class RulesController {
 	protected String parseAndSerialize(String text) {
 		try {
 			MockRule ruleModel = ruleParsingService.parse(text);
-			if (debug) {
-				System.out.println("---\n" + ruleModel + "\n---");
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Rule:\n" + ruleModel);
 			}
 			String serialized = objectMapper.writeValueAsString(ruleModel);
-			if (debug) {
-				System.out.println("---\n" + serialized + "\n---");
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Serialized rule: " + serialized);
 			}
 			return serialized;
 		} catch (JsonProcessingException e) {
