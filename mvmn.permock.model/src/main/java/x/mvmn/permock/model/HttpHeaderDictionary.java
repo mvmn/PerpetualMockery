@@ -8,17 +8,21 @@ public class HttpHeaderDictionary implements Dictionary<String, HttpHeader> {
 
 	private final Map<String, HttpHeader> map;
 
-	public HttpHeaderDictionary(List<HttpHeader> params) {
+	public HttpHeaderDictionary(List<HttpHeader> headers) {
 		map = new HashMap<>();
-		params.forEach(p -> map.put(p.getName(), p));
+		headers.forEach(p -> map.put(p.getName().toLowerCase(), p));
 	}
 
-	public HttpHeaderDictionary(Map<String, HttpHeader> map) {
-		this.map = map;
+	public HttpHeaderDictionary(Map<String, HttpHeader> headers) {
+		this.map = new HashMap<>();
+		headers.entrySet().forEach(e -> map.put(e.getKey().toLowerCase(), e.getValue()));
 	}
 
 	public HttpHeader get(String headerName) {
-		return map.get(headerName);
+		if (headerName == null) {
+			return null;
+		}
+		return map.get(headerName.toLowerCase());
 	}
 
 	@Override

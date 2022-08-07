@@ -18,6 +18,9 @@ public class RequestParameterDictionary implements Dictionary<String, RequestPar
 	}
 
 	public RequestParameter get(String key) {
+		if (key == null) {
+			return null;
+		}
 		return paramsMap.get(key);
 	}
 

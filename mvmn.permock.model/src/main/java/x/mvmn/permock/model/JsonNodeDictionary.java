@@ -16,8 +16,11 @@ public class JsonNodeDictionary implements Dictionary<String, JsonNode> {
 		this.map = map;
 	}
 
-	public JsonNode get(String headerName) {
-		return map.get(headerName);
+	public JsonNode get(String name) {
+		if (name == null) {
+			return null;
+		}
+		return map.get(name);
 	}
 
 	@Override
