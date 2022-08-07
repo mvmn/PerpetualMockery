@@ -1,5 +1,10 @@
 package x.mvmn.permock.model;
 
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.StandardCharsets;
+import java.nio.charset.UnsupportedCharsetException;
+
 public class ContentTypeModel {
 	private final String rawContentType;
 	private final String contentType;
@@ -23,7 +28,6 @@ public class ContentTypeModel {
 	}
 
 	public String getCharSet() {
-
 		return charSet;
 	}
 
@@ -33,5 +37,17 @@ public class ContentTypeModel {
 
 	public String getRawContentType() {
 		return rawContentType;
+	}
+
+	public Charset detectCharset() {
+		Charset result = StandardCharsets.UTF_8;
+		String charsetStr = getCharSet();
+		if (charsetStr != null) {
+			try {
+				return Charset.forName(charsetStr.toUpperCase());
+			} catch (IllegalCharsetNameException | UnsupportedCharsetException e) {
+			}
+		}
+		return result;
 	}
 }

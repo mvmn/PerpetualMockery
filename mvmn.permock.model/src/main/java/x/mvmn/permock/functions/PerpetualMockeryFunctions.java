@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.NullNode;
 
 import io.burt.jmespath.jackson.JacksonRuntime;
 import x.mvmn.permock.model.JsonValue;
@@ -198,6 +199,7 @@ public class PerpetualMockeryFunctions {
 	}
 
 	public JsonValue jmesPath(JsonValue val, String str) {
-		return JsonValue.of(new JacksonRuntime().compile(str).search(val.jsonNode()));
+		return val == null || val.getIsNull() ? JsonValue.of(NullNode.instance)
+				: JsonValue.of(new JacksonRuntime().compile(str).search(val.jsonNode()));
 	}
 }

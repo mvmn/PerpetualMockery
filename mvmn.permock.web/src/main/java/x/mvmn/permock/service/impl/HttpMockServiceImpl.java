@@ -25,12 +25,15 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.util.UrlEncoded;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import x.mvmn.permock.model.ContentTypeModel;
 import x.mvmn.permock.model.Cookie;
 import x.mvmn.permock.model.CookieDictionary;
 import x.mvmn.permock.model.HttpHeader;
@@ -97,6 +100,7 @@ public class HttpMockServiceImpl extends AbstractHandler {
 	@Override
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
+		request = new ContentCachingRequestWrapper(request);
 		HttpRequestModel requestModel = mapToRequestModel(request);
 		MockRule matchingRule = findMatchingRule(requestModel);
 		if (matchingRule != null) {
@@ -110,7 +114,7 @@ public class HttpMockServiceImpl extends AbstractHandler {
 	private void sendResponse(MockResponseConfig responseConfig, HttpRequestModel requestModel,
 			HttpServletRequest request, HttpServletResponse response) {
 		if (responseConfig.isProxy()) {
-			proxyService.proxyRequest(responseConfig.getProxyUrl(), request, response);
+			proxyService.proxyRequest(responseConfig.getProxyUrl(), request, response, requestModel);
 		} else {
 			response.setStatus(
 					responseConfig.getResponseStatus() != null ? responseConfig.getResponseStatus().intValue() : 200);
@@ -172,9 +176,26 @@ public class HttpMockServiceImpl extends AbstractHandler {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return new HttpRequestModel(method, path, queryString, new HttpHeaderDictionary(headers),
+
+		HttpHeaderDictionary headersByName = new HttpHeaderDictionary(headers);
+		ContentTypeModel contentTypeModel = new ContentTypeModel(
+				headersByName.get("Content-Type") != null ? headersByName.get("Content-Type").getValue() : null);
+
+		List<RequestParameter> formParams = new ArrayList<>();
+		if ("application/x-www-form-urlencoded".equalsIgnoreCase(request.getContentType())) {
+			try {
+				UrlEncoded formData = new UrlEncoded(new String(body, contentTypeModel.detectCharset()));
+				formData.forEach((key, values) -> formParams
+						.add(new RequestParameter(key, values != null && !values.isEmpty() ? values.get(0) : null,
+								values != null ? values : Collections.emptyList())));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		return new HttpRequestModel(method, path, queryString, contentTypeModel, headersByName,
 				new CookieDictionary(cookies), new RequestParameterDictionary(requestParams), body, headers, cookies,
-				requestParams);
+				requestParams, new RequestParameterDictionary(formParams), formParams);
 	}
 
 	private HttpHeader mapHeader(String headerName, HttpServletRequest request) {

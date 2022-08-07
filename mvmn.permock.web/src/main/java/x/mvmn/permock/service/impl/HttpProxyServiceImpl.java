@@ -18,10 +18,12 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
 import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.stereotype.Service;
 
+import x.mvmn.permock.model.HttpRequestModel;
 import x.mvmn.permock.service.HttpProxyService;
 import x.mvmn.permock.util.StringUtil;
 
@@ -53,7 +55,8 @@ public class HttpProxyServiceImpl implements HttpProxyService {
 	}
 
 	@Override
-	public void proxyRequest(String url, HttpServletRequest request, HttpServletResponse response) {
+	public void proxyRequest(String url, HttpServletRequest request, HttpServletResponse response,
+			HttpRequestModel mappedRequest) {
 		System.out.println("Proxying " + request.getMethod() + " " + url + request.getRequestURI() + "?"
 				+ StringUtil.blankForNull(request.getQueryString()));
 
@@ -63,6 +66,10 @@ public class HttpProxyServiceImpl implements HttpProxyService {
 				.filter(headerName -> !skipHeaders.contains(headerName.toLowerCase()))
 				.forEach(headerName -> Collections.list(request.getHeaders(headerName)).stream()
 						.forEach(headerValue -> proxRequest.addHeader(headerName, headerValue)));
+		if (mappedRequest.body() != null && mappedRequest.body().length > 0) {
+			proxRequest.setEntity(new ByteArrayEntity(mappedRequest.body(), null));
+		}
+
 		try (CloseableHttpResponse proxResponse = httpClient.execute(proxRequest)) {
 			response.setStatus(proxResponse.getCode());
 			Stream.of(proxResponse.getHeaders())
