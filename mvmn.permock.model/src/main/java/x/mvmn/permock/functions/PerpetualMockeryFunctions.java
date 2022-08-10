@@ -459,4 +459,8 @@ public class PerpetualMockeryFunctions {
 	public Double toFloat(Long val) {
 		return val != null ? val.doubleValue() : null;
 	}
+
+	public Boolean negate(Boolean bool) {
+		return bool != null ? !bool.booleanValue() : true;
+	}
 }
