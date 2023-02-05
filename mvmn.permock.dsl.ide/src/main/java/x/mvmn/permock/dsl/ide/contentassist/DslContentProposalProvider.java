@@ -78,16 +78,16 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 			IIdeContentProposalAcceptor acceptor) {
 		String prefix = context.getPrefix();
 		if (ruleCall.getRule().getName().equals(grammarAccess.getEntityRule().getName())) {
-			createProposals(modelHelper.entities(), prefix, context, acceptor);
+			createProposals(modelHelper.entities(), prefix, context, acceptor, false);
 		} else if (ruleCall.getRule().getName().equals(grammarAccess.getPropertyRefRule().getName())) {
 			EObject currentModel = context.getCurrentModel();
 			if (currentModel instanceof PropertyRef || currentModel instanceof Reference
 					|| currentModel instanceof ListElementReference || currentModel instanceof Constant) {
 				Property currentModelType = xtextModelHelper.resolveType(currentModel);
 				if (currentModelType != null) {
-					createProposals(modelHelper.properties(currentModelType), prefix, context, acceptor);
+					createProposals(modelHelper.properties(currentModelType), prefix, context, acceptor, false);
 					createFunctionProposals(modelHelper.getFunctionDescriptors(currentModelType), prefix, context,
-							acceptor);
+							acceptor, false);
 				}
 			} else {
 				LOGGER.error("Not covered in _createProposals(ruleCall): " + currentModel);
@@ -100,9 +100,9 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 				if (prefix != null && !prefix.isEmpty()) {
 					Property currentModelType = xtextModelHelper.resolveType(propRef.eContainer());
 					if (currentModelType != null) {
-						createProposals(modelHelper.properties(currentModelType), prefix, context, acceptor);
+						createProposals(modelHelper.properties(currentModelType), prefix, context, acceptor, true);
 						createFunctionProposals(modelHelper.getFunctionDescriptors(currentModelType), prefix, context,
-								acceptor);
+								acceptor, true);
 					}
 				}
 			}
@@ -148,15 +148,15 @@ public class DslContentProposalProvider extends IdeContentProposalProvider {
 	}
 
 	private void createProposals(List<Property> options, String prefix, ContentAssistContext context,
-			IIdeContentProposalAcceptor acceptor) {
-		boolean appendDot = prefix != null && prefix.startsWith(".");
+			IIdeContentProposalAcceptor acceptor, boolean skipDot) {
+		boolean appendDot = !skipDot && prefix != null && prefix.startsWith(".");
 		options.stream().forEach(n -> createProposal(appendDot ? ("." + n.getName()) : n.getName(), toDescription(n),
 				ContentAssistEntry.KIND_KEYWORD, context, acceptor));
 	}
 
 	private void createFunctionProposals(List<FunctionDescriptor> functionDescriptor, String prefix,
-			ContentAssistContext context, IIdeContentProposalAcceptor acceptor) {
-		boolean appendDot = true; // prefix != null && prefix.startsWith(".");
+			ContentAssistContext context, IIdeContentProposalAcceptor acceptor, boolean skipDot) {
+		boolean appendDot = !skipDot; // prefix != null && prefix.startsWith(".");
 
 		functionDescriptor.stream()
 				.forEach(functionDesc -> createProposal(
