@@ -38,7 +38,7 @@
 	}
 	
 	function saveRule() {
-		var path = '/api/rules';
+		var path = baseUrl + 'api/rules';
 		var method = 'POST';
 		if(currentRuleId) {
 			path += '/' + currentRuleId;
@@ -65,7 +65,7 @@
 	}
 	
 	function loadRulesList() {
-		fetch("/api/rules").then(async (response) => {
+		fetch(baseUrl + "api/rules").then(async (response) => {
 			if(response.ok) {
 				const rules = await response.json();
 				rules.sort((a,b) => b.priority - a.priority);
@@ -100,7 +100,7 @@
 	
 	function deleteRule(id) {
 		setStatus("deleting rule " + id + "...");
-		fetch("/api/rules/"+id, {method: 'DELETE'})
+		fetch(baseUrl + "api/rules/" + id, {method: 'DELETE'})
 		.then((response) => {
 			if (response.ok) {
 				setStatus("Delete success");
