@@ -6,9 +6,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -204,6 +206,28 @@ public class PerpetualMockeryFunctions {
 
 	public String toStringFromBool(Boolean val) {
 		return val != null ? val.toString() : null;
+	}
+
+	public List<String> split(String val, @FunctionParam("value") String regex) {
+		return Stream.of(val.split(regex)).collect(Collectors.toList());
+	}
+
+	public String decodeUrlBase64(String val) {
+		try {
+			return new String(Base64.getUrlDecoder().decode(val), StandardCharsets.UTF_8);
+		} catch (IllegalArgumentException iae) {
+			LOGGER.warn("Base64 decode error", iae);
+			return null;
+		}
+	}
+
+	public String decodeBase64(String val) {
+		try {
+			return new String(Base64.getDecoder().decode(val), StandardCharsets.UTF_8);
+		} catch (IllegalArgumentException iae) {
+			LOGGER.warn("Base64 decode error", iae);
+			return null;
+		}
 	}
 
 	public Long size(List<?> val) {
