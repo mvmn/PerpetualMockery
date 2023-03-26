@@ -13,6 +13,8 @@
 	<name>mvmn.permock.web</name>
 	<description>Perpetual Mockery Web</description>
 
+	<packaging>war</packaging>
+
 	<properties>
 		<java.version>1.8</java.version>
 		<m2e.apt.activation>jdt_apt</m2e.apt.activation>
@@ -22,6 +24,11 @@
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
+		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>mvmn.permock.dsl</artifactId>
@@ -136,6 +143,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>perpetual_mockery</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -185,6 +193,10 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.0.0-M7</version>
+			</plugin>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>3.3.2</version>	
 			</plugin>
 		</plugins>
 	</build>
